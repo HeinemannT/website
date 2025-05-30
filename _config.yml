@@ -3,15 +3,15 @@
 #google_analytics: UA-NNNNNNNN-N
 
 #header_pages:
-#  - index.md
-#  - about.md
+  - index.md
+  - about.md
 
 #footer:
 
 style: light
 
 #style: light # dark (default) or light
-#listen_for_clients_preferred_style: true # true or false (default)
+listen_for_clients_preferred_style: true # true or false (default)
 
 plugins:
   - jekyll-seo-tag

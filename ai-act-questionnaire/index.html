@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EU AI Act Interactive Guide</title>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Visualization & Content Choices:
-        - Home: Inviting intro, explains Act's complexity & overlapping risks, direct presentation of AI definition & inventory overview. Markdown bold replaced with <strong>.
+        - Home: Inviting intro, explains Act's complexity & overlapping risks, direct presentation of AI definition & inventory overview.
         - Risk Categories: Donut chart (init on tab view).
         - Full System Assessment: Multi-step questionnaire, role selection, Annex III details, early exits (Not AI, Prohibited), detailed role-based summary.
         - Roles & Responsibilities: Accordions for Provider, Deployer, etc.
@@ -18,10 +20,35 @@
         CONFIRMING NO SVG/Mermaid. -->
     <style>
         body {
-            font-family: 'Open Sans', sans-serif;
+            font-family: "Host Grotesk", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400; /* Default weight for body */
+            font-style: normal;
             background-color: #f8fafc; /* slate-50 */
             color: #1e293b; /* slate-800 */
         }
+        /* Raleway for specific elements */
+        h1.main-title { /* Specific class for the main page title to use Host Grotesk if body defaults to Raleway, or vice versa */
+             font-family: "Host Grotesk", sans-serif;
+             font-weight: 700; /* Bold for main title */
+        }
+
+        h2, h3, h4, h5, h6, .tab-button, 
+        .button-accent-primary, .button-accent-warning, .button-positive, .bg-slate-500,
+        .assessment-question-group p.font-medium, 
+        .assessment-question-group label, /* This targets the answer text */
+        #assessmentResultContent p.font-semibold, /* Summary headings */
+        .resource-card h3, 
+        .obligation-list h4,
+        .accordion-button .icon::before, 
+        .annex-iii-details strong, 
+        .obligation-list strong,
+        #mobile-nav, /* Ensure select dropdown uses Raleway */
+        .text-primary-heading, .text-warning-accent, .text-critical-accent, .text-positive-accent, .text-sky-500, .text-warning-message /* Utility text classes */
+         {
+            font-family: 'Raleway', sans-serif;
+        }
+
         .tab-button {
             color: #e2e8f0; /* slate-200 for inactive tabs on dark nav */
         }
@@ -148,14 +175,16 @@
             margin-bottom: 0.75rem; /* mb-3 */
         }
         .obligation-list li { margin-bottom: 0.5rem; }
-        .obligation-list strong { color: #001d3d; } /* Oxford Blue */
+        .obligation-list strong { 
+            color: #001d3d; /* Oxford Blue */
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
 
     <header class="header-bg-primary text-white shadow-md sticky top-0 z-50">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center">
-            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">EU AI Act Interactive Guide</h1>
+            <h1 class="main-title text-2xl sm:text-3xl font-bold tracking-tight">EU AI Act Interactive Guide</h1>
             <nav class="mt-3 sm:mt-0">
                 <select id="mobile-nav" class="lg:hidden nav-bg-secondary text-white p-2 rounded-md border border-slate-700 focus:ring-2 focus-ring-accent">
                     <option value="home">Home</option>
@@ -186,28 +215,28 @@
     <main class="container mx-auto p-4 sm:p-6 lg:p-8">
         <div id="home" class="content-section active">
             <h2 class="text-2xl font-semibold text-primary-heading mb-4">Getting to Grips with the EU AI Act</h2>
-            <p class="mb-4 text-lg">The EU's AI Act is here, and it's a big deal for anyone working with artificial intelligence. It's all about making AI safe, fair, and trustworthy. Sounds good, right? But let's be honest, new regulations can be a bit of a maze.</p>
-            <p class="mb-4">You've probably seen the AI Act described as a pyramid: some AI is banned (unacceptable risk), some is high-risk with lots of rules, then limited risk with transparency duties, and finally, minimal risk with fewer worries. That's a helpful starting point, but the truth is, it's not always that neat. Sometimes, an AI system might tick boxes in more than one category, or involve complex components like General Purpose AI models that have their own specific rules. It's like a puzzle where the pieces can overlap.</p>
-            <p class="mb-6">This guide is designed to help you make sense of it all. We'll break down the key ideas and point you to our assessment tool so you can start figuring out where your AI systems fit in.</p>
+            <p class="mb-4 text-lg leading-relaxed">The EU's AI Act is here, and it's a big deal for anyone working with artificial intelligence. It's all about making AI safe, fair, and trustworthy. Sounds good, right? But let's be honest, new regulations can be a bit of a maze.</p>
+            <p class="mb-4 leading-relaxed">You've probably seen the AI Act described as a pyramid: some AI is banned (unacceptable risk), some is high-risk with lots of rules, then limited risk with transparency duties, and finally, minimal risk with fewer worries. That's a helpful starting point, but the truth is, it's not always that neat. Sometimes, an AI system might tick boxes in more than one category, or involve complex components like General Purpose AI models that have their own specific rules. It's like a puzzle where the pieces can overlap.</p>
+            <p class="mb-6 leading-relaxed">This guide is designed to help you make sense of it all. We'll break down the key ideas and point you to our assessment tool so you can start figuring out where your AI systems fit in.</p>
             
             <div class="bg-white p-6 rounded-lg shadow mb-6">
                 <h3 class="text-xl font-semibold text-primary-heading mb-3">First Things First: Is It an "AI System"?</h3>
-                <p class="mb-2">Before diving into risks, you need to know if what you're working with is even considered an "AI system" by the Act. Article 3(1) defines it as: "a machine-based system that is designed to operate with varying levels of autonomy and that may exhibit adaptiveness after deployment, and that, for explicit or implicit objectives, infers, from the input it receives, how to generate outputs such as predictions, content, recommendations, or decisions”.</p>
+                <p class="mb-2 leading-relaxed">Before diving into risks, you need to know if what you're working with is even considered an "AI system" by the Act. Article 3(1) defines it as: "a machine-based system that is designed to operate with varying levels of autonomy and that may exhibit adaptiveness after deployment, and that, for explicit or implicit objectives, infers, from the input it receives, how to generate outputs such as predictions, content, recommendations, or decisions”.</p>
                 <h4 class="font-semibold mt-3 mb-1 text-slate-700">In simpler terms, look for:</h4>
-                <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm mb-3">
+                <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm mb-3 leading-relaxed">
                     <li>It's <strong>machine-based</strong> (hardware/software).</li>
                     <li>It has some <strong>autonomy</strong> (operates without constant human command).</li>
                     <li>It <strong>infers</strong> outputs (like predictions or decisions) from inputs.</li>
                     <li>It might be <strong>adaptive</strong> (learns over time), but this isn't a must.</li>
                 </ul>
-                <p class="mt-2 text-sm text-slate-500">The <strong>"intended purpose"</strong> – what you plan to use the AI for – is key for figuring out its risk level. Our <button onclick="navigateToTab('full-assessment')" class="text-primary-heading underline font-semibold">Tool: Full System Assessment</button> can help you with this.</p>
+                <p class="mt-2 text-sm text-slate-500 leading-relaxed">The <strong>"intended purpose"</strong> – what you plan to use the AI for – is key for figuring out its risk level. Our <button onclick="navigateToTab('full-assessment')" class="text-primary-heading underline font-semibold">Tool: Full System Assessment</button> can help you with this.</p>
             </div>
 
             <div class="bg-white p-6 rounded-lg shadow mb-6">
                 <h3 class="text-xl font-semibold text-primary-heading mb-3">Keeping Track: Your AI Asset Inventory</h3>
-                <p class="mb-2 text-sm">Think of an AI asset inventory as your central hub for AI Act compliance. It's not just a list; it's a living record that helps you manage risks and obligations.</p>
+                <p class="mb-2 text-sm leading-relaxed">Think of an AI asset inventory as your central hub for AI Act compliance. It's not just a list; it's a living record that helps you manage risks and obligations.</p>
                 <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Steps to Manage Your Inventory:</h4>
-                 <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
+                 <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm leading-relaxed">
                     <li>List all your potential AI systems.</li>
                     <li>Check if they fit the Act's definition of an "AI System."</li>
                     <li>Clearly define the "Intended Purpose(s)" for each.</li>
@@ -215,9 +244,9 @@
                     <li>Document why you classified it that way and what rules apply.</li>
                     <li>Review and update regularly, especially if things change.</li>
                 </ul>
-                 <p class="mt-2 text-sm text-slate-500">For more on risk levels and specific duties, check out the <button onclick="navigateToTab('risk-categories')" class="text-primary-heading underline font-semibold">Guide: Risk Categories</button> and <button onclick="navigateToTab('high-risk-obligations')" class="text-primary-heading underline font-semibold">Guide: High-Risk Obligations</button>.</p>
+                 <p class="mt-2 text-sm text-slate-500 leading-relaxed">For more on risk levels and specific duties, check out the <button onclick="navigateToTab('risk-categories')" class="text-primary-heading underline font-semibold">Guide: Risk Categories</button> and <button onclick="navigateToTab('high-risk-obligations')" class="text-primary-heading underline font-semibold">Guide: High-Risk Obligations</button>.</p>
             </div>
-            <p class="mt-6">Ready to dive deeper? Use the tabs above to explore specific topics or head straight to the assessment tool.</p>
+            <p class="mt-6 leading-relaxed">Ready to dive deeper? Use the tabs above to explore specific topics or head straight to the assessment tool.</p>
         </div>
 
         <div id="roles-responsibilities" class="content-section">
@@ -670,8 +699,8 @@
                     options: {
                         responsive: true, maintainAspectRatio: false,
                         plugins: {
-                            legend: { position: 'bottom', labels: { font: { size: 10, family: 'Open Sans' }, padding: 10 }},
-                            title: { display: true, text: 'Conceptual AI Risk Distribution', font: { size: 14, family: 'Open Sans' }, padding: { bottom:15 } },
+                            legend: { position: 'bottom', labels: { font: { size: 10, family: 'Raleway' }, padding: 10 }},
+                            title: { display: true, text: 'Conceptual AI Risk Distribution', font: { size: 14, family: 'Raleway' }, padding: { bottom:15 } },
                             tooltip: { callbacks: { label: function(context) {
                                 let label = context.label || ''; if (label) { label += ': '; }
                                 if (context.parsed !== null) { label += context.parsed + '%'; } return label;
@@ -853,8 +882,8 @@
                         options: {
                             responsive: true, maintainAspectRatio: false,
                             plugins: {
-                                legend: { position: 'bottom', labels: { font: { size: 10, family: 'Open Sans' }, padding: 10 }},
-                                title: { display: true, text: 'Conceptual AI Risk Distribution', font: { size: 14, family: 'Open Sans' }, padding: { bottom:15 } },
+                                legend: { position: 'bottom', labels: { font: { size: 10, family: 'Raleway' }, padding: 10 }},
+                                title: { display: true, text: 'Conceptual AI Risk Distribution', font: { size: 14, family: 'Raleway' }, padding: { bottom:15 } },
                                 tooltip: { callbacks: { label: function(context) {
                                     let label = context.label || ''; if (label) { label += ': '; }
                                     if (context.parsed !== null) { label += context.parsed + '%'; } return label;

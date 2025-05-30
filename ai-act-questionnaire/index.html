@@ -8,12 +8,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Visualization & Content Choices:
-        - Report Info: AI System Definition (Art 3(1)) -> Goal: Understand -> Presentation: Text + Interactive Checklist -> Interaction: User answers questions -> Justification: Clarify complex definition -> Method: HTML/JS.
-        - Report Info: Risk Categories (Prohibited, High, Limited, Minimal) -> Goal: Compare/Understand -> Presentation: Tabbed sections with details, illustrative donut chart for distribution -> Interaction: Click tabs, view charts -> Justification: Easy comparison, visual summary -> Method: HTML/JS, Chart.js (chart init on tab view).
-        - Report Info: Annex III Derogation -> Goal: Assess -> Presentation: Guided question flow (profiling check first) -> Interaction: User answers Yes/No -> Justification: Simplify complex decision -> Method: HTML/JS.
-        - Report Info: Full System Classification -> Goal: Assess/Guide -> Presentation: Multi-step interactive questionnaire with role selection, full Annex III details & improved result justification (including open-source system note) -> Interaction: User answers series of questions, receives summary -> Justification: Comprehensive self-assessment for risk level -> Method: HTML/JS.
-        - Report Info: Roles & Responsibilities -> Goal: Inform -> Presentation: Text descriptions for Provider, Deployer, Importer, Distributor -> Interaction: Read -> Justification: Clarify stakeholder duties -> Method: HTML.
-        - Report Info: Resources & Timelines -> Goal: Inform -> Presentation: Card-like layout for definitions and timelines -> Interaction: Read -> Justification: Enhanced visual presentation -> Method: HTML/Tailwind.
+        - Home: Inviting intro, explains Act's complexity & overlapping risks, direct presentation of AI definition & inventory overview. Markdown bold replaced with <strong>.
+        - Risk Categories: Donut chart (init on tab view).
+        - Full System Assessment: Multi-step questionnaire, role selection, Annex III details, early exits (Not AI, Prohibited), detailed role-based summary.
+        - Roles & Responsibilities: Accordions for Provider, Deployer, etc.
+        - High-Risk AI Obligations: Detailed accordions.
+        - GPAI Models: Detailed accordions.
+        - Resources & Timelines: Card layout.
         CONFIRMING NO SVG/Mermaid. -->
     <style>
         body {
@@ -146,6 +147,8 @@
             color: #003566; /* Yale Blue */
             margin-bottom: 0.75rem; /* mb-3 */
         }
+        .obligation-list li { margin-bottom: 0.5rem; }
+        .obligation-list strong { color: #001d3d; } /* Oxford Blue */
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -155,13 +158,12 @@
             <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">EU AI Act Interactive Guide</h1>
             <nav class="mt-3 sm:mt-0">
                 <select id="mobile-nav" class="lg:hidden nav-bg-secondary text-white p-2 rounded-md border border-slate-700 focus:ring-2 focus-ring-accent">
-                    <option value="home">Guide: Home & AI Definition</option>
-                    <option value="roles-responsibilities">Guide: Roles & Responsibilities</option>
+                    <option value="home">Home</option>
                     <option value="full-assessment">Tool: Full System Assessment</option>
+                    <option value="roles-responsibilities">Guide: Roles & Responsibilities</option>
                     <option value="risk-categories">Guide: Risk Categories</option>
-                    <option value="high-risk-deep-dive">Guide: High-Risk AI</option>
+                    <option value="high-risk-obligations">Guide: High-Risk Obligations</option>
                     <option value="gpai">Guide: GPAI Models</option>
-                    <option value="inventory-compliance">Guide: Inventory & Compliance</option>
                     <option value="resources">Guide: Resources & Timelines</option>
                 </select>
             </nav>
@@ -169,13 +171,12 @@
         <div class="hidden lg:block nav-bg-secondary">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div id="desktop-nav" class="flex space-x-1 items-center justify-center flex-wrap">
-                    <button data-tab="home" class="tab-button active text-sm font-medium py-3 px-3 sm:px-4 border-b-2 transition-colors duration-150">Guide: Home & AI Definition</button>
-                    <button data-tab="roles-responsibilities" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: Roles & Responsibilities</button>
+                    <button data-tab="home" class="tab-button active text-sm font-medium py-3 px-3 sm:px-4 border-b-2 transition-colors duration-150">Home</button>
                     <button data-tab="full-assessment" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Tool: Full System Assessment</button>
+                    <button data-tab="roles-responsibilities" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: Roles & Responsibilities</button>
                     <button data-tab="risk-categories" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: Risk Categories</button>
-                    <button data-tab="high-risk-deep-dive" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: High-Risk AI</button>
+                    <button data-tab="high-risk-obligations" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: High-Risk Obligations</button>
                     <button data-tab="gpai" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: GPAI Models</button>
-                    <button data-tab="inventory-compliance" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: Inventory & Compliance</button>
                     <button data-tab="resources" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: Resources & Timelines</button>
                 </div>
             </div>
@@ -184,45 +185,39 @@
 
     <main class="container mx-auto p-4 sm:p-6 lg:p-8">
         <div id="home" class="content-section active">
-            <h2 class="text-2xl font-semibold text-primary-heading mb-4">Welcome to the EU AI Act Interactive Guide</h2>
-            <p class="mb-4">The European Union's Artificial Intelligence Act (EU AI Act) establishes a harmonized regulatory framework for AI. This guide helps you understand its key provisions, classify AI systems, and identify obligations.</p>
-            <p class="mb-6">The Act aims to ensure AI systems are safe, transparent, traceable, non-discriminatory, and trustworthy, while fostering innovation and protecting fundamental rights.</p>
+            <h2 class="text-2xl font-semibold text-primary-heading mb-4">Getting to Grips with the EU AI Act</h2>
+            <p class="mb-4 text-lg">The EU's AI Act is here, and it's a big deal for anyone working with artificial intelligence. It's all about making AI safe, fair, and trustworthy. Sounds good, right? But let's be honest, new regulations can be a bit of a maze.</p>
+            <p class="mb-4">You've probably seen the AI Act described as a pyramid: some AI is banned (unacceptable risk), some is high-risk with lots of rules, then limited risk with transparency duties, and finally, minimal risk with fewer worries. That's a helpful starting point, but the truth is, it's not always that neat. Sometimes, an AI system might tick boxes in more than one category, or involve complex components like General Purpose AI models that have their own specific rules. It's like a puzzle where the pieces can overlap.</p>
+            <p class="mb-6">This guide is designed to help you make sense of it all. We'll break down the key ideas and point you to our assessment tool so you can start figuring out where your AI systems fit in.</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3">First Things First: Is It an "AI System"?</h3>
+                <p class="mb-2">Before diving into risks, you need to know if what you're working with is even considered an "AI system" by the Act. Article 3(1) defines it as: "a machine-based system that is designed to operate with varying levels of autonomy and that may exhibit adaptiveness after deployment, and that, for explicit or implicit objectives, infers, from the input it receives, how to generate outputs such as predictions, content, recommendations, or decisions”.</p>
+                <h4 class="font-semibold mt-3 mb-1 text-slate-700">In simpler terms, look for:</h4>
+                <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm mb-3">
+                    <li>It's <strong>machine-based</strong> (hardware/software).</li>
+                    <li>It has some <strong>autonomy</strong> (operates without constant human command).</li>
+                    <li>It <strong>infers</strong> outputs (like predictions or decisions) from inputs.</li>
+                    <li>It might be <strong>adaptive</strong> (learns over time), but this isn't a must.</li>
+                </ul>
+                <p class="mt-2 text-sm text-slate-500">The <strong>"intended purpose"</strong> – what you plan to use the AI for – is key for figuring out its risk level. Our <button onclick="navigateToTab('full-assessment')" class="text-primary-heading underline font-semibold">Tool: Full System Assessment</button> can help you with this.</p>
+            </div>
 
             <div class="bg-white p-6 rounded-lg shadow mb-6">
-                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>What is an "AI System" under the EU AI Act?</span><span class="icon"></span></h3>
-                <div class="accordion-content">
-                    <p class="mb-2"><strong>Official Definition (Article 3(1)):</strong> "a machine-based system that is designed to operate with varying levels of autonomy and that may exhibit adaptiveness after deployment, and that, for explicit or implicit objectives, infers, from the input it receives, how to generate outputs such as predictions, content, recommendations, or decisions”.</p>
-                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Components:</h4>
-                    <ul class="list-disc list-inside space-y-1 text-slate-600 mb-3">
-                        <li><strong>Machine-based system:</strong> Hardware and software integration, computationally driven.</li>
-                        <li><strong>Autonomy:</strong> Some degree of independence from human involvement.</li>
-                        <li><strong>Adaptiveness (Optional):</strong> Self-learning capabilities after deployment. Not mandatory to be an AI system.</li>
-                        <li><strong>Objectives (Explicit or Implicit):</strong> Internal goals the system is designed to achieve.</li>
-                        <li><strong>Inference:</strong> Core ability to generate outputs from inputs to achieve objectives.</li>
-                    </ul>
-                </div>
+                <h3 class="text-xl font-semibold text-primary-heading mb-3">Keeping Track: Your AI Asset Inventory</h3>
+                <p class="mb-2 text-sm">Think of an AI asset inventory as your central hub for AI Act compliance. It's not just a list; it's a living record that helps you manage risks and obligations.</p>
+                <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Steps to Manage Your Inventory:</h4>
+                 <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
+                    <li>List all your potential AI systems.</li>
+                    <li>Check if they fit the Act's definition of an "AI System."</li>
+                    <li>Clearly define the "Intended Purpose(s)" for each.</li>
+                    <li>Classify each system (Prohibited, High, Limited, Minimal Risk) – our <button onclick="navigateToTab('full-assessment')" class="text-primary-heading underline font-semibold">Assessment Tool</button> is designed for this.</li>
+                    <li>Document why you classified it that way and what rules apply.</li>
+                    <li>Review and update regularly, especially if things change.</li>
+                </ul>
+                 <p class="mt-2 text-sm text-slate-500">For more on risk levels and specific duties, check out the <button onclick="navigateToTab('risk-categories')" class="text-primary-heading underline font-semibold">Guide: Risk Categories</button> and <button onclick="navigateToTab('high-risk-obligations')" class="text-primary-heading underline font-semibold">Guide: High-Risk Obligations</button>.</p>
             </div>
-
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h3 class="text-xl font-semibold text-primary-heading mb-3">Quick Check: Is it an AI System?</h3>
-                <p class="mb-4 text-sm text-slate-600">Answer the following questions based on the Article 3(1) definition to get a preliminary idea. This is not a definitive legal assessment.</p>
-                <div id="aiDefinitionChecklist">
-                    <div class="mb-3">
-                        <label class="block text-slate-700"><input type="checkbox" data-criterion="machine_based" class="mr-2 rounded border-slate-400 input-focus-accent"> Is it a machine-based system (hardware/software)?</label>
-                    </div>
-                    <div class="mb-3">
-                        <label class="block text-slate-700"><input type="checkbox" data-criterion="autonomy" class="mr-2 rounded border-slate-400 input-focus-accent"> Does it operate with some level of autonomy?</label>
-                    </div>
-                    <div class="mb-3">
-                        <label class="block text-slate-700"><input type="checkbox" data-criterion="inference" class="mr-2 rounded border-slate-400 input-focus-accent"> Does it infer how to generate outputs?</label>
-                    </div>
-                     <div class="mb-3">
-                        <label class="block text-slate-700"><input type="checkbox" data-criterion="adaptiveness_optional" class="mr-2 rounded border-slate-400 input-focus-accent"> (Optional) May it exhibit adaptiveness after deployment?</label>
-                    </div>
-                </div>
-                <button id="checkAiSystemButton" class="mt-4 button-accent-primary px-4 py-2 rounded-md transition duration-150">Check Preliminary Status</button>
-                <p id="aiSystemResult" class="mt-3 font-semibold"></p>
-            </div>
+            <p class="mt-6">Ready to dive deeper? Use the tabs above to explore specific topics or head straight to the assessment tool.</p>
         </div>
 
         <div id="roles-responsibilities" class="content-section">
@@ -232,13 +227,10 @@
             <div class="bg-white p-6 rounded-lg shadow mb-6">
                 <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Provider</span><span class="icon"></span></h3>
                 <div class="accordion-content">
-                    <p class="mb-2"><strong>Definition (Art. 3(2)):</strong> A 'provider' is a natural or legal person, public authority, agency or other body that develops an AI system or that has an AI system developed and places that system on the market or puts it into service under its own name or trademark, whether for payment or free of charge.</p>
-                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Responsibilities (especially for High-Risk AI):</h4>
+                    <p class="mb-2"><strong>Definition (Art. 3(2)):</strong> Develops an AI system or has one developed and places it on the market/service under its own name/trademark.</p>
+                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Responsibilities:</h4>
                     <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
-                        <li>Ensuring compliance with the Act when placing AI on the market or putting it into service.</li>
-                        <li>Conducting conformity assessments & drawing up technical documentation.</li>
-                        <li>Implementing quality and risk management systems.</li>
-                        <li>Registering high-risk AI systems & post-market monitoring.</li>
+                        <li>Ensuring compliance, conformity assessments, technical documentation, QMS, registration, PMS.</li>
                     </ul>
                 </div>
             </div>
@@ -246,12 +238,10 @@
             <div class="bg-white p-6 rounded-lg shadow mb-6">
                 <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Deployer</span><span class="icon"></span></h3>
                 <div class="accordion-content">
-                    <p class="mb-2"><strong>Definition (Art. 3(4)):</strong> A 'deployer' is any natural or legal person, public authority, agency or other body using an AI system under its authority, except where the AI system is used in the course of a personal non-professional activity.</p>
-                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Responsibilities (especially for High-Risk AI - Art. 26):</h4>
+                    <p class="mb-2"><strong>Definition (Art. 3(4)):</strong> Uses an AI system under its authority (except personal non-professional use).</p>
+                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Responsibilities (High-Risk AI - Art. 26):</h4>
                     <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
-                        <li>Using AI systems per instructions & ensuring relevant input data.</li>
-                        <li>Monitoring operation, keeping logs, and ensuring human oversight.</li>
-                        <li>Potentially conducting a Fundamental Rights Impact Assessment (FRIA) for certain Annex III systems.</li>
+                        <li>Use per instructions, ensure relevant input data, monitor, keep logs, human oversight, potential FRIA.</li>
                     </ul>
                 </div>
             </div>
@@ -259,12 +249,10 @@
             <div class="bg-white p-6 rounded-lg shadow mb-6">
                 <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Importer</span><span class="icon"></span></h3>
                 <div class="accordion-content">
-                    <p class="mb-2"><strong>Definition (Art. 3(5)):</strong> An 'importer' is any natural or legal person located or established in the Union that places on the market an AI system that bears the name or trademark of a natural or legal person established outside the Union.</p>
+                    <p class="mb-2"><strong>Definition (Art. 3(5)):</strong> Places an AI system from outside the EU on the market.</p>
                     <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Responsibilities (Art. 23):</h4>
                     <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
-                        <li>Ensuring the non-EU provider has completed conformity assessment & technical documentation.</li>
-                        <li>Verifying CE marking and required documentation.</li>
-                        <li>Indicating their contact details on the system/documentation.</li>
+                        <li>Ensure non-EU provider completed conformity & docs, verify CE mark, indicate contact details.</li>
                     </ul>
                 </div>
             </div>
@@ -272,12 +260,10 @@
              <div class="bg-white p-6 rounded-lg shadow mb-6">
                 <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Distributor</span><span class="icon"></span></h3>
                 <div class="accordion-content">
-                    <p class="mb-2"><strong>Definition (Art. 3(6)):</strong> A 'distributor' is any natural or legal person in the supply chain, other than the provider or the importer, that makes an AI system available on the Union market.</p>
+                    <p class="mb-2"><strong>Definition (Art. 3(6)):</strong> Makes an AI system available on the market (not provider/importer).</p>
                     <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Responsibilities (Art. 24):</h4>
                     <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
-                        <li>Verifying CE marking and required documentation.</li>
-                        <li>Ensuring provider and importer (if any) have met their obligations.</li>
-                        <li>Not making non-conforming systems available.</li>
+                        <li>Verify CE mark & docs, ensure provider/importer compliance, don't make non-conforming systems available.</li>
                     </ul>
                 </div>
             </div>
@@ -301,7 +287,7 @@
                             <label class="block"><input type="radio" name="q0_1_user_role" value="Other" class="mr-2 input-focus-accent"> Other / Unsure</label>
                         </div>
                     </div>
-                    <button id="startAssessmentBtn" data-next="assessment-step-1-definition" class="assessment-next-btn button-accent-primary px-6 py-2 rounded-md transition duration-150">Start Assessment</button>
+                    <button data-next="assessment-step-1-definition" class="assessment-next-btn button-accent-primary px-6 py-2 rounded-md transition duration-150">Start Assessment</button>
                 </div>
 
                 <div id="assessment-step-1-definition" class="assessment-step">
@@ -337,7 +323,7 @@
                         <label class="block"><input type="checkbox" name="q2_prohibited" value="biometric_categorization_sensitive" class="mr-2 input-focus-accent"> Biometric categorization on sensitive attributes.</label>
                         <label class="block"><input type="checkbox" name="q2_prohibited" value="risk_assessment_criminal_profiling" class="mr-2 input-focus-accent"> Crime risk assessment (solely profiling).</label>
                     </div>
-                    <button data-next="assessment-step-3-highrisk-pathway" class="assessment-next-btn button-accent-primary px-4 py-2 rounded-md">Next</button>
+                    <button data-next="assessment-step-3-highrisk-pathway" id="nextFromProhibited" class="assessment-next-btn button-accent-primary px-4 py-2 rounded-md">Next</button>
                 </div>
 
                 <div id="assessment-step-3-highrisk-pathway" class="assessment-step">
@@ -451,7 +437,7 @@
                      <div class="accordion-content">
                         <p class="mb-2">Systems that can adversely impact safety or fundamental rights (Article 6). Permitted but subject to stringent requirements.</p>
                         <p class="font-semibold text-sm mt-1">Inventory State: <code class="bg-orange-100 text-warning-accent px-1 rounded">Potentially High-Risk</code></p>
-                        <button onclick="navigateToTab('high-risk-deep-dive')" class="mt-3 text-sm text-primary-heading hover:underline font-medium">Learn more about High-Risk AI &raquo;</button>
+                        <button onclick="navigateToTab('high-risk-obligations')" class="mt-3 text-sm text-primary-heading hover:underline font-medium">Learn more about High-Risk AI Obligations &raquo;</button>
                     </div>
                 </div>
 
@@ -473,90 +459,129 @@
             </div>
         </div>
 
-        <div id="high-risk-deep-dive" class="content-section">
-            <h2 class="text-2xl font-semibold text-primary-heading mb-4">Guide: High-Risk AI Systems In-Depth</h2>
-             <div class="bg-white p-6 rounded-lg shadow mb-6">
-                <h3 class="text-xl font-semibold text-warning-accent mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Annex III Derogation Assessment (Tool)</span><span class="icon"></span></h3>
-                <div class="accordion-content">
-                    <p class="mb-3 text-sm">An Annex III system is NOT high-risk if it doesn't pose significant harm and fulfills specific conditions. Does NOT apply if it performs "profiling".</p>
-                    <div id="derogationAssessmentTool">
-                        <div class="mb-3 p-3 border border-slate-200 rounded-md">
-                            <p class="font-medium text-slate-700 mb-1">1. Does the Annex III system perform "profiling"?</p>
-                            <label class="mr-4"><input type="radio" name="profiling" value="yes" class="mr-1 input-focus-accent"> Yes</label>
-                            <label><input type="radio" name="profiling" value="no" class="mr-1 input-focus-accent"> No</label>
-                        </div>
-                        <div id="derogationQ2" class="mb-3 p-3 border border-slate-200 rounded-md hidden">
-                            <p class="font-medium text-slate-700 mb-1">2. Does it pose significant risk of harm?</p>
-                            <label class="mr-4"><input type="radio" name="significant_harm" value="yes" class="mr-1 input-focus-accent"> Yes</label>
-                            <label><input type="radio" name="significant_harm" value="no" class="mr-1 input-focus-accent"> No</label>
-                        </div>
-                        <div id="derogationQ3" class="mb-3 p-3 border border-slate-200 rounded-md hidden">
-                            <p class="font-medium text-slate-700 mb-1">3. Does it fulfill one of the derogation conditions?</p>
-                            <ul class="list-none space-y-1 text-sm mt-1">
-                                <li><label><input type="checkbox" name="derogation_condition" value="narrow_procedural" class="mr-2 input-focus-accent"> Narrow procedural task.</label></li>
-                                <li><label><input type="checkbox" name="derogation_condition" value="improve_human" class="mr-2 input-focus-accent"> Improves prior human activity.</label></li>
-                                <li><label><input type="checkbox" name="derogation_condition" value="detect_patterns" class="mr-2 input-focus-accent"> Detects patterns (no influence w/o review).</label></li>
-                                <li><label><input type="checkbox" name="derogation_condition" value="preparatory_task" class="mr-2 input-focus-accent"> Preparatory task.</label></li>
-                            </ul>
-                        </div>
-                        <button id="assessDerogationButton" class="mt-4 button-accent-warning px-4 py-2 rounded-md transition duration-150">Assess Derogation Status</button>
-                        <p id="derogationResult" class="mt-3 font-semibold"></p>
-                    </div>
+        <div id="high-risk-obligations" class="content-section"> 
+            <h2 class="text-2xl font-semibold text-primary-heading mb-4">Guide: High-Risk AI System Obligations (Provider Focus)</h2>
+            <p class="mb-6">Providers of High-Risk AI systems face significant obligations under Chapter III of the EU AI Act. This section outlines key requirements. Deployers also have specific duties (Art. 26), detailed further in the "Roles & Responsibilities" guide.</p>
+            <div class="space-y-4 obligation-list">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Risk Management System (Art. 9)</strong></h4>
+                    <p class="text-sm text-slate-600">Establish, implement, document, and maintain a continuous, iterative risk management system throughout the AI system's entire lifecycle. This includes identification, estimation, evaluation of risks, and adoption of risk mitigation measures.</p>
                 </div>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow mb-6">
-                 <h3 class="text-xl font-semibold text-warning-accent mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Key Obligations for High-Risk AI Systems (Provider Focus)</span><span class="icon"></span></h3>
-                <div class="accordion-content">
-                    <p class="mb-3 text-sm">High-Risk AI systems are subject to a comprehensive set of requirements.</p>
-                    <ul class="space-y-2 text-sm">
-                        <li>Risk Management System, Data Governance, Technical Documentation, Record-Keeping, Transparency, Human Oversight, Accuracy/Robustness/Cybersecurity, QMS, Conformity Assessment, Registration, Post-Market Monitoring, Incident Reporting.</li>
-                    </ul>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Data and Data Governance (Art. 10)</strong></h4>
+                    <p class="text-sm text-slate-600">Implement appropriate data governance and management practices for training, validation, and testing data sets. Ensure data is relevant, representative, free of errors, complete, and has the appropriate statistical properties. Address possible biases.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Technical Documentation (Art. 11 & Annex IV)</strong></h4>
+                    <p class="text-sm text-slate-600">Prepare and maintain extensive technical documentation <strong>before</strong> market placement. This must demonstrate compliance and include system description, capabilities, limitations, algorithms, data, training/testing/validation procedures, risk management, instructions for use, and PMS plan.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Record-Keeping (Logs) (Art. 12)</strong></h4>
+                    <p class="text-sm text-slate-600">Design systems for automatic, traceable, secure, and robust logging of operations relevant for risk identification, monitoring, and post-market surveillance.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Transparency & Info to Deployers (Art. 13)</strong></h4>
+                    <p class="text-sm text-slate-600">Provide clear, concise, and comprehensive instructions for use, covering identity, intended purpose, capabilities, limitations, accuracy, robustness, cybersecurity, human oversight measures, computational resources, expected lifetime, and maintenance.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Human Oversight (Art. 14)</strong></h4>
+                    <p class="text-sm text-slate-600">Design systems for effective human oversight, allowing intervention, disregard, or override of outputs. Measures should be proportionate to risks.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Accuracy, Robustness, and Cybersecurity (Art. 15)</strong></h4>
+                    <p class="text-sm text-slate-600">Ensure appropriate levels throughout the lifecycle. Systems must be resilient to errors, faults, inconsistencies, and attempts to alter use or behavior. Implement cybersecurity measures.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Quality Management System (Art. 17)</strong></h4>
+                    <p class="text-sm text-slate-600">Implement a QMS ensuring compliance with the Act, covering strategy, design controls, testing, post-market monitoring, incident reporting, and accountability.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Conformity Assessment (Art. 43)</strong></h4>
+                    <p class="text-sm text-slate-600">Undergo the relevant conformity assessment procedure before market placement and for substantial modifications. This may involve internal controls or a Notified Body, depending on the system.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Registration (Art. 49)</strong></h4>
+                    <p class="text-sm text-slate-600">Providers must register their high-risk AI systems in a publicly accessible EU database before placing them on the market or putting them into service.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Post-Market Monitoring (PMS) (Art. 72)</strong></h4>
+                    <p class="text-sm text-slate-600">Establish and document a PMS system to proactively collect, document, and analyze data on the performance of high-risk AI systems throughout their lifetime, and take corrective actions if necessary.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-primary-heading"><strong>Serious Incident Reporting (Art. 73)</strong></h4>
+                    <p class="text-sm text-slate-600">Report any serious incidents and any malfunctioning of AI systems that might lead to such incidents to the relevant national competent authorities.</p>
                 </div>
             </div>
         </div>
 
         <div id="gpai" class="content-section">
             <h2 class="text-2xl font-semibold text-primary-heading mb-4">Guide: General Purpose AI (GPAI) Models</h2>
-            <p class="mb-4">Overview of General Purpose AI (GPAI) models under the EU AI Act.</p>
-            <div class="bg-white p-6 rounded-lg shadow mb-6">
-                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Defining GPAI Models</span><span class="icon"></span></h3>
-                <div class="accordion-content">
-                    <p class="mb-2">GPAI models display significant generality, perform a wide range of tasks, and can be integrated into various downstream systems.</p>
-                </div>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow mb-6">
-                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Obligations for GPAI Providers</span><span class="icon"></span></h3>
-                <div class="accordion-content">
-                     <p class="mb-2 text-sm">Include technical documentation, copyright policy, training data summary.</p>
-                </div>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow mb-6">
-                <h3 class="text-xl font-semibold text-critical-accent mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>GPAI Models with Systemic Risk</span><span class="icon"></span></h3>
-                <div class="accordion-content">
-                    <p class="mb-2">Models with "high-impact capabilities" (e.g., >$10^{25}$ FLOPs) face stricter obligations: model evaluations, risk mitigation, incident reporting, cybersecurity.</p>
-                </div>
-            </div>
-        </div>
+            <p class="mb-4">This section provides a detailed overview of General Purpose AI (GPAI) models as defined and regulated by the EU AI Act. Understanding these provisions is crucial if your organization develops, provides, or integrates GPAI models.</p>
 
-        <div id="inventory-compliance" class="content-section">
-            <h2 class="text-2xl font-semibold text-primary-heading mb-4">Guide: AI Asset Inventory & Ongoing Compliance</h2>
-            <p class="mb-4">A dynamic AI asset inventory is crucial for EU AI Act compliance.</p>
             <div class="bg-white p-6 rounded-lg shadow mb-6">
-                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Input Criteria for Assessment</span><span class="icon"></span></h3>
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Defining GPAI Models (Article 3(63))</span><span class="icon"></span></h3>
                 <div class="accordion-content">
-                    <p class="mb-3 text-sm">Key details: AI System (Y/N), Intended Purpose, Annex I/III Listing, Profiling, Significant Harm, Nature of Task (for derogation).</p>
+                    <p class="mb-2">A GPAI model is defined as "an AI model, including where such an AI model is trained with a large amount of data using self-supervision at scale, that displays significant generality and is capable of competently performing a wide range of distinct tasks regardless of the way the model is placed on the market and that can be integrated into a variety of downstream systems or applications."</p>
+                    <p class="mt-2 text-sm text-slate-600">These are foundational components, like large language or image generation models, designed for broad applicability. <strong>"Significant generality"</strong> is a key characteristic.</p>
                 </div>
             </div>
+
             <div class="bg-white p-6 rounded-lg shadow mb-6">
-                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Output Classifications & Actions</span><span class="icon"></span></h3>
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Obligations for ALL Providers of GPAI Models (Article 53)</span><span class="icon"></span></h3>
                 <div class="accordion-content">
-                    <ul class="space-y-1 text-slate-600 text-sm">
-                        <li><strong class="text-critical-accent">Prohibited:</strong> Cease.</li>
-                        <li><strong class="text-warning-accent">High-Risk:</strong> Full compliance.</li>
-                        <li><strong class="text-orange-500">Not High-Risk (Derogation):</strong> Document & register.</li>
-                        <li><strong class="text-sky-600">Limited Risk:</strong> Transparency.</li>
-                        <li><strong class="text-positive-accent">Minimal Risk:</strong> Monitor.</li>
+                     <p class="mb-2 text-sm">These baseline obligations apply from August 2, 2025, to all GPAI model providers:</p>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
+                        <li><strong>Technical Documentation:</strong> Draw up and maintain up-to-date technical documentation (Art. 53(1)(a) & (b)). This must contain information for downstream providers to understand the GPAI model's capabilities, limitations, and comply with their own AI Act obligations. It must be provided to the AI Office, national authorities on request, and downstream providers.</li>
+                        <li><strong>Copyright Policy (Art. 53(1)(c)):</strong> Implement a policy to respect Union copyright law, particularly identifying and respecting reservations of rights under Article 4(3) of the Copyright Directive (EU) 2019/790.</li>
+                        <li><strong>Training Data Summary (Art. 53(1)(d)):</strong> Prepare and make publicly available a "sufficiently detailed summary" of the content used for training the GPAI model.</li>
                     </ul>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-critical-accent mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>GPAI Models with Systemic Risk (Articles 51, 52, 55 & Annex XIII)</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-2">GPAI models with <strong>"high-impact capabilities"</strong> are deemed to pose systemic risks and face more stringent obligations.</p>
+                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Classification Criteria (Article 51):</h4>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm mb-2">
+                        <li><strong>Presumption by FLOPs:</strong> A model is presumed to have systemic risk if the cumulative amount of computation used for its training (measured in floating-point operations - FLOPs) is greater than $10^{25}$. The Commission can update this threshold.</li>
+                        <li><strong>Commission Designation:</strong> The Commission can designate other GPAI models as systemic risk based on criteria in Annex XIII, such as:
+                            <ul>
+                                <li>High number of parameters.</li>
+                                <li>High number of registered users or business users.</li>
+                                <li>Input and output modalities (e.g., text, image, speech, structured data).</li>
+                                <li>Perceived or actual level of autonomy and sophistication.</li>
+                                <li>Degree of scalability in terms of users or tasks.</li>
+                                <li>Access to tools (e.g., internet access, ability to call APIs).</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Provider Notification (Article 52(1)):</h4>
+                     <p class="text-sm text-slate-600 mb-2">Providers must notify the Commission within two weeks if their GPAI model meets the systemic risk criteria (e.g., exceeds FLOPs threshold or they anticipate it will).</p>
+                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Additional Obligations for Systemic Risk GPAI Providers (Article 55):</h4>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
+                        <li><strong>Model Evaluations:</strong> Perform and document model evaluations, including adversarial testing, to identify and assess systemic risks.</li>
+                        <li><strong>Systemic Risk Assessment & Mitigation:</strong> Assess and mitigate possible systemic risks (e.g., to public health, safety, fundamental rights, society) throughout the model's lifecycle.</li>
+                        <li><strong>Serious Incident Reporting:</strong> Track, document, and report serious incidents and corrective measures to the AI Office and national authorities.</li>
+                        <li><strong>Cybersecurity Protection:</strong> Ensure adequate cybersecurity for the model and its physical infrastructure.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Open-Source GPAI Models (Article 53(2))</span><span class="icon"></span></h3>
+                 <div class="accordion-content">
+                    <p class="mb-2 text-sm text-slate-600">Providers of GPAI models released under a free and open-source license that allows access, use, modification, and distribution of the model are exempt from certain obligations under Art. 53(1)(a) (technical documentation to AI Office/authorities) and Art. 53(1)(b) (technical documentation to downstream providers), provided the model's parameters, architecture, and usage information are publicly available.</p>
+                    <p class="mt-1 text-sm text-slate-600 font-semibold">However, this exemption does NOT apply to GPAI models with systemic risk. Systemic risk GPAI models must comply with all obligations, regardless of their open-source status.</p>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Interaction with AI System Rules & Fine-tuning</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-2 text-sm text-slate-600">A GPAI model is a component. An AI <strong>system</strong> incorporating it still needs its own risk classification (Prohibited, High, Limited, Minimal) based on its specific intended purpose.</p>
+                    <p class="mt-1 text-sm text-slate-600">If an organization develops a high-risk AI system that integrates a systemic risk GPAI model they also developed, they face compounded compliance burdens (Chapter III for the system + Art. 53 & 55 for the model).</p>
+                    <p class="mt-1 text-sm text-slate-600">Entities fine-tuning an existing GPAI model may become providers of a new GPAI model, incurring provider obligations for the modification/fine-tuning. The AI Office is expected to provide further clarifications.</p>
                 </div>
             </div>
         </div>
@@ -744,9 +769,11 @@
             resultContentDiv.innerHTML += `<p class="text-sm"><strong>Justification:</strong> ${assessmentState.highRiskReason}</p>`;
             resultContentDiv.innerHTML += `<p class="text-sm"><strong>Action for ${assessmentState.userRole}:</strong> `;
             if (assessmentState.userRole === 'Provider') {
-                resultContentDiv.innerHTML += `Subject to stringent obligations under Chapter III of the AI Act (e.g., risk management, data governance, technical documentation, conformity assessment, human oversight, post-market monitoring, registration).`;
+                resultContentDiv.innerHTML += `Subject to stringent obligations under Chapter III of the AI Act (e.g., risk management, data governance, technical documentation, conformity assessment, human oversight, post-market monitoring, registration). Refer to the "Guide: High-Risk Obligations" for details.`;
             } else if (assessmentState.userRole === 'Deployer') {
-                 resultContentDiv.innerHTML += `Ensure use per instructions, appropriate human oversight, monitor operation, keep logs, and potentially conduct a Fundamental Rights Impact Assessment (FRIA) if Annex III (pts 2-8) and you are a public authority or providing essential public services.`;
+                 resultContentDiv.innerHTML += `Ensure use per instructions, appropriate human oversight, monitor operation, keep logs, and potentially conduct a Fundamental Rights Impact Assessment (FRIA) if Annex III (pts 2-8) and you are a public authority or providing essential public services. Ensure the provider meets their obligations.`;
+            } else if (assessmentState.userRole === 'Importer' || assessmentState.userRole === 'Distributor') {
+                 resultContentDiv.innerHTML += `Verify provider compliance (CE mark, documentation). Do not make non-conforming systems available. Consult Articles 23 (Importers) & 24 (Distributors).`;
             } else {
                  resultContentDiv.innerHTML += `Consult specific obligations for your role. Providers bear primary responsibility for conformity.`;
             }
@@ -786,7 +813,7 @@
 
         resultContentDiv.innerHTML += `<hr class="my-3 border-slate-300">`;
         resultContentDiv.innerHTML += `<p class="font-semibold text-primary-heading">Note on Open Source AI Systems:</p>`;
-        resultContentDiv.innerHTML += `<p class="text-sm">If your AI system (whether classified as High-Risk, Limited Risk, or Minimal Risk) is developed or distributed under a free and open-source license, this promotes transparency and community review. However, under the EU AI Act, the classification of an AI *system* and its corresponding legal obligations are primarily determined by its intended purpose, functionalities, and potential impact. Making a High-Risk or Limited-Risk AI *system* open-source does **not** generally exempt it from the specific obligations applicable to its risk category. For instance, a High-Risk AI system, even if open-source, must still meet all requirements of Chapter III of the Act (risk management, data governance, conformity assessment, etc.).</p>`;
+        resultContentDiv.innerHTML += `<p class="text-sm">If your AI system (whether classified as High-Risk, Limited Risk, or Minimal Risk) is developed or distributed under a free and open-source license, this promotes transparency and community review. However, under the EU AI Act, the classification of an AI <strong>system</strong> and its corresponding legal obligations are primarily determined by its intended purpose, functionalities, and potential impact. Making a High-Risk or Limited-Risk AI <strong>system</strong> open-source does <strong>not</strong> generally exempt it from the specific obligations applicable to its risk category. For instance, a High-Risk AI system, even if open-source, must still meet all requirements of Chapter III of the Act (risk management, data governance, conformity assessment, etc.).</p>`;
         
         resultContentDiv.innerHTML += `<hr class="my-3 border-slate-300"><p class="text-xs text-slate-500 mt-2"><strong>Disclaimer:</strong> This is a preliminary assessment based on your inputs and for informational purposes only. It does not constitute legal advice. Always refer to the official EU AI Act text and consult with legal professionals for definitive classification and compliance guidance for your specific AI system.</p>`;
         document.getElementById('assessment-result-display').classList.remove('hidden');
@@ -868,7 +895,7 @@
                     aiSystemResult.className = "mt-3 font-semibold text-positive-accent";
                 } else {
                     aiSystemResult.textContent = "Preliminary: May not meet all core criteria for an AI System under the Act. Review definition carefully.";
-                    aiSystemResult.className = "mt-3 font-semibold text-warning-message"; // Changed from text-warning-accent
+                    aiSystemResult.className = "mt-3 font-semibold text-warning-message"; 
                 }
             });
         }
@@ -924,14 +951,14 @@
                 }
                 if (significantHarm.value === 'yes') {
                     derogationResultP.textContent = "System is likely High-Risk (poses significant harm).";
-                    derogationResultP.className = "mt-3 font-semibold text-warning-message"; // Changed
+                    derogationResultP.className = "mt-3 font-semibold text-warning-message"; 
                 } else { 
                     if (conditions.length > 0) {
                         derogationResultP.textContent = "Derogation may apply. System might not be High-Risk. Thoroughly document your assessment as per Art 6(3).";
                         derogationResultP.className = "mt-3 font-semibold text-positive-accent";
                     } else {
                         derogationResultP.textContent = "System is likely High-Risk (does not meet derogation conditions in Q3).";
-                        derogationResultP.className = "mt-3 font-semibold text-warning-message"; // Changed
+                        derogationResultP.className = "mt-3 font-semibold text-warning-message"; 
                     }
                 }
             });
@@ -952,6 +979,26 @@
 
                 const currentStepId = assessmentSteps[currentStepIndex];
                 let nextStepId = btn.dataset.next; 
+
+                // Early exit for Not an AI System
+                if (currentStepId === "assessment-step-1-definition") {
+                    collectAnswers(); // Collect answers for step 1
+                    if (!assessmentState.isAISystem) {
+                        displayAssessmentResult(); // Display "Not an AI System" result
+                        return; // Stop further progression
+                    }
+                }
+                
+                // Early exit for Prohibited AI
+                if (currentStepId === "assessment-step-2-prohibited") {
+                    const prohibitedCheckboxes = document.querySelectorAll('input[name="q2_prohibited"]:checked');
+                    if (prohibitedCheckboxes.length > 0) {
+                        collectAnswers(); 
+                        displayAssessmentResult(); 
+                        return; 
+                    }
+                }
+
 
                 if (currentStepId === "assessment-step-3-highrisk-pathway") { 
                     const isAnnexIII = document.querySelector('input[name="q3_2_annex_iii"]:checked')?.value;

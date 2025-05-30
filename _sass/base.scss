@@ -1,11 +1,11 @@
 @charset "utf-8";
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&display=swap');
 /**
  * Style variables
  */
-$base-font-family: "Cormorant Garamond", serif;
-$base-font-size:       12.5px !default;
-$mobile-font-size:     12px !default;
+$base-font-family: "Geist Mono", monospace !default;
+$base-font-size:       13px !default;
+$mobile-font-size:     12.5px !default;
 $base-line-height:     1.5 !default;
 $container-width:      90% !default;
 $container-max-width:  600px !default;

@@ -1263,7 +1263,7 @@
                 console.error("CRITICAL ERROR during initialization:", e);
                 const loadingIndicator = document.getElementById('loadingIndicator');
                 if(loadingIndicator) loadingIndicator.innerHTML = `<p style="color:red;">SYSTEM ERROR. Details: ${e.message}</p>`;
-                showMessage("FATAL ERROR: App could not start. " + e.message, "error");
+                showMessage("FATAL ERROR: App could not start. " + e.message, " error");
             }
         };
     </script>

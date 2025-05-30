@@ -1,26 +1,68 @@
-# Dependencies
-markdown:         redcarpet
-highlighter:      pygments
-
-# Permalinks
-permalink:        pretty
-relative_permalinks: true
-
-# Setup #
-title:            Hyde
-tagline:          'A Jekyll theme'
-description:      'A brazen two-column <a href="http://jekyllrb.com" target="_blank">Jekyll</a> theme that pairs a prominent sidebar with uncomplicated content. Made by <a href="https://twitter.com/mdo" target="_blank">@mdo</a>.'
-url:              http://hyde.getpoole.com
-baseurl:          /
-
+# Site Settings
+title: My Journey Through Pages & Thoughts # Customize this!
 author:
-  name:           'Mark Otto'
-  url:            https://twitter.com/mdo
+  name: HeinemannT # Customize this!
+  # url: https://github.com/HeinemannT # Optional: Link to your GitHub profile or other site
+description: >- # Customize this!
+  A personal space for musings on literature, life's reflections.
+url: "https://HeinemannT.github.io" # Your GitHub Pages root URL
+baseurl: "/website" # CRITICAL: Your repository name, as it's a project site
 
-paginate:         5
+# Hyde Theme Specific Settings (from Hyde's defaults, customize as needed)
+hyde:
+  theme_color: theme-base-0d # Example: theme-base-0d (blue), theme-base-08 (red). See Hyde docs for options.
+  reverse_layout: false      # Set to true to put sidebar on the right
 
-# Custom vars
-version:          2.1.0
+# Build settings
+markdown: kramdown
+kramdown:
+  input: GFM # Enables GitHub Flavored Markdown
+  hard_wrap: false
+highlighter: rouge
+permalink: pretty # Makes URLs like /categories/name/ instead of .html
+# relative_permalinks: true # This is true by default in Jekyll 3, can often be omitted
 
-github:
-  repo:           https://github.com/poole/hyde
+# Pagination (Optional, if your Hyde index.html supports it and you want it)
+# paginate: 5
+# paginate_path: "/website/page:num/" # Ensure baseurl is included if you enable pagination
+
+# Navigation links for the Hyde sidebar
+# Adjust titles and URLs as needed.
+# URLs should be relative to your site root AFTER baseurl is applied.
+# Example: if a page is at /website/about/, the url here is /about/
+# Jekyll prepends the baseurl automatically for {{ nav_item.url | relative_url }} in templates
+nav:
+  - title: Home
+    url: / # Points to HeinemannT.github.io/website/
+  - title: About
+    url: /about/ # Assumes you have about.md with permalink: /about/
+  - title: Archives # Example - you'll need to create an archive.md page for this
+    url: /archives/
+  # - title: My Book List # Example
+  #   url: /book-list/ # You would create book-list.md
+
+# Custom Variables (from Hyde's example, version of Hyde theme)
+version: 2.1.0 # Or remove if not needed
+
+# GitHub repository (optional, for links if the theme uses it)
+# github:
+#   repo: https://github.com/HeinemannT/website # Link to your site's repo
+
+# Exclude from processing - files/folders Jekyll should ignore
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - Rakefile
+  - README.md # Good to keep your project's README.md separate from site content
+  - LICENSE
+  - CNAME # You are not using a custom domain name directly in this repo via CNAME file yet
+  - node_modules/
+  - vendor/
+  - .jekyll-cache/
+  - .sass-cache/
+  # - .git # Jekyll excludes this by default
+  # - _site # Jekyll excludes this by default
+
+# Plugins (GitHub Pages usually manages these, but jekyll-feed is common if you want RSS)
+# plugins:
+#   - jekyll-feed

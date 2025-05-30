@@ -9,7 +9,7 @@ url: "https://HeinemannT.github.io" # Your main GitHub Pages URL
 baseurl: "/website" # CRITICAL: This must match your repository name if it's not yourusername.github.io
 
 # Theme
-theme: jekyll-theme-minimal # A clean, simple theme to start with. Others: jekyll-theme-merlot, jekyll-theme-cayman
+# theme: jekyll-theme-minimal # A clean, simple theme to start with. Others: jekyll-theme-merlot, jekyll-theme-cayman
 
 # Navigation - some themes might use this, others generate nav from pages.
 # This is an example if your theme supports it this way.
@@ -23,3 +23,31 @@ markdown: kramdown # The default Markdown processor
 # exclude:
 #   - Gemfile
 #   - Gemfile.lock
+
+
+# Dependencies
+markdown:         redcarpet
+highlighter:      pygments
+
+# Permalinks
+permalink:        pretty
+relative_permalinks: true
+
+# Setup
+title:            Hyde
+tagline:          'A Jekyll theme'
+description:      'A brazen two-column <a href="http://jekyllrb.com" target="_blank">Jekyll</a> theme that pairs a prominent sidebar with uncomplicated content. Made by <a href="https://twitter.com/mdo" target="_blank">@mdo</a>.'
+url:              http://hyde.getpoole.com
+baseurl:          /
+
+author:
+  name:           'Mark Otto'
+  url:            https://twitter.com/mdo
+
+paginate:         5
+
+# Custom vars
+version:          2.1.0
+
+github:
+  repo:           https://github.com/poole/hyde

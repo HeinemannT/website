@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EU AI Act Interactive Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Visualization & Content Choices:
+        - Report Info: AI System Definition (Art 3(1)) -> Goal: Understand -> Presentation: Text + Interactive Checklist -> Interaction: User answers questions -> Justification: Clarify complex definition -> Method: HTML/JS.
+        - Report Info: Risk Categories (Prohibited, High, Limited, Minimal) -> Goal: Compare/Understand -> Presentation: Tabbed sections with details, illustrative donut chart for distribution -> Interaction: Click tabs, view charts -> Justification: Easy comparison, visual summary -> Method: HTML/JS, Chart.js (chart init on tab view).
+        - Report Info: Annex III Derogation -> Goal: Assess -> Presentation: Guided question flow (profiling check first) -> Interaction: User answers Yes/No -> Justification: Simplify complex decision -> Method: HTML/JS.
+        - Report Info: Full System Classification -> Goal: Assess/Guide -> Presentation: Multi-step interactive questionnaire with role selection, full Annex III details & improved result justification (including open-source system note) -> Interaction: User answers series of questions, receives summary -> Justification: Comprehensive self-assessment for risk level -> Method: HTML/JS.
+        - Report Info: Roles & Responsibilities -> Goal: Inform -> Presentation: Text descriptions for Provider, Deployer, Importer, Distributor -> Interaction: Read -> Justification: Clarify stakeholder duties -> Method: HTML.
+        - Report Info: Resources & Timelines -> Goal: Inform -> Presentation: Card-like layout for definitions and timelines -> Interaction: Read -> Justification: Enhanced visual presentation -> Method: HTML/Tailwind.
+        CONFIRMING NO SVG/Mermaid. -->
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .tab-button {
+            color: #e2e8f0; /* slate-200 for inactive tabs on dark nav */
+        }
+        .tab-button.active {
+            border-color: #ffc300; /* Mikado Yellow for active border */
+            color: #FFFFFF; /* White text for active tab */
+            background-color: #001d3d; /* Oxford Blue for active tab background */
+            font-weight: 600;
+        }
+        .tab-button:hover:not(.active) {
+            color: #FFFFFF;
+            border-color: #ffc300; /* Mikado Yellow for hover border */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .accordion-button .icon::before {
+            content: '+'; /* Plus for closed */
+            font-weight: bold;
+            margin-left: 8px; /* Ensure space */
+            display: inline-block;
+            transition: transform 0.2s ease-in-out;
+        }
+        .accordion-button.open .icon::before {
+            content: '–'; /* Minus for open */
+        }
+        .accordion-content {
+            display: none;
+            padding-left: 1rem; 
+            border-left: 2px solid #e2e8f0; /* slate-200 */
+            margin-left: 0.5rem; 
+            margin-top: 0.75rem; 
+        }
+        .chart-container-wrapper {
+            position: relative;
+            margin: auto;
+            height: 300px; 
+            width: 100%;
+            max-width: 450px; 
+        }
+        @media (min-width: 768px) { 
+            .chart-container-wrapper {
+                height: 350px;
+            }
+        }
+        .assessment-step {
+            display: none; 
+        }
+        .assessment-step.active {
+            display: block; 
+        }
+        .assessment-question-group {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            border-radius: 0.375rem; 
+        }
+        .header-bg-primary { 
+            background-color: #001d3d; /* Oxford Blue */
+        }
+        .nav-bg-secondary { 
+            background-color: #003566; /* Yale Blue */
+        }
+        .button-accent-primary { 
+            background-color: #ffc300; /* Mikado Yellow */
+            color: #000814; /* Rich Black */
+        }
+        .button-accent-primary:hover {
+            background-color: #e6b000; /* Darker Mikado Yellow */
+        }
+        .button-accent-warning { 
+            background-color: #ffd60a; /* Gold */
+            color: #000814; /* Rich Black */
+        }
+        .button-accent-warning:hover {
+            background-color: #e6bf09; /* Darker Gold */
+        }
+        .button-positive {
+            background-color: #16A34A; /* Green-600 */
+            color: white;
+        }
+        .button-positive:hover {
+             background-color: #15803d; /* Green-700 */
+        }
+         .text-primary-heading { color: #003566; } /* Yale Blue for main headings */
+         .text-warning-message { color: #c2410c; } /* Muted Rust/Orange for warning text on light bg */
+         .text-critical-accent { color: #DC2626; } /* Red-600 */
+         .text-positive-accent { color: #16A34A; } /* Green-600 */
+
+        .annex-iii-details ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            font-size: 0.875rem; 
+            color: #475569; /* slate-600 */
+        }
+        .annex-iii-details strong {
+            color: #334155; /* slate-700 */
+        }
+        .assessment-result-box {
+            background-color: #fffbeb; /* Corresponds to gold-50 or a very light yellow/gold */
+            border-color: #ffd60a; /* Gold */
+        }
+        .focus-ring-accent:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #ffc300, 0 1px 2px 0 rgba(0, 0, 0, 0);
+        }
+         .input-focus-accent:focus {
+            border-color: #ffc300; /* Mikado Yellow */
+            box-shadow: 0 0 0 0.2rem rgba(255, 195, 0, 0.25); /* Mikado Yellow with alpha */
+        }
+        .resource-card {
+            background-color: white;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 1.5rem; /* p-6 */
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); /* shadow-md */
+        }
+        .resource-card h3 {
+            color: #003566; /* Yale Blue */
+            margin-bottom: 0.75rem; /* mb-3 */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="header-bg-primary text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">EU AI Act Interactive Guide</h1>
+            <nav class="mt-3 sm:mt-0">
+                <select id="mobile-nav" class="lg:hidden nav-bg-secondary text-white p-2 rounded-md border border-slate-700 focus:ring-2 focus-ring-accent">
+                    <option value="home">Guide: Home & AI Definition</option>
+                    <option value="roles-responsibilities">Guide: Roles & Responsibilities</option>
+                    <option value="full-assessment">Tool: Full System Assessment</option>
+                    <option value="risk-categories">Guide: Risk Categories</option>
+                    <option value="high-risk-deep-dive">Guide: High-Risk AI</option>
+                    <option value="gpai">Guide: GPAI Models</option>
+                    <option value="inventory-compliance">Guide: Inventory & Compliance</option>
+                    <option value="resources">Guide: Resources & Timelines</option>
+                </select>
+            </nav>
+        </div>
+        <div class="hidden lg:block nav-bg-secondary">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div id="desktop-nav" class="flex space-x-1 items-center justify-center flex-wrap">
+                    <button data-tab="home" class="tab-button active text-sm font-medium py-3 px-3 sm:px-4 border-b-2 transition-colors duration-150">Guide: Home & AI Definition</button>
+                    <button data-tab="roles-responsibilities" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: Roles & Responsibilities</button>
+                    <button data-tab="full-assessment" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Tool: Full System Assessment</button>
+                    <button data-tab="risk-categories" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: Risk Categories</button>
+                    <button data-tab="high-risk-deep-dive" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: High-Risk AI</button>
+                    <button data-tab="gpai" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: GPAI Models</button>
+                    <button data-tab="inventory-compliance" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: Inventory & Compliance</button>
+                    <button data-tab="resources" class="tab-button text-sm font-medium py-3 px-3 sm:px-4 border-b-2 border-transparent transition-colors duration-150">Guide: Resources & Timelines</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div id="home" class="content-section active">
+            <h2 class="text-2xl font-semibold text-primary-heading mb-4">Welcome to the EU AI Act Interactive Guide</h2>
+            <p class="mb-4">The European Union's Artificial Intelligence Act (EU AI Act) establishes a harmonized regulatory framework for AI. This guide helps you understand its key provisions, classify AI systems, and identify obligations.</p>
+            <p class="mb-6">The Act aims to ensure AI systems are safe, transparent, traceable, non-discriminatory, and trustworthy, while fostering innovation and protecting fundamental rights.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>What is an "AI System" under the EU AI Act?</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-2"><strong>Official Definition (Article 3(1)):</strong> "a machine-based system that is designed to operate with varying levels of autonomy and that may exhibit adaptiveness after deployment, and that, for explicit or implicit objectives, infers, from the input it receives, how to generate outputs such as predictions, content, recommendations, or decisions”.</p>
+                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Components:</h4>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 mb-3">
+                        <li><strong>Machine-based system:</strong> Hardware and software integration, computationally driven.</li>
+                        <li><strong>Autonomy:</strong> Some degree of independence from human involvement.</li>
+                        <li><strong>Adaptiveness (Optional):</strong> Self-learning capabilities after deployment. Not mandatory to be an AI system.</li>
+                        <li><strong>Objectives (Explicit or Implicit):</strong> Internal goals the system is designed to achieve.</li>
+                        <li><strong>Inference:</strong> Core ability to generate outputs from inputs to achieve objectives.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3">Quick Check: Is it an AI System?</h3>
+                <p class="mb-4 text-sm text-slate-600">Answer the following questions based on the Article 3(1) definition to get a preliminary idea. This is not a definitive legal assessment.</p>
+                <div id="aiDefinitionChecklist">
+                    <div class="mb-3">
+                        <label class="block text-slate-700"><input type="checkbox" data-criterion="machine_based" class="mr-2 rounded border-slate-400 input-focus-accent"> Is it a machine-based system (hardware/software)?</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-slate-700"><input type="checkbox" data-criterion="autonomy" class="mr-2 rounded border-slate-400 input-focus-accent"> Does it operate with some level of autonomy?</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-slate-700"><input type="checkbox" data-criterion="inference" class="mr-2 rounded border-slate-400 input-focus-accent"> Does it infer how to generate outputs?</label>
+                    </div>
+                     <div class="mb-3">
+                        <label class="block text-slate-700"><input type="checkbox" data-criterion="adaptiveness_optional" class="mr-2 rounded border-slate-400 input-focus-accent"> (Optional) May it exhibit adaptiveness after deployment?</label>
+                    </div>
+                </div>
+                <button id="checkAiSystemButton" class="mt-4 button-accent-primary px-4 py-2 rounded-md transition duration-150">Check Preliminary Status</button>
+                <p id="aiSystemResult" class="mt-3 font-semibold"></p>
+            </div>
+        </div>
+
+        <div id="roles-responsibilities" class="content-section">
+            <h2 class="text-2xl font-semibold text-primary-heading mb-6">Guide: Roles & Responsibilities under the EU AI Act</h2>
+            <p class="mb-4">The EU AI Act defines specific roles for entities involved in the AI lifecycle. Understanding your role is crucial for identifying applicable obligations.</p>
+
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Provider</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-2"><strong>Definition (Art. 3(2)):</strong> A 'provider' is a natural or legal person, public authority, agency or other body that develops an AI system or that has an AI system developed and places that system on the market or puts it into service under its own name or trademark, whether for payment or free of charge.</p>
+                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Responsibilities (especially for High-Risk AI):</h4>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
+                        <li>Ensuring compliance with the Act when placing AI on the market or putting it into service.</li>
+                        <li>Conducting conformity assessments & drawing up technical documentation.</li>
+                        <li>Implementing quality and risk management systems.</li>
+                        <li>Registering high-risk AI systems & post-market monitoring.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Deployer</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-2"><strong>Definition (Art. 3(4)):</strong> A 'deployer' is any natural or legal person, public authority, agency or other body using an AI system under its authority, except where the AI system is used in the course of a personal non-professional activity.</p>
+                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Responsibilities (especially for High-Risk AI - Art. 26):</h4>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
+                        <li>Using AI systems per instructions & ensuring relevant input data.</li>
+                        <li>Monitoring operation, keeping logs, and ensuring human oversight.</li>
+                        <li>Potentially conducting a Fundamental Rights Impact Assessment (FRIA) for certain Annex III systems.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Importer</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-2"><strong>Definition (Art. 3(5)):</strong> An 'importer' is any natural or legal person located or established in the Union that places on the market an AI system that bears the name or trademark of a natural or legal person established outside the Union.</p>
+                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Responsibilities (Art. 23):</h4>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
+                        <li>Ensuring the non-EU provider has completed conformity assessment & technical documentation.</li>
+                        <li>Verifying CE marking and required documentation.</li>
+                        <li>Indicating their contact details on the system/documentation.</li>
+                    </ul>
+                </div>
+            </div>
+
+             <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Distributor</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-2"><strong>Definition (Art. 3(6)):</strong> A 'distributor' is any natural or legal person in the supply chain, other than the provider or the importer, that makes an AI system available on the Union market.</p>
+                    <h4 class="font-semibold mt-3 mb-1 text-slate-700">Key Responsibilities (Art. 24):</h4>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 text-sm">
+                        <li>Verifying CE marking and required documentation.</li>
+                        <li>Ensuring provider and importer (if any) have met their obligations.</li>
+                        <li>Not making non-conforming systems available.</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="mt-4 text-sm text-slate-500">Note: An entity can fulfill multiple roles. Obligations depend on activities performed.</p>
+        </div>
+        
+        <div id="full-assessment" class="content-section">
+            <h2 class="text-2xl font-semibold text-primary-heading mb-4">Tool: Full AI System Assessment</h2>
+            <p class="mb-6">This questionnaire will guide you through a series of questions to help determine a preliminary classification for your AI system under the EU AI Act. This is not legal advice but an informational tool.</p>
+
+            <div id="assessmentContainer" class="bg-white p-6 rounded-lg shadow">
+                <div id="assessment-step-role" class="assessment-step active">
+                    <h3 class="text-lg font-semibold text-slate-700 mb-3">Step 0: Your Role</h3>
+                     <div class="assessment-question-group">
+                        <p class="font-medium mb-2">0.1. What is your primary role concerning this AI system?</p>
+                        <div class="space-y-1">
+                            <label class="block"><input type="radio" name="q0_1_user_role" value="Provider" class="mr-2 input-focus-accent"> Provider</label>
+                            <label class="block"><input type="radio" name="q0_1_user_role" value="Deployer" class="mr-2 input-focus-accent"> Deployer</label>
+                            <label class="block"><input type="radio" name="q0_1_user_role" value="Importer" class="mr-2 input-focus-accent"> Importer</label>
+                            <label class="block"><input type="radio" name="q0_1_user_role" value="Distributor" class="mr-2 input-focus-accent"> Distributor</label>
+                            <label class="block"><input type="radio" name="q0_1_user_role" value="Other" class="mr-2 input-focus-accent"> Other / Unsure</label>
+                        </div>
+                    </div>
+                    <button id="startAssessmentBtn" data-next="assessment-step-1-definition" class="assessment-next-btn button-accent-primary px-6 py-2 rounded-md transition duration-150">Start Assessment</button>
+                </div>
+
+                <div id="assessment-step-1-definition" class="assessment-step">
+                    <h3 class="text-lg font-semibold text-slate-700 mb-3">Step 1: AI System Definition (Art 3(1))</h3>
+                    <div class="assessment-question-group">
+                        <p class="font-medium mb-2">1.1. Is the system machine-based?</p>
+                        <label class="mr-4"><input type="radio" name="q1_1_machine_based" value="yes" class="mr-1 input-focus-accent"> Yes</label>
+                        <label><input type="radio" name="q1_1_machine_based" value="no" class="mr-1 input-focus-accent"> No</label>
+                    </div>
+                    <div class="assessment-question-group">
+                        <p class="font-medium mb-2">1.2. Does it operate with autonomy?</p>
+                        <label class="mr-4"><input type="radio" name="q1_2_autonomy" value="yes" class="mr-1 input-focus-accent"> Yes</label>
+                        <label><input type="radio" name="q1_2_autonomy" value="no" class="mr-1 input-focus-accent"> No</label>
+                    </div>
+                    <div class="assessment-question-group">
+                        <p class="font-medium mb-2">1.3. Does it infer outputs?</p>
+                        <label class="mr-4"><input type="radio" name="q1_3_inference" value="yes" class="mr-1 input-focus-accent"> Yes</label>
+                        <label><input type="radio" name="q1_3_inference" value="no" class="mr-1 input-focus-accent"> No</label>
+                    </div>
+                    <button data-next="assessment-step-2-prohibited" class="assessment-next-btn button-accent-primary px-4 py-2 rounded-md">Next</button>
+                </div>
+
+                <div id="assessment-step-2-prohibited" class="assessment-step">
+                    <h3 class="text-lg font-semibold text-slate-700 mb-3">Step 2: Prohibited AI Practices (Art 5)</h3>
+                    <p class="text-sm mb-3 text-slate-500">Does your AI system involve any of the following? (Select all that apply)</p>
+                    <div class="assessment-question-group space-y-2">
+                        <label class="block"><input type="checkbox" name="q2_prohibited" value="social_scoring" class="mr-2 input-focus-accent"> Social scoring.</label>
+                        <label class="block"><input type="checkbox" name="q2_prohibited" value="exploit_vulnerabilities_harm" class="mr-2 input-focus-accent"> Exploitation of vulnerabilities causing harm.</label>
+                        <label class="block"><input type="checkbox" name="q2_prohibited" value="subliminal_manipulative_harm" class="mr-2 input-focus-accent"> Subliminal/manipulative techniques causing harm.</label>
+                        <label class="block"><input type="checkbox" name="q2_prohibited" value="real_time_remote_biometric_le" class="mr-2 input-focus-accent"> 'Real-time' remote biometric ID by LE (public spaces).</label>
+                        <label class="block"><input type="checkbox" name="q2_prohibited" value="untargeted_scraping_facial" class="mr-2 input-focus-accent"> Untargeted scraping for facial recognition.</label>
+                        <label class="block"><input type="checkbox" name="q2_prohibited" value="emotion_recognition_work_edu" class="mr-2 input-focus-accent"> Emotion recognition in workplace/education.</label>
+                        <label class="block"><input type="checkbox" name="q2_prohibited" value="biometric_categorization_sensitive" class="mr-2 input-focus-accent"> Biometric categorization on sensitive attributes.</label>
+                        <label class="block"><input type="checkbox" name="q2_prohibited" value="risk_assessment_criminal_profiling" class="mr-2 input-focus-accent"> Crime risk assessment (solely profiling).</label>
+                    </div>
+                    <button data-next="assessment-step-3-highrisk-pathway" class="assessment-next-btn button-accent-primary px-4 py-2 rounded-md">Next</button>
+                </div>
+
+                <div id="assessment-step-3-highrisk-pathway" class="assessment-step">
+                    <h3 class="text-lg font-semibold text-slate-700 mb-3">Step 3: High-Risk Pathway Identification (Art 6)</h3>
+                    <div class="assessment-question-group">
+                        <p class="font-medium mb-2">3.1. Is the AI system an Annex I product/safety component requiring 3rd party assessment?</p>
+                        <label class="mr-4"><input type="radio" name="q3_1_annex_i" value="yes" class="mr-1 input-focus-accent"> Yes</label>
+                        <label><input type="radio" name="q3_1_annex_i" value="no" class="mr-1 input-focus-accent"> No</label>
+                    </div>
+                    <div class="assessment-question-group">
+                        <p class="font-medium mb-2">3.2. Is the AI system's intended purpose listed in Annex III?</p>
+                        <label class="mr-4"><input type="radio" name="q3_2_annex_iii" value="yes" class="mr-1 input-focus-accent"> Yes</label>
+                        <label><input type="radio" name="q3_2_annex_iii" value="no" class="mr-1 input-focus-accent"> No</label>
+                        <div class="mt-3">
+                            <button type="button" id="toggleAnnexIIIDetails" class="accordion-button text-sm text-primary-heading hover:underline w-full text-left p-2 bg-slate-100 rounded-md flex justify-between items-center"><span>View Annex III Categories</span><span class="icon"></span></button>
+                            <div id="annexIIIDetails" class="accordion-content annex-iii-details mt-2 p-3 bg-slate-50 rounded-md border border-slate-200">
+                                <p class="text-xs text-slate-500 mb-2">This is an indicative list. Refer to the official EU AI Act for the definitive text.</p>
+                                <ul>
+                                    <li><strong>Biometric identification and categorisation.</strong></li>
+                                    <li><strong>Management/operation of critical infrastructure.</strong></li>
+                                    <li><strong>Education and vocational training.</strong></li>
+                                    <li><strong>Employment, workers management, access to self-employment.</strong></li>
+                                    <li><strong>Access to essential private/public services and benefits.</strong></li>
+                                    <li><strong>Law enforcement.</strong></li>
+                                    <li><strong>Migration, asylum, and border control management.</strong></li>
+                                    <li><strong>Administration of justice and democratic processes.</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <button data-next="assessment-step-4a-annex3-profiling" class="assessment-next-btn button-accent-primary px-4 py-2 rounded-md">Next</button>
+                </div>
+                
+                <div id="assessment-step-4a-annex3-profiling" class="assessment-step">
+                    <h3 class="text-lg font-semibold text-slate-700 mb-3">Step 4 (For Annex III Systems): Profiling Check</h3>
+                    <div class="assessment-question-group">
+                        <p class="font-medium mb-2">4.1. Does your Annex III system perform "profiling of natural persons"?</p>
+                        <label class="mr-4"><input type="radio" name="q4_1_profiling" value="yes" class="mr-1 input-focus-accent"> Yes</label>
+                        <label><input type="radio" name="q4_1_profiling" value="no" class="mr-1 input-focus-accent"> No</label>
+                         <p class="text-xs text-slate-500 mt-1">If yes, it's High-Risk (derogation N/A).</p>
+                    </div>
+                    <button data-next="assessment-step-4b-annex3-harm" class="assessment-next-btn button-accent-primary px-4 py-2 rounded-md">Next</button>
+                </div>
+
+                <div id="assessment-step-4b-annex3-harm" class="assessment-step">
+                    <h3 class="text-lg font-semibold text-slate-700 mb-3">Step 4 (Annex III, No Profiling): Significant Harm Check</h3>
+                     <div class="assessment-question-group">
+                        <p class="font-medium mb-2">4.2. Does the system pose a significant risk of harm to health, safety, or fundamental rights?</p>
+                        <label class="mr-4"><input type="radio" name="q4_2_significant_harm" value="yes" class="mr-1 input-focus-accent"> Yes</label>
+                        <label><input type="radio" name="q4_2_significant_harm" value="no" class="mr-1 input-focus-accent"> No</label>
+                        <p class="text-xs text-slate-500 mt-1">If yes, likely High-Risk. If no, check derogation conditions.</p>
+                    </div>
+                    <button data-next="assessment-step-4c-annex3-conditions" class="assessment-next-btn button-accent-primary px-4 py-2 rounded-md">Next</button>
+                </div>
+
+                <div id="assessment-step-4c-annex3-conditions" class="assessment-step">
+                    <h3 class="text-lg font-semibold text-slate-700 mb-3">Step 4 (Annex III, No Profiling/Harm): Derogation Conditions</h3>
+                    <p class="text-sm mb-3 text-slate-500">Does it fulfill AT LEAST ONE condition for derogation?</p>
+                    <div class="assessment-question-group space-y-2">
+                        <label class="block"><input type="checkbox" name="q4_3_derogation_condition" value="narrow_procedural" class="mr-2 input-focus-accent"> Narrow procedural task.</label>
+                        <label class="block"><input type="checkbox" name="q4_3_derogation_condition" value="improve_human" class="mr-2 input-focus-accent"> Improves prior human activity.</label>
+                        <label class="block"><input type="checkbox" name="q4_3_derogation_condition" value="detect_patterns" class="mr-2 input-focus-accent"> Detects patterns (no influence w/o review).</label>
+                        <label class="block"><input type="checkbox" name="q4_3_derogation_condition" value="preparatory_task" class="mr-2 input-focus-accent"> Preparatory task for Annex III assessment.</label>
+                        <p class="text-xs text-slate-500 mt-1">If yes (and no profiling/harm), derogation MAY apply. Else, High-Risk.</p>
+                    </div>
+                    <button data-next="assessment-step-5-limited" class="assessment-next-btn button-accent-primary px-4 py-2 rounded-md">Next</button>
+                </div>
+                
+                <div id="assessment-step-5-limited" class="assessment-step">
+                    <h3 class="text-lg font-semibold text-slate-700 mb-3">Step 5: Limited Risk AI (Art 50 Transparency)</h3>
+                    <p class="text-sm mb-3 text-slate-500">Does it involve any of these functionalities? (Select all that apply)</p>
+                    <div class="assessment-question-group space-y-2">
+                        <label class="block"><input type="checkbox" name="q5_limited_risk" value="chatbot" class="mr-2 input-focus-accent"> Interacts with humans (e.g., chatbot).</label>
+                        <label class="block"><input type="checkbox" name="q5_limited_risk" value="emotion_biometric_categorization" class="mr-2 input-focus-accent"> Emotion recognition/biometric categorization.</label>
+                        <label class="block"><input type="checkbox" name="q5_limited_risk" value="deep_fake" class="mr-2 input-focus-accent"> Generates "deep fakes".</label>
+                        <label class="block"><input type="checkbox" name="q5_limited_risk" value="generative_text_public_interest" class="mr-2 input-focus-accent"> Generates text on public interest matters.</label>
+                    </div>
+                     <button id="viewAssessmentResultBtn" class="assessment-next-btn button-positive px-6 py-2 rounded-md transition duration-150">View Assessment</button>
+                </div>
+
+                <div id="assessment-result-display" class="mt-6 hidden">
+                    <h3 class="text-xl font-semibold text-primary-heading mb-3">Assessment Summary</h3>
+                    <div id="assessmentResultContent" class="p-4 border rounded-md assessment-result-box space-y-3">
+                    </div>
+                    <button id="resetAssessmentBtn" class="mt-4 bg-slate-500 text-white px-4 py-2 rounded-md hover:bg-slate-600">Start New Assessment</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="risk-categories" class="content-section">
+            <h2 class="text-2xl font-semibold text-primary-heading mb-4">Guide: EU AI Act Risk Categories</h2>
+            <p class="mb-6">The Act categorizes AI systems into four main risk levels, with obligations proportionate to the risk. Understanding these categories is crucial for compliance.</p>
+            
+            <div class="chart-container-wrapper mb-8">
+                <canvas id="riskDistributionChart"></canvas>
+            </div>
+            <p class="text-center text-sm text-slate-500 mb-8">Illustrative conceptual distribution of AI systems by risk. Actual distribution varies.</p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div id="prohibited-ai-section" class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold text-critical-accent mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Prohibited AI (Unacceptable Risk)</span><span class="icon"></span></h3>
+                    <div class="accordion-content">
+                        <p class="mb-2">Practices posing a clear threat to safety, livelihoods, and fundamental rights (Article 5). These are banned.</p>
+                         <p class="font-semibold text-sm mt-1">Inventory State: <code class="bg-red-100 text-critical-accent px-1 rounded">Prohibited - Cease/Prevent Deployment</code></p>
+                    </div>
+                </div>
+
+                <div id="high-risk-ai-section-summary" class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold text-warning-accent mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>High-Risk AI</span><span class="icon"></span></h3>
+                     <div class="accordion-content">
+                        <p class="mb-2">Systems that can adversely impact safety or fundamental rights (Article 6). Permitted but subject to stringent requirements.</p>
+                        <p class="font-semibold text-sm mt-1">Inventory State: <code class="bg-orange-100 text-warning-accent px-1 rounded">Potentially High-Risk</code></p>
+                        <button onclick="navigateToTab('high-risk-deep-dive')" class="mt-3 text-sm text-primary-heading hover:underline font-medium">Learn more about High-Risk AI &raquo;</button>
+                    </div>
+                </div>
+
+                <div id="limited-risk-ai-section" class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold text-sky-500 mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Limited Risk AI</span><span class="icon"></span></h3>
+                    <div class="accordion-content">
+                        <p class="mb-2">Systems posing specific transparency risks (Article 50). Users must be aware of AI interaction or AI-generated content.</p>
+                        <p class="font-semibold text-sm mt-1">Inventory State: <code class="bg-sky-100 text-sky-700 px-1 rounded">Limited Risk - Transparency Obligations Apply</code></p>
+                    </div>
+                </div>
+
+                <div id="minimal-risk-ai-section" class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold text-positive-accent mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Minimal or No Risk AI</span><span class="icon"></span></h3>
+                    <div class="accordion-content">
+                        <p class="mb-2">Systems not falling into Prohibited, High, or Limited risk categories. Generally permitted without additional specific AI Act obligations.</p>
+                        <p class="font-semibold text-sm mt-1">Inventory State: <code class="bg-green-100 text-positive-accent px-1 rounded">Minimal Risk - Monitor</code></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="high-risk-deep-dive" class="content-section">
+            <h2 class="text-2xl font-semibold text-primary-heading mb-4">Guide: High-Risk AI Systems In-Depth</h2>
+             <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-warning-accent mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Annex III Derogation Assessment (Tool)</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-3 text-sm">An Annex III system is NOT high-risk if it doesn't pose significant harm and fulfills specific conditions. Does NOT apply if it performs "profiling".</p>
+                    <div id="derogationAssessmentTool">
+                        <div class="mb-3 p-3 border border-slate-200 rounded-md">
+                            <p class="font-medium text-slate-700 mb-1">1. Does the Annex III system perform "profiling"?</p>
+                            <label class="mr-4"><input type="radio" name="profiling" value="yes" class="mr-1 input-focus-accent"> Yes</label>
+                            <label><input type="radio" name="profiling" value="no" class="mr-1 input-focus-accent"> No</label>
+                        </div>
+                        <div id="derogationQ2" class="mb-3 p-3 border border-slate-200 rounded-md hidden">
+                            <p class="font-medium text-slate-700 mb-1">2. Does it pose significant risk of harm?</p>
+                            <label class="mr-4"><input type="radio" name="significant_harm" value="yes" class="mr-1 input-focus-accent"> Yes</label>
+                            <label><input type="radio" name="significant_harm" value="no" class="mr-1 input-focus-accent"> No</label>
+                        </div>
+                        <div id="derogationQ3" class="mb-3 p-3 border border-slate-200 rounded-md hidden">
+                            <p class="font-medium text-slate-700 mb-1">3. Does it fulfill one of the derogation conditions?</p>
+                            <ul class="list-none space-y-1 text-sm mt-1">
+                                <li><label><input type="checkbox" name="derogation_condition" value="narrow_procedural" class="mr-2 input-focus-accent"> Narrow procedural task.</label></li>
+                                <li><label><input type="checkbox" name="derogation_condition" value="improve_human" class="mr-2 input-focus-accent"> Improves prior human activity.</label></li>
+                                <li><label><input type="checkbox" name="derogation_condition" value="detect_patterns" class="mr-2 input-focus-accent"> Detects patterns (no influence w/o review).</label></li>
+                                <li><label><input type="checkbox" name="derogation_condition" value="preparatory_task" class="mr-2 input-focus-accent"> Preparatory task.</label></li>
+                            </ul>
+                        </div>
+                        <button id="assessDerogationButton" class="mt-4 button-accent-warning px-4 py-2 rounded-md transition duration-150">Assess Derogation Status</button>
+                        <p id="derogationResult" class="mt-3 font-semibold"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                 <h3 class="text-xl font-semibold text-warning-accent mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Key Obligations for High-Risk AI Systems (Provider Focus)</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-3 text-sm">High-Risk AI systems are subject to a comprehensive set of requirements.</p>
+                    <ul class="space-y-2 text-sm">
+                        <li>Risk Management System, Data Governance, Technical Documentation, Record-Keeping, Transparency, Human Oversight, Accuracy/Robustness/Cybersecurity, QMS, Conformity Assessment, Registration, Post-Market Monitoring, Incident Reporting.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="gpai" class="content-section">
+            <h2 class="text-2xl font-semibold text-primary-heading mb-4">Guide: General Purpose AI (GPAI) Models</h2>
+            <p class="mb-4">Overview of General Purpose AI (GPAI) models under the EU AI Act.</p>
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Defining GPAI Models</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-2">GPAI models display significant generality, perform a wide range of tasks, and can be integrated into various downstream systems.</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Obligations for GPAI Providers</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                     <p class="mb-2 text-sm">Include technical documentation, copyright policy, training data summary.</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-critical-accent mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>GPAI Models with Systemic Risk</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-2">Models with "high-impact capabilities" (e.g., >$10^{25}$ FLOPs) face stricter obligations: model evaluations, risk mitigation, incident reporting, cybersecurity.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="inventory-compliance" class="content-section">
+            <h2 class="text-2xl font-semibold text-primary-heading mb-4">Guide: AI Asset Inventory & Ongoing Compliance</h2>
+            <p class="mb-4">A dynamic AI asset inventory is crucial for EU AI Act compliance.</p>
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Input Criteria for Assessment</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <p class="mb-3 text-sm">Key details: AI System (Y/N), Intended Purpose, Annex I/III Listing, Profiling, Significant Harm, Nature of Task (for derogation).</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 class="text-xl font-semibold text-primary-heading mb-3 accordion-button cursor-pointer flex justify-between items-center"><span>Output Classifications & Actions</span><span class="icon"></span></h3>
+                <div class="accordion-content">
+                    <ul class="space-y-1 text-slate-600 text-sm">
+                        <li><strong class="text-critical-accent">Prohibited:</strong> Cease.</li>
+                        <li><strong class="text-warning-accent">High-Risk:</strong> Full compliance.</li>
+                        <li><strong class="text-orange-500">Not High-Risk (Derogation):</strong> Document & register.</li>
+                        <li><strong class="text-sky-600">Limited Risk:</strong> Transparency.</li>
+                        <li><strong class="text-positive-accent">Minimal Risk:</strong> Monitor.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="resources" class="content-section">
+            <h2 class="text-2xl font-semibold text-primary-heading mb-6">Guide: Resources & Key Timelines</h2>
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="resource-card">
+                    <h3 class="text-xl font-semibold">Key Definitions (Simplified)</h3>
+                    <ul class="space-y-2 text-sm text-slate-700">
+                        <li><strong>AI System:</strong> Machine-based, autonomous, infers outputs.</li>
+                        <li><strong>Provider:</strong> Develops AI system or has it developed, places on market/service under own name/trademark.</li>
+                        <li><strong>Deployer:</strong> Uses AI system under its authority (except personal non-professional activity).</li>
+                        <li><strong>Intended Purpose:</strong> Use for which an AI system is intended by the provider.</li>
+                        <li><strong>GPAI Model:</strong> AI model with significant generality, capable of wide range of tasks.</li>
+                    </ul>
+                </div>
+                <div class="resource-card">
+                    <h3 class="text-xl font-semibold">Key Application Dates</h3>
+                    <ul class="space-y-2 text-sm text-slate-700">
+                        <li><strong>Feb 2, 2025:</strong> Most prohibitions (Art. 5) apply.</li>
+                        <li><strong>Aug 2, 2025:</strong> Rules on GPAI models apply.</li>
+                        <li><strong>Aug 2, 2026:</strong> Majority of AI Act provisions apply (incl. most High-Risk).</li>
+                        <li><strong>Aug 2, 2027:</strong> Obligations for High-Risk AI (Annex I, Section A products).</li>
+                    </ul>
+                    <p class="mt-3 text-xs text-slate-500">This is a simplified overview. Refer to official text.</p>
+                </div>
+            </div>
+
+            <div class="resource-card">
+                <h3 class="text-xl font-semibold">Further Information</h3>
+                <p class="mb-2">For complete and official texts, guidelines, and updates, refer to official EU sources:</p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li><a href="https://eur-lex.europa.eu/" target="_blank" rel="noopener noreferrer" class="text-primary-heading hover:underline">EUR-Lex (Official Journal of the EU)</a></li>
+                    <li><a href="https://digital-strategy.ec.europa.eu/en/policies/european-approach-artificial-intelligence" target="_blank" rel="noopener noreferrer" class="text-primary-heading hover:underline">European Commission - AI Strategy</a></li>
+                </ul>
+                 <p class="mt-4 text-sm text-slate-500">This guide is for informational purposes only and does not constitute legal advice. Consult with legal professionals for specific guidance on EU AI Act compliance.</p>
+            </div>
+        </div>
+    </main>
+
+<script>
+    let assessmentState = {};
+    const assessmentSteps = [
+        "assessment-step-role", 
+        "assessment-step-1-definition",
+        "assessment-step-2-prohibited",
+        "assessment-step-3-highrisk-pathway",
+        "assessment-step-4a-annex3-profiling",
+        "assessment-step-4b-annex3-harm",
+        "assessment-step-4c-annex3-conditions",
+        "assessment-step-5-limited"
+    ];
+    let currentStepIndex = 0; 
+    let riskChart = null; 
+
+    function navigateToTab(tabId) {
+        const tabs = document.querySelectorAll('.tab-button');
+        const contentSections = document.querySelectorAll('.content-section');
+        const mobileNav = document.getElementById('mobile-nav');
+
+        contentSections.forEach(section => section.classList.remove('active'));
+        const activeSection = document.getElementById(tabId);
+        if (activeSection) activeSection.classList.add('active');
+
+        tabs.forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.tab === tabId);
+        });
+        if (mobileNav.value !== tabId) mobileNav.value = tabId;
+        window.scrollTo(0, 0);
+
+        if (tabId === 'risk-categories' && !riskChart) { 
+            const ctxRisk = document.getElementById('riskDistributionChart');
+            if (ctxRisk) {
+                riskChart = new Chart(ctxRisk, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Minimal Risk', 'Limited Risk', 'High-Risk', 'Prohibited'],
+                        datasets: [{
+                            label: 'Conceptual Risk Distribution', data: [70, 15, 14, 1],
+                            backgroundColor: ['#16A34A', '#a5d1ff', '#ffd60a', '#DC2626'], 
+                            borderColor: ['#15803d', '#001d3d', '#d4b100', '#b91c1c'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { font: { size: 10, family: 'Open Sans' }, padding: 10 }},
+                            title: { display: true, text: 'Conceptual AI Risk Distribution', font: { size: 14, family: 'Open Sans' }, padding: { bottom:15 } },
+                            tooltip: { callbacks: { label: function(context) {
+                                let label = context.label || ''; if (label) { label += ': '; }
+                                if (context.parsed !== null) { label += context.parsed + '%'; } return label;
+                            }}}
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+
+    function showAssessmentStep(stepId) {
+        document.querySelectorAll('.assessment-step').forEach(step => step.classList.remove('active'));
+        const currentStepElement = document.getElementById(stepId);
+        if (currentStepElement) {
+            currentStepElement.classList.add('active');
+        }
+    }
+
+    function collectAnswers() {
+        assessmentState = {}; 
+        
+        assessmentState.userRole = document.querySelector('input[name="q0_1_user_role"]:checked')?.value || 'Not Specified';
+
+        assessmentState.isMachineBased = document.querySelector('input[name="q1_1_machine_based"]:checked')?.value;
+        assessmentState.hasAutonomy = document.querySelector('input[name="q1_2_autonomy"]:checked')?.value;
+        assessmentState.hasInference = document.querySelector('input[name="q1_3_inference"]:checked')?.value;
+        assessmentState.isAISystem = (assessmentState.isMachineBased === 'yes' && assessmentState.hasAutonomy === 'yes' && assessmentState.hasInference === 'yes');
+
+        assessmentState.prohibitedPractices = Array.from(document.querySelectorAll('input[name="q2_prohibited"]:checked')).map(cb => cb.value);
+        assessmentState.isProhibited = assessmentState.prohibitedPractices.length > 0;
+
+        assessmentState.isAnnexI = document.querySelector('input[name="q3_1_annex_i"]:checked')?.value;
+        assessmentState.isAnnexIII = document.querySelector('input[name="q3_2_annex_iii"]:checked')?.value;
+
+        if (assessmentState.isAnnexIII === 'yes') {
+            assessmentState.performsProfiling = document.querySelector('input[name="q4_1_profiling"]:checked')?.value;
+            if (assessmentState.performsProfiling === 'no') {
+                assessmentState.posesSignificantHarm = document.querySelector('input[name="q4_2_significant_harm"]:checked')?.value;
+                if (assessmentState.posesSignificantHarm === 'no') {
+                    assessmentState.derogationConditionsMet = Array.from(document.querySelectorAll('input[name="q4_3_derogation_condition"]:checked')).map(cb => cb.value).length > 0;
+                }
+            }
+        }
+        
+        assessmentState.isHighRisk = false;
+        assessmentState.highRiskReason = "Not applicable or not determined.";
+        if (assessmentState.isAnnexI === 'yes') {
+            assessmentState.isHighRisk = true;
+            assessmentState.highRiskReason = "System is indicated as falling under Annex I (safety component of a regulated product requiring third-party conformity assessment - based on your answer to Q3.1).";
+        } else if (assessmentState.isAnnexIII === 'yes') {
+            if (assessmentState.performsProfiling === 'yes') {
+                assessmentState.isHighRisk = true;
+                assessmentState.highRiskReason = "System is indicated as listed in Annex III (Q3.2: Yes) AND performs profiling of natural persons (Q4.1: Yes). Derogation does not apply.";
+            } else if (assessmentState.posesSignificantHarm === 'yes') {
+                assessmentState.isHighRisk = true;
+                assessmentState.highRiskReason = "System is indicated as listed in Annex III (Q3.2: Yes), does not perform profiling (Q4.1: No), BUT poses a significant risk of harm to health, safety, or fundamental rights (Q4.2: Yes).";
+            } else if (assessmentState.posesSignificantHarm === 'no' && (typeof assessmentState.derogationConditionsMet === 'undefined' || !assessmentState.derogationConditionsMet)) {
+                assessmentState.isHighRisk = true;
+                assessmentState.highRiskReason = "System is indicated as listed in Annex III (Q3.2: Yes), does not perform profiling (Q4.1: No), does not pose significant harm (Q4.2: No), BUT does NOT meet any of the specific derogation conditions (Q4.3).";
+            } else if (assessmentState.posesSignificantHarm === 'no' && assessmentState.derogationConditionsMet) {
+                assessmentState.isHighRisk = false; 
+                assessmentState.highRiskReason = "System is indicated as listed in Annex III (Q3.2: Yes), but derogation from High-Risk classification LIKELY applies because: it does NOT perform profiling (Q4.1: No), does NOT pose significant harm (Q4.2: No), AND meets at least one specific derogation condition (Q4.3). Thorough documentation of this assessment is required.";
+            }
+        }
+
+        assessmentState.limitedRiskPractices = Array.from(document.querySelectorAll('input[name="q5_limited_risk"]:checked')).map(cb => cb.value);
+        assessmentState.isLimitedRisk = assessmentState.limitedRiskPractices.length > 0;
+    }
+
+    function displayAssessmentResult() {
+        const resultContentDiv = document.getElementById('assessmentResultContent');
+        resultContentDiv.innerHTML = `<p class="font-semibold text-primary-heading text-lg mb-2">Assessment Summary (Role: ${assessmentState.userRole}):</p>`;
+        let primaryClassificationDetermined = false;
+
+        if (!assessmentState.isAISystem) {
+            resultContentDiv.innerHTML += `<p class="text-critical-accent font-medium">System does NOT appear to meet the AI Act definition of an "AI System" based on your answers to Step 1 (Machine-based: ${assessmentState.isMachineBased || 'N/A'}, Autonomy: ${assessmentState.hasAutonomy || 'N/A'}, Inference: ${assessmentState.hasInference || 'N/A'}). If this is correct, the Act's specific AI rules may not apply. Verify carefully.</p>`;
+            document.getElementById('assessment-result-display').classList.remove('hidden');
+            primaryClassificationDetermined = true; 
+            return;
+        } else {
+            resultContentDiv.innerHTML += `<p class="text-positive-accent">System appears to meet the AI Act definition of an "AI System" (Machine-based: ${assessmentState.isMachineBased}, Autonomy: ${assessmentState.hasAutonomy}, Inference: ${assessmentState.hasInference}).</p>`;
+        }
+
+        if (assessmentState.isProhibited) {
+            resultContentDiv.innerHTML += `<p class="text-critical-accent font-bold mt-2">POTENTIAL CLASSIFICATION: Prohibited AI (Unacceptable Risk).</p>`;
+            resultContentDiv.innerHTML += `<p class="text-sm"><strong>Justification:</strong> Your answers indicate involvement in one or more prohibited practices (Step 2), such as: ${assessmentState.prohibitedPractices.join(', ').replace(/_/g, ' ')}.</p>`;
+            resultContentDiv.innerHTML += `<p class="text-sm"><strong>Action:</strong> Cease development and prevent deployment. These systems are banned under Article 5.</p>`;
+            primaryClassificationDetermined = true;
+        }
+        
+        if (!primaryClassificationDetermined && assessmentState.isHighRisk) {
+            resultContentDiv.innerHTML += `<p class="text-warning-accent font-bold mt-2">POTENTIAL CLASSIFICATION: High-Risk AI.</p>`;
+            resultContentDiv.innerHTML += `<p class="text-sm"><strong>Justification:</strong> ${assessmentState.highRiskReason}</p>`;
+            resultContentDiv.innerHTML += `<p class="text-sm"><strong>Action for ${assessmentState.userRole}:</strong> `;
+            if (assessmentState.userRole === 'Provider') {
+                resultContentDiv.innerHTML += `Subject to stringent obligations under Chapter III of the AI Act (e.g., risk management, data governance, technical documentation, conformity assessment, human oversight, post-market monitoring, registration).`;
+            } else if (assessmentState.userRole === 'Deployer') {
+                 resultContentDiv.innerHTML += `Ensure use per instructions, appropriate human oversight, monitor operation, keep logs, and potentially conduct a Fundamental Rights Impact Assessment (FRIA) if Annex III (pts 2-8) and you are a public authority or providing essential public services.`;
+            } else {
+                 resultContentDiv.innerHTML += `Consult specific obligations for your role. Providers bear primary responsibility for conformity.`;
+            }
+            resultContentDiv.innerHTML += `</p>`;
+            primaryClassificationDetermined = true;
+        }
+        
+        if (!primaryClassificationDetermined && assessmentState.isAnnexIII === 'yes' && assessmentState.highRiskReason && assessmentState.highRiskReason.includes("derogation likely applies")) {
+            resultContentDiv.innerHTML += `<p class="text-positive-accent font-bold mt-2">POTENTIAL CLASSIFICATION: Not High-Risk (Annex III Derogation Likely Applies).</p>`;
+            resultContentDiv.innerHTML += `<p class="text-sm"><strong>Justification:</strong> ${assessmentState.highRiskReason}</p>`;
+            resultContentDiv.innerHTML += `<p class="text-sm"><strong>Action for ${assessmentState.userRole}:</strong> `;
+             if (assessmentState.userRole === 'Provider') {
+                resultContentDiv.innerHTML += `You must thoroughly document this assessment demonstrating that all derogation criteria under Article 6(3) are met and register the system in the EU database as per Article 49(2). This documentation must be provided to authorities upon request.`;
+            } else {
+                 resultContentDiv.innerHTML += `Ensure the provider has documented this derogation and registered the system appropriately.`;
+            }
+            resultContentDiv.innerHTML += `</p>`;
+            primaryClassificationDetermined = true; 
+        }
+        
+        if (assessmentState.isLimitedRisk) {
+             if (!primaryClassificationDetermined) { 
+                resultContentDiv.innerHTML += `<p class="text-sky-600 font-bold mt-2">POTENTIAL CLASSIFICATION: Limited Risk AI.</p>`;
+                primaryClassificationDetermined = true;
+            } else {
+                 resultContentDiv.innerHTML += `<p class="text-sky-600 font-semibold mt-2">ADDITIONAL CONSIDERATION: Limited Risk (Transparency Obligations).</p>`;
+            }
+            resultContentDiv.innerHTML += `<p class="text-sm"><strong>Justification:</strong> Your answers indicate the system has functionalities requiring transparency under Article 50 (Step 5), such as: ${assessmentState.limitedRiskPractices.join(', ').replace(/_/g, ' ')}.</p>`;
+            resultContentDiv.innerHTML += `<p class="text-sm"><strong>Action for ${assessmentState.userRole}:</strong> Implement required transparency measures (e.g., inform users of AI interaction, label AI-generated content).</p>`;
+        }
+        
+        if (!primaryClassificationDetermined) {
+             resultContentDiv.innerHTML += `<p class="text-positive-accent font-bold mt-2">POTENTIAL CLASSIFICATION: Minimal Risk AI.</p>`;
+             resultContentDiv.innerHTML += `<p class="text-sm"><strong>Justification:</strong> Based on your answers, the system does not appear to fall into Prohibited, High-Risk (either directly or via Annex III without valid derogation), or Limited Risk categories.</p>`;
+             resultContentDiv.innerHTML += `<p class="text-sm"><strong>Action for ${assessmentState.userRole}:</strong> Generally permitted under the AI Act. Monitor for changes in functionality or intended use that could alter its risk profile. Voluntary codes of conduct are encouraged.</p>`;
+        }
+
+        resultContentDiv.innerHTML += `<hr class="my-3 border-slate-300">`;
+        resultContentDiv.innerHTML += `<p class="font-semibold text-primary-heading">Note on Open Source AI Systems:</p>`;
+        resultContentDiv.innerHTML += `<p class="text-sm">If your AI system (whether classified as High-Risk, Limited Risk, or Minimal Risk) is developed or distributed under a free and open-source license, this promotes transparency and community review. However, under the EU AI Act, the classification of an AI *system* and its corresponding legal obligations are primarily determined by its intended purpose, functionalities, and potential impact. Making a High-Risk or Limited-Risk AI *system* open-source does **not** generally exempt it from the specific obligations applicable to its risk category. For instance, a High-Risk AI system, even if open-source, must still meet all requirements of Chapter III of the Act (risk management, data governance, conformity assessment, etc.).</p>`;
+        
+        resultContentDiv.innerHTML += `<hr class="my-3 border-slate-300"><p class="text-xs text-slate-500 mt-2"><strong>Disclaimer:</strong> This is a preliminary assessment based on your inputs and for informational purposes only. It does not constitute legal advice. Always refer to the official EU AI Act text and consult with legal professionals for definitive classification and compliance guidance for your specific AI system.</p>`;
+        document.getElementById('assessment-result-display').classList.remove('hidden');
+        document.getElementById('assessment-result-display').scrollIntoView({ behavior: 'smooth' });
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('.tab-button');
+        const mobileNav = document.getElementById('mobile-nav');
+        const contentSections = document.querySelectorAll('.content-section');
+        const accordions = document.querySelectorAll('.accordion-button');
+
+        function showTab(tabId) {
+            contentSections.forEach(section => section.classList.remove('active'));
+            const activeSection = document.getElementById(tabId);
+            if (activeSection) activeSection.classList.add('active');
+
+            tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.tab === tabId));
+            if (mobileNav.value !== tabId) mobileNav.value = tabId;
+            window.scrollTo(0, 0);
+
+            if (tabId === 'risk-categories' && !riskChart) { 
+                const ctxRisk = document.getElementById('riskDistributionChart');
+                if (ctxRisk) {
+                    riskChart = new Chart(ctxRisk, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Minimal Risk', 'Limited Risk', 'High-Risk', 'Prohibited'],
+                            datasets: [{
+                                label: 'Conceptual Risk Distribution', data: [70, 15, 14, 1],
+                                backgroundColor: ['#16A34A', '#a5d1ff', '#ffd60a', '#DC2626'], 
+                                borderColor: ['#15803d', '#001d3d', '#d4b100', '#b91c1c'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { font: { size: 10, family: 'Open Sans' }, padding: 10 }},
+                                title: { display: true, text: 'Conceptual AI Risk Distribution', font: { size: 14, family: 'Open Sans' }, padding: { bottom:15 } },
+                                tooltip: { callbacks: { label: function(context) {
+                                    let label = context.label || ''; if (label) { label += ': '; }
+                                    if (context.parsed !== null) { label += context.parsed + '%'; } return label;
+                                }}}
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        window.navigateToTab = showTab; 
+
+        tabs.forEach(tab => tab.addEventListener('click', () => showTab(tab.dataset.tab)));
+        mobileNav.addEventListener('change', (event) => showTab(event.target.value));
+        showTab('home'); // Initialize with the home tab
+
+        accordions.forEach(button => {
+            button.addEventListener('click', () => {
+                button.classList.toggle('open');
+                const content = button.nextElementSibling;
+                if (content && content.classList.contains('accordion-content')) {
+                    content.style.display = content.style.display === "block" ? "none" : "block";
+                }
+            });
+        });
+        
+        const checkAiSystemButton = document.getElementById('checkAiSystemButton');
+        const aiSystemResult = document.getElementById('aiSystemResult');
+        if(checkAiSystemButton) {
+            checkAiSystemButton.addEventListener('click', () => {
+                const criteria = {
+                    machine_based: document.querySelector('input[data-criterion="machine_based"]').checked,
+                    autonomy: document.querySelector('input[data-criterion="autonomy"]').checked,
+                    inference: document.querySelector('input[data-criterion="inference"]').checked
+                };
+                if (criteria.machine_based && criteria.autonomy && criteria.inference) {
+                    aiSystemResult.textContent = "Preliminary: Likely an AI System. Further assessment of its intended purpose is needed for risk classification.";
+                    aiSystemResult.className = "mt-3 font-semibold text-positive-accent";
+                } else {
+                    aiSystemResult.textContent = "Preliminary: May not meet all core criteria for an AI System under the Act. Review definition carefully.";
+                    aiSystemResult.className = "mt-3 font-semibold text-warning-message"; // Changed from text-warning-accent
+                }
+            });
+        }
+
+        const profilingRadios = document.querySelectorAll('input[name="profiling"]');
+        const derogationQ2Div = document.getElementById('derogationQ2');
+        const derogationQ3Div = document.getElementById('derogationQ3');
+        const assessDerogationButton = document.getElementById('assessDerogationButton');
+        const derogationResultP = document.getElementById('derogationResult');
+
+        if(profilingRadios.length > 0 && derogationQ2Div && assessDerogationButton && derogationResultP) {
+            profilingRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'no') {
+                        derogationQ2Div.classList.remove('hidden');
+                    } else {
+                        derogationQ2Div.classList.add('hidden');
+                        if(derogationQ3Div) derogationQ3Div.classList.add('hidden');
+                        derogationResultP.textContent = "If profiling is performed, the Annex III system is High-Risk. Derogation does not apply.";
+                        derogationResultP.className = "mt-3 font-semibold text-critical-accent";
+                    }
+                });
+            });
+
+            const significantHarmRadios = document.querySelectorAll('input[name="significant_harm"]');
+            significantHarmRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'no' && derogationQ3Div) {
+                        derogationQ3Div.classList.remove('hidden');
+                    } else if (derogationQ3Div) {
+                        derogationQ3Div.classList.add('hidden');
+                        derogationResultP.textContent = ""; 
+                    }
+                });
+            });
+
+            assessDerogationButton.addEventListener('click', () => {
+                const profiling = document.querySelector('input[name="profiling"]:checked');
+                const significantHarm = document.querySelector('input[name="significant_harm"]:checked');
+                const conditions = Array.from(document.querySelectorAll('input[name="derogation_condition"]:checked')).map(cb => cb.value);
+
+                if (!profiling) {
+                    derogationResultP.textContent = "Please answer Question 1 (Profiling).";
+                    derogationResultP.className = "mt-3 font-semibold text-critical-accent"; return;
+                }
+                if (profiling.value === 'yes') {
+                    derogationResultP.textContent = "System is High-Risk (performs profiling). Derogation does not apply.";
+                    derogationResultP.className = "mt-3 font-semibold text-critical-accent"; return;
+                }
+                if (!significantHarm) {
+                    derogationResultP.textContent = "Please answer Question 2 (Significant Harm).";
+                    derogationResultP.className = "mt-3 font-semibold text-critical-accent"; return;
+                }
+                if (significantHarm.value === 'yes') {
+                    derogationResultP.textContent = "System is likely High-Risk (poses significant harm).";
+                    derogationResultP.className = "mt-3 font-semibold text-warning-message"; // Changed
+                } else { 
+                    if (conditions.length > 0) {
+                        derogationResultP.textContent = "Derogation may apply. System might not be High-Risk. Thoroughly document your assessment as per Art 6(3).";
+                        derogationResultP.className = "mt-3 font-semibold text-positive-accent";
+                    } else {
+                        derogationResultP.textContent = "System is likely High-Risk (does not meet derogation conditions in Q3).";
+                        derogationResultP.className = "mt-3 font-semibold text-warning-message"; // Changed
+                    }
+                }
+            });
+        }
+        
+        const assessmentNextBtns = document.querySelectorAll('.assessment-next-btn');
+        const resetAssessmentBtn = document.getElementById('resetAssessmentBtn');
+        
+        showAssessmentStep(assessmentSteps[0]); 
+
+        assessmentNextBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.id === 'viewAssessmentResultBtn') { 
+                    collectAnswers();
+                    displayAssessmentResult();
+                    return; 
+                }
+
+                const currentStepId = assessmentSteps[currentStepIndex];
+                let nextStepId = btn.dataset.next; 
+
+                if (currentStepId === "assessment-step-3-highrisk-pathway") { 
+                    const isAnnexIII = document.querySelector('input[name="q3_2_annex_iii"]:checked')?.value;
+                    if (isAnnexIII !== 'yes') { 
+                        nextStepId = "assessment-step-5-limited"; 
+                    } else {
+                        nextStepId = "assessment-step-4a-annex3-profiling";
+                    }
+                } else if (currentStepId === "assessment-step-4a-annex3-profiling") { 
+                    const performsProfiling = document.querySelector('input[name="q4_1_profiling"]:checked')?.value;
+                    if (performsProfiling === 'yes') { 
+                        nextStepId = "assessment-step-5-limited";
+                    } else {
+                        nextStepId = "assessment-step-4b-annex3-harm";
+                    }
+                } else if (currentStepId === "assessment-step-4b-annex3-harm") { 
+                    const posesHarm = document.querySelector('input[name="q4_2_significant_harm"]:checked')?.value;
+                    if (posesHarm === 'yes') { 
+                        nextStepId = "assessment-step-5-limited";
+                    } else {
+                         nextStepId = "assessment-step-4c-annex3-conditions";
+                    }
+                }
+                
+                if (nextStepId) {
+                    const nextStepIndexAttempt = assessmentSteps.indexOf(nextStepId);
+                    if (nextStepIndexAttempt !== -1) {
+                        currentStepIndex = nextStepIndexAttempt;
+                        showAssessmentStep(assessmentSteps[currentStepIndex]);
+                    }
+                }
+            });
+        });
+        
+        if (resetAssessmentBtn) {
+            resetAssessmentBtn.addEventListener('click', () => {
+                document.getElementById('assessmentContainer').querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => input.checked = false);
+                currentStepIndex = 0; 
+                showAssessmentStep(assessmentSteps[currentStepIndex]);
+                document.getElementById('assessment-result-display').classList.add('hidden');
+                const annexIIIDetails = document.getElementById('annexIIIDetails');
+                const toggleBtn = document.getElementById('toggleAnnexIIIDetails');
+                if(annexIIIDetails && toggleBtn && annexIIIDetails.style.display === 'block') {
+                    annexIIIDetails.style.display = 'none';
+                    toggleBtn.classList.remove('open');
+                }
+            });
+        }
+
+    });
+</script>
+
+</body>
+</html>

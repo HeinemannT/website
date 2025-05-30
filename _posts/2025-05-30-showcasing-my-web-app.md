@@ -1,22 +1,17 @@
 ---
 layout: post
-title: "Showcasing My New Web App Project!"
-date: 2025-05-30 19:20:00 +0200 # Using current time, adjust as needed
+title: "Projects with AI"
+date: 2025-05-30 19:20:00 +0200 
 categories: [projects, webdev]
-# tags: [pwa, javascript, showcase]
 ---
 
-## Check Out My Latest Project!
+Two projects I don't take credit for. It is scary how well AI - in this case Gemini 2.5 Pro - manages to transform coarse words and concepts into a detailed reality.
 
-I'm excited to share a small web application I've been working on. It's a neat experiment featuring a web manifest and a service worker for some offline capabilities.
 
-You can explore the project directly here:
+[A tracker for my studies]({{ '/study-tracker/' | relative_url }}) - I am pursuing SCRUM and ISO 27001 certifications. Of course, procrastination always precedes studying, so I channeled it into creating this small site.
 
-[Launch My Cool Project]({{ '/study-tracker/' | relative_url }})
+[AI Act questionnaire]({{ '/ai-act-questionnaire/' | relative_url }}) - The AI act is a confusing piece of legislation on several different levels. This site is an attempt to dispell confusion on the most surface level and determine an AI system's risk classification.
 
-I built this to explore [mention a technology or concept if you like, e.g., Progressive Web App features, vanilla JS, etc.]. 
-Let me know what you think if you get a chance to check it out!
-
-### Technical Bits:
-* It uses a `manifest.json` for app-like properties.
-* A `sw.js` service worker is included for [mention its purpose, e.g., caching assets].
+I find webpages fascinating. I love sleek, creative sites with a purpose.
+But creating one myself with HTML? That's too much effort. I know Java, C#, JavaScript, and Python, not to mention some WordPress, but the HTML and CSS process is too overwhelming.
+However, webpages provide you with something tangible — a working artifact that is shareable and visually iterable.

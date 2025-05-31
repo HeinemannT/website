@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Projects with AI"
-date: 2025-05-30 19:20:00 +0200 
 categories: [projects, webdev]
 ---
 

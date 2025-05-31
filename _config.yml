@@ -4,7 +4,7 @@
 
 header_pages:
   - index.md
-  - about.md
+  - thoughts.md
   - contact.md
 
 #footer:

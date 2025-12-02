@@ -70,6 +70,36 @@ permalink: /tools/corporater-layout-builder/
         </div>
 
         <div class="flex items-center gap-4">
+
+            <!-- Mobile Strategy Selector -->
+            <div
+                class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded-md border border-slate-200 group relative cursor-help">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">MOBILE STRATEGY</span>
+                <select id="mobileStrategy" onchange="generateCode()"
+                    class="bg-transparent text-xs font-bold text-indigo-600 focus:outline-none cursor-pointer">
+                    <option value="mirror" selected>💻 Mirror Desktop (Default)</option>
+                    <option value="stack">📱 Stack (Full Width)</option>
+                    <option value="grid">📱 Grid (2-Col)</option>
+                </select>
+                <i class="fas fa-question-circle text-slate-300 text-xs hover:text-indigo-500 transition-colors"></i>
+
+                <!-- Tooltip -->
+                <div
+                    class="absolute top-full mt-2 right-0 w-64 bg-slate-800 text-white text-[10px] p-3 rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 leading-relaxed border border-slate-700">
+                    <strong class="text-indigo-300 block mb-1">How Mobile layouts are calculated:</strong>
+                    <ul class="list-disc pl-3 space-y-1">
+                        <li><strong>Mirror:</strong> Mobile uses the exact same widths as Desktop. Best for complex
+                            dashboards.</li>
+                        <li><strong>Stack:</strong> Forces all containers to width 6 on mobile. Safest for readability.
+                        </li>
+                        <li><strong>Grid:</strong> Tries to fit two items per row (width 3) on mobile if they are small
+                            enough.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="h-6 w-px bg-slate-200"></div>
+
             <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-md border border-slate-200">
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">PARENT CONTEXT</span>
                 <span class="text-xs font-mono font-bold text-indigo-400">t.</span>
@@ -188,11 +218,6 @@ permalink: /tools/corporater-layout-builder/
             if (prefixRegex.test(col.name)) {
                 // If the name starts with [W#], update the number
                 col.name = col.name.replace(prefixRegex, `[W${newWidth}]`);
-            } else {
-                // Optional: If no prefix exists, should we add it? 
-                // Let's assume if user deleted it, they don't want it, 
-                // BUT the user asked for "how much space", so let's be helpful and prepend it if missing logic implies
-                // For now, only update if pattern matches to respect custom names like "My Header"
             }
         }
 
@@ -427,6 +452,8 @@ permalink: /tools/corporater-layout-builder/
         // --- Code Generator ---
         function generateCode() {
             let rootInput = document.getElementById('rootParentId').value || 'swi_folder';
+            let mobileStrategy = document.getElementById('mobileStrategy').value;
+
             let vRootVal;
             if (rootInput.startsWith('t.') || rootInput.startsWith('root.') || rootInput.startsWith('this.')) {
                 vRootVal = rootInput;
@@ -447,11 +474,25 @@ permalink: /tools/corporater-layout-builder/
 
                     tab.children.forEach((row, rIdx) => {
                         // ROW WRAPPER
+                        // Row wrappers generally stay full width (6) to maintain vertical flow logic
                         c += `        ${row.varName} := ${tab.varName}.add(Container, name := '${row.name}', columnsLargeScreen := 6, columnsMediumScreen := 6, columnsSmallScreen := 6)\n`;
 
                         row.children.forEach((col, cIdx) => {
-                            // COL CONTAINER
-                            c += `            ${col.varName} := ${row.varName}.add(Container, name := '${col.name}', columnsLargeScreen := ${col.width}, columnsMediumScreen := ${col.width}, columnsSmallScreen := ${col.width})\n`;
+                            // AUTO-CALCULATE WIDTHS
+                            let wLarge = col.width;
+                            let wMedium = wLarge; // Tablet usually mirrors desktop (safe default)
+                            let wSmall = 6;       // Stack by default
+
+                            if (mobileStrategy === 'grid') {
+                                // Grid: Allow 2 columns (size 3) on mobile if possible, else stack
+                                wSmall = (wLarge <= 3) ? 3 : 6;
+                            } else if (mobileStrategy === 'mirror') {
+                                // Mirror: Exact copy
+                                wSmall = wLarge;
+                            }
+                            // 'stack' strategy falls through to default wSmall = 6
+
+                            c += `            ${col.varName} := ${row.varName}.add(Container, name := '${col.name}', columnsLargeScreen := ${wLarge}, columnsMediumScreen := ${wMedium}, columnsSmallScreen := ${wSmall})\n`;
                         });
                     });
                 });

@@ -1,188 +1,468 @@
 ---
-<div
-    class="w-[55%] bg-grid-pattern flex flex-col overflow-hidden relative border-r border-slate-200 dark:border-slate-800 shadow-[inset_-10px_0_20px_rgba(0,0,0,0.05)] dark:shadow-[inset_-10px_0_20px_rgba(0,0,0,0.5)]">
+layout: null
+permalink: /tools/corporater-colorset-builder/
+---
+<!DOCTYPE html>
+<html lang="en">
 
-    <!-- Palette Meta & Actions (Redesigned) -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporater Color Architect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Smooth Transitions */
+        .smooth-transition {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Grid Pattern Background */
+        .bg-grid-pattern {
+            background-color: #f8fafc;
+            background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .dark .bg-grid-pattern {
+            background-color: #0f172a;
+            background-image: linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px);
+        }
+    </style>
+</head>
+
+<body
+    class="h-screen flex overflow-hidden bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
     <div
-        class="p-8 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/95 backdrop-blur-md sticky top-0 z-10">
-        <div class="flex items-end justify-between gap-8">
+        class="w-[55%] bg-grid-pattern flex flex-col overflow-hidden relative border-r border-slate-200 dark:border-slate-800 shadow-[inset_-10px_0_20px_rgba(0,0,0,0.05)] dark:shadow-[inset_-10px_0_20px_rgba(0,0,0,0.5)]">
 
-            <!-- Identity Block -->
-            <div class="flex-1">
-                <!-- Name Input -->
-                <div class="group relative">
-                    <label
-                        class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-4 left-0">Palette
-                        Name</label>
-                    <input type="text" id="setName" value="Status Colors" onkeyup="updateSetMeta();"
-                        class="input-title text-3xl font-extrabold text-slate-800 dark:text-white w-full rounded-md px-2 -ml-2 py-1 leading-none placeholder-slate-300 dark:placeholder-slate-700">
+        <!-- Palette Meta & Actions (Redesigned) -->
+        <div
+            class="p-8 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-950/95 backdrop-blur-md sticky top-0 z-10">
+            <div class="flex items-end justify-between gap-8">
+
+                <!-- Identity Block -->
+                <div class="flex-1">
+                    <!-- Name Input -->
+                    <div class="group relative">
+                        <label
+                            class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-4 left-0">Palette
+                            Name</label>
+                        <input type="text" id="setName" value="Status Colors" onkeyup="updateSetMeta();"
+                            class="input-title text-3xl font-extrabold text-slate-800 dark:text-white w-full rounded-md px-2 -ml-2 py-1 leading-none placeholder-slate-300 dark:placeholder-slate-700">
+                    </div>
+
+                    <!-- ID Input -->
+                    <div class="flex items-center gap-2 mt-1 px-1">
+                        <span class="text-[10px] font-mono text-slate-500 dark:text-slate-600 select-none">ID:</span>
+                        <input type="text" id="setId" value="StatusColors" onkeyup="generateCode()"
+                            class="input-title text-xs font-mono text-brand-600 dark:text-brand-500 w-full max-w-[240px] rounded px-1.5 py-0.5 opacity-90 focus:opacity-100">
+                    </div>
                 </div>
 
-                <!-- ID Input -->
-                <div class="flex items-center gap-2 mt-1 px-1">
-                    <span class="text-[10px] font-mono text-slate-500 dark:text-slate-600 select-none">ID:</span>
-                    <input type="text" id="setId" value="StatusColors" onkeyup="generateCode()"
-                        class="input-title text-xs font-mono text-brand-600 dark:text-brand-500 w-full max-w-[240px] rounded px-1.5 py-0.5 opacity-90 focus:opacity-100">
+                <!-- Actions Block -->
+                <div class="flex items-center gap-3 pb-1">
+                    <!-- Delete (Hidden unless selection) -->
+                    <button id="btnDeleteGlobal" onclick="deleteActiveColor()"
+                        class="hidden group items-center gap-2 px-4 py-2.5 rounded-lg border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-500/5 hover:bg-red-500 hover:border-red-500 transition-all duration-200">
+                        <i class="fas fa-trash-alt text-xs text-red-500 group-hover:text-white transition-colors"></i>
+                        <span class="text-xs font-bold text-red-500 dark:text-red-400 group-hover:text-white">Delete
+                            Selected</span>
+                    </button>
+
+                    <!-- Add -->
+                    <button onclick="addNewColor()"
+                        class="group flex items-center gap-2 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 px-6 py-2.5 rounded-full font-bold text-xs shadow-lg shadow-slate-900/10 dark:shadow-white/5 border border-transparent hover:scale-105 active:scale-95 transition-all">
+                        <i
+                            class="fas fa-plus text-brand-400 dark:text-brand-600 group-hover:scale-110 transition-transform"></i>
+                        <span>New Color</span>
+                    </button>
                 </div>
             </div>
+        </div>
 
-            <!-- Actions Block -->
-            <div class="flex items-center gap-3 pb-1">
-                <!-- Delete (Hidden unless selection) -->
-                <button id="btnDeleteGlobal" onclick="deleteActiveColor()"
-                    class="hidden group items-center gap-2 px-4 py-2.5 rounded-lg border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-500/5 hover:bg-red-500 hover:border-red-500 transition-all duration-200">
-                    <i class="fas fa-trash-alt text-xs text-red-500 group-hover:text-white transition-colors"></i>
-                    <span class="text-xs font-bold text-red-500 dark:text-red-400 group-hover:text-white">Delete
-                        Selected</span>
-                </button>
-
-                <!-- Add -->
-                <button onclick="addNewColor()"
-                    class="group flex items-center gap-2 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white text-white dark:text-slate-900 px-6 py-2.5 rounded-full font-bold text-xs shadow-lg shadow-slate-900/10 dark:shadow-white/5 border border-transparent hover:scale-105 active:scale-95 transition-all">
-                    <i
-                        class="fas fa-plus text-brand-400 dark:text-brand-600 group-hover:scale-110 transition-transform"></i>
-                    <span>New Color</span>
-                </button>
-            </div>
+        <!-- Grid -->
+        <div id="gridContainer" class="flex-1 overflow-y-auto p-8">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" id="colorGrid"></div>
         </div>
     </div>
 
-    <!-- Grid -->
-    <div id="gridContainer" class="flex-1 overflow-y-auto p-8">
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" id="colorGrid"></div>
-    </div>
-</div>
+    <!-- Right: Studio & Tools (45%) -->
+    <div
+        class="w-[45%] bg-white dark:bg-slate-900 flex flex-col shadow-2xl z-40 relative border-l border-slate-200 dark:border-slate-800">
 
-<!-- Right: Studio & Tools (45%) -->
-<div
-    class="w-[45%] bg-white dark:bg-slate-900 flex flex-col shadow-2xl z-40 relative border-l border-slate-200 dark:border-slate-800">
-
-    <!-- Tabs -->
-    <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
-        <button onclick="switchTab('studio')" id="btnTabStudio"
-            class="flex-1 py-4 text-[10px] font-bold text-slate-800 dark:text-white border-b-2 border-brand-500 bg-white dark:bg-slate-900 tracking-wider transition-colors">STUDIO</button>
-        <button onclick="switchTab('generate')" id="btnTabGen"
-            class="flex-1 py-4 text-[10px] font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900/50 transition-colors tracking-wider">GENERATORS</button>
-        <button onclick="switchTab('import')" id="btnTabImport"
-            class="flex-1 py-4 text-[10px] font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900/50 transition-colors tracking-wider">IMPORT</button>
-        <button onclick="switchTab('code')" id="btnTabCode"
-            class="flex-1 py-4 text-[10px] font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900/50 transition-colors tracking-wider">SCRIPT</button>
-    </div>
-
-    <!-- TAB 1: STUDIO -->
-    <div id="viewStudio" class="flex-1 overflow-y-auto flex flex-col relative bg-white dark:bg-slate-900">
-
-        <!-- Active Color Header Strip -->
-        <div id="activeColorStrip"
-            class="h-1 w-full bg-transparent transition-colors duration-300 shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+        <!-- Tabs -->
+        <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+            <button onclick="switchTab('studio')" id="btnTabStudio"
+                class="flex-1 py-4 text-[10px] font-bold text-slate-800 dark:text-white border-b-2 border-brand-500 bg-white dark:bg-slate-900 tracking-wider transition-colors">STUDIO</button>
+            <button onclick="switchTab('generate')" id="btnTabGen"
+                class="flex-1 py-4 text-[10px] font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900/50 transition-colors tracking-wider">GENERATORS</button>
+            <button onclick="switchTab('import')" id="btnTabImport"
+                class="flex-1 py-4 text-[10px] font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900/50 transition-colors tracking-wider">IMPORT</button>
+            <button onclick="switchTab('code')" id="btnTabCode"
+                class="flex-1 py-4 text-[10px] font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900/50 transition-colors tracking-wider">SCRIPT</button>
         </div>
 
-        <div id="emptyState"
-            class="flex flex-col items-center justify-center h-full text-slate-400 dark:text-slate-600 space-y-4 absolute inset-0 z-0">
-            <div
-                class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center border border-slate-200 dark:border-slate-700/50">
-                <i class="fas fa-sliders-h text-2xl text-slate-300 dark:text-slate-500"></i>
-            </div>
-            <p class="text-xs font-medium uppercase tracking-widest opacity-75">Select Color</p>
-        </div>
+        <!-- TAB 1: STUDIO -->
+        <div id="viewStudio" class="flex-1 overflow-y-auto flex flex-col relative bg-white dark:bg-slate-900">
 
-        <div id="editorState" class="hidden flex-col h-full relative z-10 p-8">
-
-            <!-- Pro Picker Layout -->
-            <div class="flex gap-5 mb-8" style="height: 260px;">
-
-                <!-- Main Matrix -->
-                <div class="flex-1 relative rounded border border-slate-200 dark:border-slate-700 cursor-crosshair group shadow-xl bg-black"
-                    id="matrixContainer">
-                    <canvas id="colorCanvas" class="w-full h-full rounded-[3px]"></canvas>
-                    <div id="matrixCursor" class="matrix-cursor top-0 left-0"></div>
-                </div>
-
-                <!-- Custom Vertical Hue Bar -->
-                <div class="w-8 h-full hue-track-vertical rounded border border-slate-200 dark:border-slate-700 relative shadow-inner"
-                    id="hueContainer">
-                    <div id="hueThumb" class="hue-thumb top-0"></div>
-                </div>
+            <!-- Active Color Header Strip -->
+            <div id="activeColorStrip"
+                class="h-1 w-full bg-transparent transition-colors duration-300 shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:shadow-[0_0_15px_rgba(0,0,0,0.5)]">
             </div>
 
-            <!-- Pipette & Hex Row (Aligned!) -->
-            <div class="flex gap-3 items-stretch mb-8">
-                <button onclick="startPipette()" id="btnPipette"
-                    class="w-14 bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-brand-500 rounded-lg flex items-center justify-center transition-all shadow-md group active:scale-95">
-                    <i class="fas fa-eye-dropper"></i>
-                </button>
-
-                <!-- Hex Input Container -->
+            <div id="emptyState"
+                class="flex flex-col items-center justify-center h-full text-slate-400 dark:text-slate-600 space-y-4 absolute inset-0 z-0">
                 <div
-                    class="flex-1 relative group flex items-center bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-4 transition-colors focus-within:border-brand-500 shadow-inner">
-                    <span class="text-slate-400 dark:text-slate-500 font-bold text-lg select-none mr-2">#</span>
-                    <input type="text" id="inpHex" maxlength="6" oninput="handleHexInput(this.value)"
-                        class="flex-1 bg-transparent py-3 text-lg font-bold tabular-nums text-slate-800 dark:text-white focus:outline-none uppercase tracking-widest text-center placeholder-slate-300 dark:placeholder-slate-700">
+                    class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center border border-slate-200 dark:border-slate-700/50">
+                    <i class="fas fa-sliders-h text-2xl text-slate-300 dark:text-slate-500"></i>
                 </div>
+                <p class="text-xs font-medium uppercase tracking-widest opacity-75">Select Color</p>
             </div>
 
-            <!-- Values: RGB & Sliders -->
-            <div
-                class="bg-slate-50 dark:bg-slate-950/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800 space-y-6">
+            <div id="editorState" class="hidden flex-col h-full relative z-10 p-8">
 
-                <!-- RGB -->
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="relative group">
-                        <label
-                            class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">R</label>
-                        <input type="number" id="inpR" min="0" max="255" oninput="handleRGBInput()"
-                            class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
+                <!-- Pro Picker Layout -->
+                <div class="flex gap-5 mb-8" style="height: 260px;">
+
+                    <!-- Main Matrix -->
+                    <div class="flex-1 relative rounded border border-slate-200 dark:border-slate-700 cursor-crosshair group shadow-xl bg-black"
+                        id="matrixContainer">
+                        <canvas id="colorCanvas" class="w-full h-full rounded-[3px]"></canvas>
+                        <div id="matrixCursor" class="matrix-cursor top-0 left-0"></div>
                     </div>
-                    <div class="relative group">
-                        <label
-                            class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">G</label>
-                        <input type="number" id="inpG" min="0" max="255" oninput="handleRGBInput()"
-                            class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
-                    </div>
-                    <div class="relative group">
-                        <label
-                            class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">B</label>
-                        <input type="number" id="inpB" min="0" max="255" oninput="handleRGBInput()"
-                            class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
+
+                    <!-- Custom Vertical Hue Bar -->
+                    <div class="w-8 h-full hue-track-vertical rounded border border-slate-200 dark:border-slate-700 relative shadow-inner"
+                        id="hueContainer">
+                        <div id="hueThumb" class="hue-thumb top-0"></div>
                     </div>
                 </div>
 
-                <div class="h-px bg-slate-200 dark:bg-slate-800/50"></div>
+                <!-- Pipette & Hex Row (Aligned!) -->
+                <div class="flex gap-3 items-stretch mb-8">
+                    <button onclick="startPipette()" id="btnPipette"
+                        class="w-14 bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-brand-500 rounded-lg flex items-center justify-center transition-all shadow-md group active:scale-95">
+                        <i class="fas fa-eye-dropper"></i>
+                    </button>
 
-                <!-- Fine Tune Sliders -->
-                <div class="space-y-4">
-                    <div class="flex items-center gap-4 text-xs">
-                        <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 w-6">SAT</span>
-                        <input type="range" id="slSat" min="0" max="100" class="flex-1" oninput="handleFineSliders()">
-                        <span id="lblSat"
-                            class="text-[10px] font-bold tabular-nums text-slate-500 dark:text-slate-400 w-8 text-right">0%</span>
-                    </div>
-                    <div class="flex items-center gap-4 text-xs">
-                        <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 w-6">VAL</span>
-                        <input type="range" id="slVal" min="0" max="100" class="flex-1" oninput="handleFineSliders()">
-                        <span id="lblVal"
-                            class="text-[10px] font-bold tabular-nums text-slate-500 dark:text-slate-400 w-8 text-right">0%</span>
+                    <!-- Hex Input Container -->
+                    <div
+                        class="flex-1 relative group flex items-center bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-4 transition-colors focus-within:border-brand-500 shadow-inner">
+                        <span class="text-slate-400 dark:text-slate-500 font-bold text-lg select-none mr-2">#</span>
+                        <input type="text" id="inpHex" maxlength="6" oninput="handleHexInput(this.value)"
+                            class="flex-1 bg-transparent py-3 text-lg font-bold tabular-nums text-slate-800 dark:text-white focus:outline-none uppercase tracking-widest text-center placeholder-slate-300 dark:placeholder-slate-700">
                     </div>
                 </div>
+
+                <!-- Values: RGB & Sliders -->
+                <div
+                    class="bg-slate-50 dark:bg-slate-950/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800 space-y-6">
+
+                    <!-- RGB -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="relative group">
+                            <label
+                                class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">R</label>
+                            <input type="number" id="inpR" min="0" max="255" oninput="handleRGBInput()"
+                                class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
+                        </div>
+                        <div class="relative group">
+                            <label
+                                class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">G</label>
+                            <input type="number" id="inpG" min="0" max="255" oninput="handleRGBInput()"
+                                class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
+                        </div>
+                        <div class="relative group">
+                            <label
+                                class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">B</label>
+                            <input type="number" id="inpB" min="0" max="255" oninput="handleRGBInput()"
+                                class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
+                        </div>
+                    </div>
+
+                    <div class="h-px bg-slate-200 dark:bg-slate-800/50"></div>
+
+                    <!-- Fine Tune Sliders -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 text-xs">
+                            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 w-6">SAT</span>
+                            <input type="range" id="slSat" min="0" max="100" class="flex-1"
+                                oninput="handleFineSliders()">
+                            <span id="lblSat"
+                                class="text-[10px] font-bold tabular-nums text-slate-500 dark:text-slate-400 w-8 text-right">0%</span>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs">
+                            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 w-6">VAL</span>
+                            <input type="range" id="slVal" min="0" max="100" class="flex-1"
+                                oninput="handleFineSliders()">
+                            <span id="lblVal"
+                                class="text-[10px] font-bold tabular-nums text-slate-500 dark:text-slate-400 w-8 text-right">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meta Data -->
+                <div class="grid grid-cols-2 gap-4 mt-auto">
+                    <div>
+                        <label
+                            class="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-1.5">Color
+                            Name</label>
+                        <input type="text" id="inpName" oninput="handleTextUpdate('name', this.value)"
+                            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:border-brand-500 focus:outline-none transition-colors placeholder-slate-400 dark:placeholder-slate-600">
+                    </div>
+                    <div>
+                        <label class="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-1.5">ID
+                            (System)</label>
+                        <input type="text" id="inpId" oninput="handleTextUpdate('id', this.value)"
+                            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 focus:border-brand-500 focus:outline-none transition-colors placeholder-slate-400 dark:placeholder-slate-600">
+                    </div>
+                </div>
+
             </div>
-
-            <!-- Meta Data -->
-            <div class="grid grid-cols-2 gap-4 mt-auto">
-                <div>
-                    <label class="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-1.5">Color
-                        Name</label>
-                    <input type="text" id="inpName" oninput="handleTextUpdate('name', this.value)"
-                        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:border-brand-500 focus:outline-none transition-colors placeholder-slate-400 dark:placeholder-slate-600">
-                </div>
-                <div>
-                    <label class="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-1.5">ID
-                        (System)</label>
-                    <input type="text" id="inpId" oninput="handleTextUpdate('id', this.value)"
-                        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 focus:border-brand-500 focus:outline-none transition-colors placeholder-slate-400 dark:placeholder-slate-600">
-                </div>
-            </div>
-
         </div>
+
+        <!-- TAB 2: GENERATORS -->
+        <div id="viewGenerate" class="hidden flex-1 overflow-y-auto p-8 space-y-8 bg-white dark:bg-slate-900">
+
+            <div
+                class="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-200 dark:border-slate-800 flex items-center gap-4 shadow-inner">
+                <div id="genSeedPreview"
+                    class="w-12 h-12 rounded shadow-lg border border-black/5 dark:border-white/10 bg-slate-200 dark:bg-slate-800">
+                </div>
+                <div>
+                    <span
+                        class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase block tracking-wider">Base
+                        Color</span>
+                    <span id="genSeedName" class="text-sm font-bold text-slate-800 dark:text-white">No Color
+                        Selected</span>
+                </div>
+            </div>
+
+            <div id="genControls" class="space-y-6 opacity-50 pointer-events-none transition-opacity">
+                <div class="space-y-3">
+                    <label
+                        class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Strategy</label>
+                    <select id="genStrategy" onchange="generatePreview()"
+                        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded px-3 py-3 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-500 cursor-pointer shadow-sm">
+                        <option value="scale">Material Scale (100-900)</option>
+                        <option value="pastel">Pastel Variations</option>
+                        <option value="shades">Deep Shades</option>
+                        <option value="tints">Bright Tints</option>
+                        <option value="complement">Complementary & Triad</option>
+                    </select>
+                </div>
+
+                <div class="space-y-3">
+                    <label
+                        class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Preview</label>
+                    <div id="genPreview" class="grid grid-cols-2 gap-2"></div>
+                </div>
+
+                <button onclick="commitGenerated()"
+                    class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs py-3 rounded shadow-lg transition-all hover:shadow-brand-500/20 transform active:scale-95">
+                    Add Generated Colors
+                </button>
+            </div>
+
+            <div id="genWarning" class="text-center text-xs text-slate-400 dark:text-slate-500 italic mt-10">
+                Select a color in the grid to activate generators.
+            </div>
+        </div>
+
+        <!-- TAB 3: IMPORT -->
+        <div id="viewImport" class="hidden flex-1 overflow-y-auto p-8 space-y-8 bg-white dark:bg-slate-900">
+
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <label
+                        class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Quick
+                        Paste</label>
+                    <span class="text-[9px] text-slate-400 dark:text-slate-500">Supports #hex, rgb(), lists</span>
+                </div>
+                <div class="relative group">
+                    <textarea id="pasteArea"
+                        class="w-full h-48 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded p-4 text-xs font-mono text-slate-600 dark:text-slate-300 focus:outline-none focus:border-brand-500 resize-none leading-relaxed shadow-inner transition-colors"
+                        placeholder="#FF5733&#10;#C70039&#10;#900C3F"></textarea>
+                    <button onclick="processPaste()"
+                        class="absolute bottom-4 right-4 bg-slate-200 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-slate-600 dark:text-slate-300 px-4 py-2 rounded text-[10px] font-bold border border-slate-300 dark:border-slate-700 hover:border-brand-500 shadow-lg transition-all">
+                        Process
+                    </button>
+                </div>
+            </div>
+
+            <div class="h-px bg-slate-200 dark:bg-slate-800 w-full"></div>
+
+            <div class="space-y-3">
+                <label class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Useful
+                    External
+                    Tools</label>
+                <div class="grid grid-cols-1 gap-2">
+                    <a href="https://coolors.co/" target="_blank"
+                        class="group flex justify-between items-center bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+                        <span
+                            class="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Coolors.co</span>
+                        <i
+                            class="fas fa-external-link-alt text-[10px] text-slate-400 dark:text-slate-600 group-hover:text-brand-500"></i>
+                    </a>
+                    <a href="https://color.adobe.com/create/color-wheel" target="_blank"
+                        class="group flex justify-between items-center bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+                        <span
+                            class="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Adobe
+                            Color</span>
+                        <i
+                            class="fas fa-external-link-alt text-[10px] text-slate-400 dark:text-slate-600 group-hover:text-brand-500"></i>
+                    </a>
+                    <a href="https://colorhunt.co/" target="_blank"
+                        class="group flex justify-between items-center bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+                        <span
+                            class="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Color
+                            Hunt</span>
+                        <i
+                            class="fas fa-external-link-alt text-[10px] text-slate-400 dark:text-slate-600 group-hover:text-brand-500"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: SCRIPT -->
+        <div id="viewCode" class="hidden flex-1 flex flex-col p-0 bg-slate-50 dark:bg-slate-950">
+            <div
+                class="flex justify-between items-center px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Extended
+                    Script</span>
+                <button onclick="copyCode()"
+                    class="text-[10px] font-bold text-brand-500 hover:text-brand-400 flex items-center gap-1 transition-colors">
+                    <i class="far fa-copy"></i> Copy
+                </button>
+            </div>
+            <textarea id="codeOutput" readonly
+                class="flex-1 p-6 font-mono text-[10px] bg-slate-50 dark:bg-slate-950 text-brand-600 dark:text-brand-400 resize-none focus:outline-none leading-relaxed selection:bg-brand-100 dark:selection:bg-brand-900/50"
+                spellcheck="false"></textarea>
+        </div>
+
+        <span class="text-slate-400 dark:text-slate-500 font-bold text-lg select-none mr-2">#</span>
+        <input type="text" id="inpHex" maxlength="6" oninput="handleHexInput(this.value)"
+            class="flex-1 bg-transparent py-3 text-lg font-bold tabular-nums text-slate-800 dark:text-white focus:outline-none uppercase tracking-widest text-center placeholder-slate-300 dark:placeholder-slate-700">
+    </div>
+    </div>
+
+    <!-- Values: RGB & Sliders -->
+    <div
+        class="bg-slate-50 dark:bg-slate-950/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800 space-y-6">
+
+        <!-- RGB -->
+        <div class="grid grid-cols-3 gap-3">
+            <div class="relative group">
+                <label
+                    class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">R</label>
+                <input type="number" id="inpR" min="0" max="255" oninput="handleRGBInput()"
+                    class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
+            </div>
+            <div class="relative group">
+                <label
+                    class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">G</label>
+                <input type="number" id="inpG" min="0" max="255" oninput="handleRGBInput()"
+                    class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
+            </div>
+            <div class="relative group">
+                <label
+                    class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">B</label>
+                <input type="number" id="inpB" min="0" max="255" oninput="handleRGBInput()"
+                    class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
+            </div>
+        </div>
+
+        <div class="h-px bg-slate-200 dark:bg-slate-800/50"></div>
+
+        <!-- Fine Tune Sliders -->
+        <div class="space-y-4">
+            <div class="flex items-center gap-4 text-xs">
+                <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 w-6">SAT</span>
+                <input type="range" id="slSat" min="0" max="100" class="flex-1" oninput="handleFineSliders()">
+                <span id="lblSat"
+                    class="text-[10px] font-bold tabular-nums text-slate-500 dark:text-slate-400 w-8 text-right">0%</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+                <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 w-6">VAL</span>
+                <input type="range" id="slVal" min="0" max="100" class="flex-1" oninput="handleFineSliders()">
+                <span id="lblVal"
+                    class="text-[10px] font-bold tabular-nums text-slate-500 dark:text-slate-400 w-8 text-right">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meta Data -->
+    <div class="grid grid-cols-2 gap-4 mt-auto">
+        <div>
+            <label class="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-1.5">Color
+                Name</label>
+            <input type="text" id="inpName" oninput="handleTextUpdate('name', this.value)"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:border-brand-500 focus:outline-none transition-colors placeholder-slate-400 dark:placeholder-slate-600">
+        </div>
+        <div>
+            <label class="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-1.5">ID
+                (System)</label>
+            <input type="text" id="inpId" oninput="handleTextUpdate('id', this.value)"
+                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 focus:border-brand-500 focus:outline-none transition-colors placeholder-slate-400 dark:placeholder-slate-600">
+        </div>
+    </div>
+
+    </div>
     </div>
 
     <!-- TAB 2: GENERATORS -->
@@ -303,244 +583,58 @@
             spellcheck="false"></textarea>
     </div>
 
-    <span class="text-slate-400 dark:text-slate-500 font-bold text-lg select-none mr-2">#</span>
-    <input type="text" id="inpHex" maxlength="6" oninput="handleHexInput(this.value)"
-        class="flex-1 bg-transparent py-3 text-lg font-bold tabular-nums text-slate-800 dark:text-white focus:outline-none uppercase tracking-widest text-center placeholder-slate-300 dark:placeholder-slate-700">
-</div>
-</div>
-
-<!-- Values: RGB & Sliders -->
-<div class="bg-slate-50 dark:bg-slate-950/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800 space-y-6">
-
-    <!-- RGB -->
-    <div class="grid grid-cols-3 gap-3">
-        <div class="relative group">
-            <label
-                class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">R</label>
-            <input type="number" id="inpR" min="0" max="255" oninput="handleRGBInput()"
-                class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
-        </div>
-        <div class="relative group">
-            <label
-                class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">G</label>
-            <input type="number" id="inpG" min="0" max="255" oninput="handleRGBInput()"
-                class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
-        </div>
-        <div class="relative group">
-            <label
-                class="absolute -top-2 left-3 px-1 bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500">B</label>
-            <input type="number" id="inpB" min="0" max="255" oninput="handleRGBInput()"
-                class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-2 text-sm tabular-nums font-bold text-center text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none transition-colors">
-        </div>
+    </div>
     </div>
 
-    <div class="h-px bg-slate-200 dark:bg-slate-800/50"></div>
+    <!-- Logic -->
+    <script>
+        // --- State ---
+        let palette = {
+            name: "Status Colors",
+            colors: [
+                { id: 'color_ef4444', name: '#EF4444', hex: '#EF4444' }, // Red
+                { id: 'color_eab308', name: '#EAB308', hex: '#EAB308' }, // Yellow
+                { id: 'color_22c55e', name: '#22C55E', hex: '#22C55E' }  // Green
+            ]
+        };
+        let selectedIndex = -1;
 
-    <!-- Fine Tune Sliders -->
-    <div class="space-y-4">
-        <div class="flex items-center gap-4 text-xs">
-            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 w-6">SAT</span>
-            <input type="range" id="slSat" min="0" max="100" class="flex-1" oninput="handleFineSliders()">
-            <span id="lblSat"
-                class="text-[10px] font-bold tabular-nums text-slate-500 dark:text-slate-400 w-8 text-right">0%</span>
-        </div>
-        <div class="flex items-center gap-4 text-xs">
-            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 w-6">VAL</span>
-            <input type="range" id="slVal" min="0" max="100" class="flex-1" oninput="handleFineSliders()">
-            <span id="lblVal"
-                class="text-[10px] font-bold tabular-nums text-slate-500 dark:text-slate-400 w-8 text-right">0%</span>
-        </div>
-    </div>
-</div>
+        // Picker State (HSV)
+        let currentHue = 0; // 0-360
+        let currentSat = 0; // 0-100
+        let currentVal = 0; // 0-100
+        let isMatrixDragging = false;
+        let isHueDragging = false;
 
-<!-- Meta Data -->
-<div class="grid grid-cols-2 gap-4 mt-auto">
-    <div>
-        <label class="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-1.5">Color
-            Name</label>
-        <input type="text" id="inpName" oninput="handleTextUpdate('name', this.value)"
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-white focus:border-brand-500 focus:outline-none transition-colors placeholder-slate-400 dark:placeholder-slate-600">
-    </div>
-    <div>
-        <label class="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 block mb-1.5">ID
-            (System)</label>
-        <input type="text" id="inpId" oninput="handleTextUpdate('id', this.value)"
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 focus:border-brand-500 focus:outline-none transition-colors placeholder-slate-400 dark:placeholder-slate-600">
-    </div>
-</div>
+        // --- Init ---
+        const canvas = document.getElementById('colorCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-</div>
-</div>
+        // Listeners: Matrix
+        const matrixContainer = document.getElementById('matrixContainer');
+        matrixContainer.addEventListener('mousedown', (e) => { isMatrixDragging = true; updateMatrixFromMouse(e); });
+        window.addEventListener('mousemove', (e) => { if (isMatrixDragging) updateMatrixFromMouse(e); });
+        window.addEventListener('mouseup', () => { isMatrixDragging = false; });
 
-<!-- TAB 2: GENERATORS -->
-<div id="viewGenerate" class="hidden flex-1 overflow-y-auto p-8 space-y-8 bg-white dark:bg-slate-900">
+        // Listeners: Hue
+        const hueContainer = document.getElementById('hueContainer');
+        hueContainer.addEventListener('mousedown', (e) => { isHueDragging = true; updateHueFromMouse(e); });
+        window.addEventListener('mousemove', (e) => { if (isHueDragging) updateHueFromMouse(e); });
+        window.addEventListener('mouseup', () => { isHueDragging = false; });
 
-    <div
-        class="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-200 dark:border-slate-800 flex items-center gap-4 shadow-inner">
-        <div id="genSeedPreview"
-            class="w-12 h-12 rounded shadow-lg border border-black/5 dark:border-white/10 bg-slate-200 dark:bg-slate-800">
-        </div>
-        <div>
-            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase block tracking-wider">Base
-                Color</span>
-            <span id="genSeedName" class="text-sm font-bold text-slate-800 dark:text-white">No Color
-                Selected</span>
-        </div>
-    </div>
+        // --- Core Functions ---
 
-    <div id="genControls" class="space-y-6 opacity-50 pointer-events-none transition-opacity">
-        <div class="space-y-3">
-            <label
-                class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Strategy</label>
-            <select id="genStrategy" onchange="generatePreview()"
-                class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded px-3 py-3 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-500 cursor-pointer shadow-sm">
-                <option value="scale">Material Scale (100-900)</option>
-                <option value="pastel">Pastel Variations</option>
-                <option value="shades">Deep Shades</option>
-                <option value="tints">Bright Tints</option>
-                <option value="complement">Complementary & Triad</option>
-            </select>
-        </div>
+        function renderGrid() {
+            const container = document.getElementById('colorGrid');
+            container.innerHTML = '';
 
-        <div class="space-y-3">
-            <label
-                class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Preview</label>
-            <div id="genPreview" class="grid grid-cols-2 gap-2"></div>
-        </div>
+            palette.colors.forEach((col, idx) => {
+                const el = document.createElement('div');
+                const isSelected = idx === selectedIndex;
+                el.className = `group relative bg-white dark:bg-slate-900 border ${isSelected ? 'border-brand-500 ring-1 ring-brand-500 shadow-[0_0_15px_rgba(236,72,153,0.2)]' : 'border-slate-200 dark:border-slate-800/50 hover:border-slate-300 dark:hover:border-slate-600'} rounded-lg p-2.5 cursor-pointer transition-all duration-200 hover:-translate-y-0.5 shadow-md`;
+                el.onclick = () => selectColor(idx);
 
-        <button onclick="commitGenerated()"
-            class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs py-3 rounded shadow-lg transition-all hover:shadow-brand-500/20 transform active:scale-95">
-            Add Generated Colors
-        </button>
-    </div>
-
-    <div id="genWarning" class="text-center text-xs text-slate-400 dark:text-slate-500 italic mt-10">
-        Select a color in the grid to activate generators.
-    </div>
-</div>
-
-<!-- TAB 3: IMPORT -->
-<div id="viewImport" class="hidden flex-1 overflow-y-auto p-8 space-y-8 bg-white dark:bg-slate-900">
-
-    <div class="space-y-3">
-        <div class="flex justify-between items-center">
-            <label class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Quick
-                Paste</label>
-            <span class="text-[9px] text-slate-400 dark:text-slate-500">Supports #hex, rgb(), lists</span>
-        </div>
-        <div class="relative group">
-            <textarea id="pasteArea"
-                class="w-full h-48 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded p-4 text-xs font-mono text-slate-600 dark:text-slate-300 focus:outline-none focus:border-brand-500 resize-none leading-relaxed shadow-inner transition-colors"
-                placeholder="#FF5733&#10;#C70039&#10;#900C3F"></textarea>
-            <button onclick="processPaste()"
-                class="absolute bottom-4 right-4 bg-slate-200 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-slate-600 dark:text-slate-300 px-4 py-2 rounded text-[10px] font-bold border border-slate-300 dark:border-slate-700 hover:border-brand-500 shadow-lg transition-all">
-                Process
-            </button>
-        </div>
-    </div>
-
-    <div class="h-px bg-slate-200 dark:bg-slate-800 w-full"></div>
-
-    <div class="space-y-3">
-        <label class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Useful
-            External
-            Tools</label>
-        <div class="grid grid-cols-1 gap-2">
-            <a href="https://coolors.co/" target="_blank"
-                class="group flex justify-between items-center bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
-                <span
-                    class="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Coolors.co</span>
-                <i
-                    class="fas fa-external-link-alt text-[10px] text-slate-400 dark:text-slate-600 group-hover:text-brand-500"></i>
-            </a>
-            <a href="https://color.adobe.com/create/color-wheel" target="_blank"
-                class="group flex justify-between items-center bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
-                <span
-                    class="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Adobe
-                    Color</span>
-                <i
-                    class="fas fa-external-link-alt text-[10px] text-slate-400 dark:text-slate-600 group-hover:text-brand-500"></i>
-            </a>
-            <a href="https://colorhunt.co/" target="_blank"
-                class="group flex justify-between items-center bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-800 p-3 rounded border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
-                <span
-                    class="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">Color
-                    Hunt</span>
-                <i
-                    class="fas fa-external-link-alt text-[10px] text-slate-400 dark:text-slate-600 group-hover:text-brand-500"></i>
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- TAB 4: SCRIPT -->
-<div id="viewCode" class="hidden flex-1 flex flex-col p-0 bg-slate-50 dark:bg-slate-950">
-    <div
-        class="flex justify-between items-center px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Extended
-            Script</span>
-        <button onclick="copyCode()"
-            class="text-[10px] font-bold text-brand-500 hover:text-brand-400 flex items-center gap-1 transition-colors">
-            <i class="far fa-copy"></i> Copy
-        </button>
-    </div>
-    <textarea id="codeOutput" readonly
-        class="flex-1 p-6 font-mono text-[10px] bg-slate-50 dark:bg-slate-950 text-brand-600 dark:text-brand-400 resize-none focus:outline-none leading-relaxed selection:bg-brand-100 dark:selection:bg-brand-900/50"
-        spellcheck="false"></textarea>
-</div>
-
-</div>
-</div>
-
-<!-- Logic -->
-<script>
-    // --- State ---
-    let palette = {
-        name: "Status Colors",
-        colors: [
-            { id: 'color_ef4444', name: '#EF4444', hex: '#EF4444' }, // Red
-            { id: 'color_eab308', name: '#EAB308', hex: '#EAB308' }, // Yellow
-            { id: 'color_22c55e', name: '#22C55E', hex: '#22C55E' }  // Green
-        ]
-    };
-    let selectedIndex = -1;
-
-    // Picker State (HSV)
-    let currentHue = 0; // 0-360
-    let currentSat = 0; // 0-100
-    let currentVal = 0; // 0-100
-    let isMatrixDragging = false;
-    let isHueDragging = false;
-
-    // --- Init ---
-    const canvas = document.getElementById('colorCanvas');
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-
-    // Listeners: Matrix
-    const matrixContainer = document.getElementById('matrixContainer');
-    matrixContainer.addEventListener('mousedown', (e) => { isMatrixDragging = true; updateMatrixFromMouse(e); });
-    window.addEventListener('mousemove', (e) => { if (isMatrixDragging) updateMatrixFromMouse(e); });
-    window.addEventListener('mouseup', () => { isMatrixDragging = false; });
-
-    // Listeners: Hue
-    const hueContainer = document.getElementById('hueContainer');
-    hueContainer.addEventListener('mousedown', (e) => { isHueDragging = true; updateHueFromMouse(e); });
-    window.addEventListener('mousemove', (e) => { if (isHueDragging) updateHueFromMouse(e); });
-    window.addEventListener('mouseup', () => { isHueDragging = false; });
-
-    // --- Core Functions ---
-
-    function renderGrid() {
-        const container = document.getElementById('colorGrid');
-        container.innerHTML = '';
-
-        palette.colors.forEach((col, idx) => {
-            const el = document.createElement('div');
-            const isSelected = idx === selectedIndex;
-            el.className = `group relative bg-white dark:bg-slate-900 border ${isSelected ? 'border-brand-500 ring-1 ring-brand-500 shadow-[0_0_15px_rgba(236,72,153,0.2)]' : 'border-slate-200 dark:border-slate-800/50 hover:border-slate-300 dark:hover:border-slate-600'} rounded-lg p-2.5 cursor-pointer transition-all duration-200 hover:-translate-y-0.5 shadow-md`;
-            el.onclick = () => selectColor(idx);
-
-            el.innerHTML = `
+                el.innerHTML = `
                     <div class="w-full h-16 rounded-sm mb-3 shadow-inner border border-black/10 relative overflow-hidden" style="background-color: ${col.hex}">
                         ${isSelected ? '<div class="absolute inset-0 border-2 border-white/30"></div>' : ''}
                     </div>
@@ -549,373 +643,373 @@
                         <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide tabular-nums">${col.hex}</span>
                     </div>
                 `;
-            container.appendChild(el);
-        });
-        generateCode();
-    }
-
-    function selectColor(idx) {
-        selectedIndex = idx;
-        renderGrid();
-
-        // Toggle Delete Button Visibility
-        document.getElementById('btnDeleteGlobal').classList.remove('hidden');
-        document.getElementById('btnDeleteGlobal').classList.add('flex');
-
-        document.getElementById('emptyState').classList.add('hidden');
-        document.getElementById('editorState').classList.remove('hidden');
-        document.getElementById('editorState').classList.add('flex');
-
-        const col = palette.colors[idx];
-        document.getElementById('inpName').value = col.name;
-        document.getElementById('inpId').value = col.id;
-        document.getElementById('activeColorStrip').style.backgroundColor = col.hex;
-
-        // Sync State
-        const [h, s, v] = hexToHSV(col.hex);
-        currentHue = h;
-        currentSat = s;
-        currentVal = v;
-
-        updateStudioUI();
-        updateGeneratorContext(col);
-    }
-
-    function updateStudioUI() {
-        // Sliders
-        document.getElementById('slSat').value = currentSat;
-        document.getElementById('slVal').value = currentVal;
-        document.getElementById('lblSat').innerText = Math.round(currentSat) + '%';
-        document.getElementById('lblVal').innerText = Math.round(currentVal) + '%';
-
-        // Hue Thumb Pos
-        const huePercent = (currentHue / 360) * 100;
-        document.getElementById('hueThumb').style.top = huePercent + '%';
-
-        // Calc Colors
-        const hex = hsvToHex(currentHue, currentSat, currentVal);
-        const [r, g, b] = hexToRGB(hex);
-
-        // Inputs
-        document.getElementById('inpHex').value = hex.replace('#', '');
-        document.getElementById('inpR').value = r;
-        document.getElementById('inpG').value = g;
-        document.getElementById('inpB').value = b;
-
-        // Draw
-        drawMatrix();
-    }
-
-    // --- Custom Interaction Logic ---
-
-    function drawMatrix() {
-        const rect = matrixContainer.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-
-        // Base Hue
-        ctx.fillStyle = `hsl(${currentHue}, 100%, 50%)`;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Saturation Gradient (White -> Transparent Left-Right)
-        const grdWhite = ctx.createLinearGradient(0, 0, canvas.width, 0);
-        grdWhite.addColorStop(0, 'white');
-        grdWhite.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = grdWhite;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Value Gradient (Transparent -> Black Top-Bottom)
-        const grdBlack = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        grdBlack.addColorStop(0, 'rgba(0,0,0,0)');
-        grdBlack.addColorStop(1, 'black');
-        ctx.fillStyle = grdBlack;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Cursor Pos
-        const x = (currentSat / 100) * canvas.width;
-        const y = (1 - (currentVal / 100)) * canvas.height;
-        const cursor = document.getElementById('matrixCursor');
-        cursor.style.left = x + 'px';
-        cursor.style.top = y + 'px';
-        // Smart cursor contrast
-        cursor.style.borderColor = currentVal < 50 ? 'white' : 'black';
-        cursor.style.backgroundColor = hsvToHex(currentHue, currentSat, currentVal);
-    }
-
-    function updateMatrixFromMouse(e) {
-        const rect = matrixContainer.getBoundingClientRect();
-        const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-        const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
-
-        currentSat = (x / rect.width) * 100;
-        currentVal = 100 - ((y / rect.height) * 100);
-
-        updateModelFromState();
-    }
-
-    function updateHueFromMouse(e) {
-        const rect = hueContainer.getBoundingClientRect();
-        const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
-
-        // Map Y to 0-360
-        currentHue = (y / rect.height) * 360;
-
-        updateModelFromState();
-    }
-
-    // --- Inputs ---
-
-    function handleFineSliders() {
-        currentSat = document.getElementById('slSat').value;
-        currentVal = document.getElementById('slVal').value;
-        updateModelFromState();
-    }
-
-    function handleHexInput(val) {
-        if (val.length === 6) {
-            const [h, s, v] = hexToHSV('#' + val);
-            currentHue = h; currentSat = s; currentVal = v;
-            updateModelFromState(false);
+                container.appendChild(el);
+            });
+            generateCode();
         }
-    }
 
-    function handleRGBInput() {
-        const r = parseInt(document.getElementById('inpR').value) || 0;
-        const g = parseInt(document.getElementById('inpG').value) || 0;
-        const b = parseInt(document.getElementById('inpB').value) || 0;
-        const hex = rgbToHex(r, g, b);
-        const [h, s, v] = hexToHSV(hex);
-        currentHue = h; currentSat = s; currentVal = v;
-        updateModelFromState();
-    }
+        function selectColor(idx) {
+            selectedIndex = idx;
+            renderGrid();
 
-    async function startPipette() {
-        if (!window.EyeDropper) { alert("Use Chrome/Edge for Pipette."); return; }
-        const btn = document.getElementById('btnPipette');
-        btn.classList.add('text-brand-500', 'border-brand-500'); // Active State
-        try {
-            const eyeDropper = new EyeDropper();
-            const result = await eyeDropper.open();
-            const hex = result.sRGBHex.toUpperCase();
+            // Toggle Delete Button Visibility
+            document.getElementById('btnDeleteGlobal').classList.remove('hidden');
+            document.getElementById('btnDeleteGlobal').classList.add('flex');
+
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('editorState').classList.remove('hidden');
+            document.getElementById('editorState').classList.add('flex');
+
+            const col = palette.colors[idx];
+            document.getElementById('inpName').value = col.name;
+            document.getElementById('inpId').value = col.id;
+            document.getElementById('activeColorStrip').style.backgroundColor = col.hex;
+
+            // Sync State
+            const [h, s, v] = hexToHSV(col.hex);
+            currentHue = h;
+            currentSat = s;
+            currentVal = v;
+
+            updateStudioUI();
+            updateGeneratorContext(col);
+        }
+
+        function updateStudioUI() {
+            // Sliders
+            document.getElementById('slSat').value = currentSat;
+            document.getElementById('slVal').value = currentVal;
+            document.getElementById('lblSat').innerText = Math.round(currentSat) + '%';
+            document.getElementById('lblVal').innerText = Math.round(currentVal) + '%';
+
+            // Hue Thumb Pos
+            const huePercent = (currentHue / 360) * 100;
+            document.getElementById('hueThumb').style.top = huePercent + '%';
+
+            // Calc Colors
+            const hex = hsvToHex(currentHue, currentSat, currentVal);
+            const [r, g, b] = hexToRGB(hex);
+
+            // Inputs
+            document.getElementById('inpHex').value = hex.replace('#', '');
+            document.getElementById('inpR').value = r;
+            document.getElementById('inpG').value = g;
+            document.getElementById('inpB').value = b;
+
+            // Draw
+            drawMatrix();
+        }
+
+        // --- Custom Interaction Logic ---
+
+        function drawMatrix() {
+            const rect = matrixContainer.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            // Base Hue
+            ctx.fillStyle = `hsl(${currentHue}, 100%, 50%)`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Saturation Gradient (White -> Transparent Left-Right)
+            const grdWhite = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            grdWhite.addColorStop(0, 'white');
+            grdWhite.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = grdWhite;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Value Gradient (Transparent -> Black Top-Bottom)
+            const grdBlack = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grdBlack.addColorStop(0, 'rgba(0,0,0,0)');
+            grdBlack.addColorStop(1, 'black');
+            ctx.fillStyle = grdBlack;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Cursor Pos
+            const x = (currentSat / 100) * canvas.width;
+            const y = (1 - (currentVal / 100)) * canvas.height;
+            const cursor = document.getElementById('matrixCursor');
+            cursor.style.left = x + 'px';
+            cursor.style.top = y + 'px';
+            // Smart cursor contrast
+            cursor.style.borderColor = currentVal < 50 ? 'white' : 'black';
+            cursor.style.backgroundColor = hsvToHex(currentHue, currentSat, currentVal);
+        }
+
+        function updateMatrixFromMouse(e) {
+            const rect = matrixContainer.getBoundingClientRect();
+            const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+            const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+
+            currentSat = (x / rect.width) * 100;
+            currentVal = 100 - ((y / rect.height) * 100);
+
+            updateModelFromState();
+        }
+
+        function updateHueFromMouse(e) {
+            const rect = hueContainer.getBoundingClientRect();
+            const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
+
+            // Map Y to 0-360
+            currentHue = (y / rect.height) * 360;
+
+            updateModelFromState();
+        }
+
+        // --- Inputs ---
+
+        function handleFineSliders() {
+            currentSat = document.getElementById('slSat').value;
+            currentVal = document.getElementById('slVal').value;
+            updateModelFromState();
+        }
+
+        function handleHexInput(val) {
+            if (val.length === 6) {
+                const [h, s, v] = hexToHSV('#' + val);
+                currentHue = h; currentSat = s; currentVal = v;
+                updateModelFromState(false);
+            }
+        }
+
+        function handleRGBInput() {
+            const r = parseInt(document.getElementById('inpR').value) || 0;
+            const g = parseInt(document.getElementById('inpG').value) || 0;
+            const b = parseInt(document.getElementById('inpB').value) || 0;
+            const hex = rgbToHex(r, g, b);
             const [h, s, v] = hexToHSV(hex);
             currentHue = h; currentSat = s; currentVal = v;
             updateModelFromState();
-        } catch (e) { }
-        btn.classList.remove('text-brand-500', 'border-brand-500');
-    }
-
-    // --- Core Update ---
-
-    function updateModelFromState(updateHexInput = true) {
-        const hex = hsvToHex(currentHue, currentSat, currentVal);
-
-        if (selectedIndex !== -1) {
-            const col = palette.colors[selectedIndex];
-
-            // Smart Syncs
-            const oldHexClean = col.hex.replace('#', '').toLowerCase();
-            if (col.id === `color_${oldHexClean}` || col.id.startsWith('color_')) {
-                const newId = `color_${hex.replace('#', '').toLowerCase()}`;
-                col.id = newId;
-                document.getElementById('inpId').value = newId;
-            }
-            if (col.name.startsWith('#')) {
-                col.name = hex;
-                document.getElementById('inpName').value = hex;
-            }
-
-            col.hex = hex;
-            document.getElementById('activeColorStrip').style.backgroundColor = hex;
-
-            updateStudioUI();
-            if (!updateHexInput) document.getElementById('inpHex').value = hex.replace('#', '');
-
-            renderGrid();
-            updateGeneratorContext(col);
         }
-    }
 
-    // --- Generators & Tools ---
+        async function startPipette() {
+            if (!window.EyeDropper) { alert("Use Chrome/Edge for Pipette."); return; }
+            const btn = document.getElementById('btnPipette');
+            btn.classList.add('text-brand-500', 'border-brand-500'); // Active State
+            try {
+                const eyeDropper = new EyeDropper();
+                const result = await eyeDropper.open();
+                const hex = result.sRGBHex.toUpperCase();
+                const [h, s, v] = hexToHSV(hex);
+                currentHue = h; currentSat = s; currentVal = v;
+                updateModelFromState();
+            } catch (e) { }
+            btn.classList.remove('text-brand-500', 'border-brand-500');
+        }
 
-    function updateGeneratorContext(col) {
-        document.getElementById('genSeedPreview').style.backgroundColor = col.hex;
-        document.getElementById('genSeedName').innerText = col.name;
-        document.getElementById('genControls').classList.remove('opacity-50', 'pointer-events-none');
-        document.getElementById('genWarning').classList.add('hidden');
-        generatePreview();
-    }
+        // --- Core Update ---
 
-    function generatePreview() {
-        if (selectedIndex === -1) return;
-        const seedHex = palette.colors[selectedIndex].hex;
-        const strategy = document.getElementById('genStrategy').value;
-        const container = document.getElementById('genPreview');
-        container.innerHTML = '';
-        generatedCache = [];
+        function updateModelFromState(updateHexInput = true) {
+            const hex = hsvToHex(currentHue, currentSat, currentVal);
 
-        let colors = [];
-        const [h, s, l] = hexToHSL(seedHex);
+            if (selectedIndex !== -1) {
+                const col = palette.colors[selectedIndex];
 
-        if (strategy === 'scale') {
-            [95, 85, 75, 65, 55, 45, 35, 25, 15].forEach((light, i) => {
-                colors.push({ name: `Weight ${(i + 1) * 100}`, hex: hslToHex(h, s, light) });
+                // Smart Syncs
+                const oldHexClean = col.hex.replace('#', '').toLowerCase();
+                if (col.id === `color_${oldHexClean}` || col.id.startsWith('color_')) {
+                    const newId = `color_${hex.replace('#', '').toLowerCase()}`;
+                    col.id = newId;
+                    document.getElementById('inpId').value = newId;
+                }
+                if (col.name.startsWith('#')) {
+                    col.name = hex;
+                    document.getElementById('inpName').value = hex;
+                }
+
+                col.hex = hex;
+                document.getElementById('activeColorStrip').style.backgroundColor = hex;
+
+                updateStudioUI();
+                if (!updateHexInput) document.getElementById('inpHex').value = hex.replace('#', '');
+
+                renderGrid();
+                updateGeneratorContext(col);
+            }
+        }
+
+        // --- Generators & Tools ---
+
+        function updateGeneratorContext(col) {
+            document.getElementById('genSeedPreview').style.backgroundColor = col.hex;
+            document.getElementById('genSeedName').innerText = col.name;
+            document.getElementById('genControls').classList.remove('opacity-50', 'pointer-events-none');
+            document.getElementById('genWarning').classList.add('hidden');
+            generatePreview();
+        }
+
+        function generatePreview() {
+            if (selectedIndex === -1) return;
+            const seedHex = palette.colors[selectedIndex].hex;
+            const strategy = document.getElementById('genStrategy').value;
+            const container = document.getElementById('genPreview');
+            container.innerHTML = '';
+            generatedCache = [];
+
+            let colors = [];
+            const [h, s, l] = hexToHSL(seedHex);
+
+            if (strategy === 'scale') {
+                [95, 85, 75, 65, 55, 45, 35, 25, 15].forEach((light, i) => {
+                    colors.push({ name: `Weight ${(i + 1) * 100}`, hex: hslToHex(h, s, light) });
+                });
+            } else if (strategy === 'pastel') {
+                for (let i = 0; i < 6; i++) { colors.push({ name: `Pastel ${i + 1}`, hex: hslToHex(h, Math.max(s - 30, 10), 88 - (i * 4)) }); }
+            } else if (strategy === 'shades') {
+                for (let i = 0; i < 6; i++) { colors.push({ name: `Shade ${i + 1}`, hex: hslToHex(h, s, 35 - (i * 6)) }); }
+            } else if (strategy === 'tints') {
+                for (let i = 0; i < 6; i++) { colors.push({ name: `Tint ${i + 1}`, hex: hslToHex(h, s, 70 + (i * 4)) }); }
+            } else if (strategy === 'complement') {
+                colors.push({ name: 'Base', hex: seedHex });
+                colors.push({ name: 'Complement', hex: hslToHex((h + 180) % 360, s, l) });
+                colors.push({ name: 'Split 1', hex: hslToHex((h + 150) % 360, s, l) });
+                colors.push({ name: 'Split 2', hex: hslToHex((h + 210) % 360, s, l) });
+            }
+
+            generatedCache = colors;
+            colors.forEach(c => {
+                const row = document.createElement('div');
+                row.className = "flex items-center gap-3 bg-slate-50 dark:bg-slate-950 p-2 rounded border border-slate-200 dark:border-slate-800";
+                row.innerHTML = `<div class="w-8 h-8 rounded border border-black/5 dark:border-white/10" style="background-color: ${c.hex}"></div><div class="flex flex-col"><span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">${c.name}</span><span class="text-[9px] font-mono text-slate-400 dark:text-slate-500">${c.hex}</span></div>`;
+                container.appendChild(row);
             });
-        } else if (strategy === 'pastel') {
-            for (let i = 0; i < 6; i++) { colors.push({ name: `Pastel ${i + 1}`, hex: hslToHex(h, Math.max(s - 30, 10), 88 - (i * 4)) }); }
-        } else if (strategy === 'shades') {
-            for (let i = 0; i < 6; i++) { colors.push({ name: `Shade ${i + 1}`, hex: hslToHex(h, s, 35 - (i * 6)) }); }
-        } else if (strategy === 'tints') {
-            for (let i = 0; i < 6; i++) { colors.push({ name: `Tint ${i + 1}`, hex: hslToHex(h, s, 70 + (i * 4)) }); }
-        } else if (strategy === 'complement') {
-            colors.push({ name: 'Base', hex: seedHex });
-            colors.push({ name: 'Complement', hex: hslToHex((h + 180) % 360, s, l) });
-            colors.push({ name: 'Split 1', hex: hslToHex((h + 150) % 360, s, l) });
-            colors.push({ name: 'Split 2', hex: hslToHex((h + 210) % 360, s, l) });
         }
 
-        generatedCache = colors;
-        colors.forEach(c => {
-            const row = document.createElement('div');
-            row.className = "flex items-center gap-3 bg-slate-50 dark:bg-slate-950 p-2 rounded border border-slate-200 dark:border-slate-800";
-            row.innerHTML = `<div class="w-8 h-8 rounded border border-black/5 dark:border-white/10" style="background-color: ${c.hex}"></div><div class="flex flex-col"><span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">${c.name}</span><span class="text-[9px] font-mono text-slate-400 dark:text-slate-500">${c.hex}</span></div>`;
-            container.appendChild(row);
+        function commitGenerated() {
+            generatedCache.forEach(c => { palette.colors.push({ id: 'color_' + c.hex.replace('#', '').toLowerCase(), name: c.hex, hex: c.hex }); });
+            renderGrid();
+        }
+
+        function processPaste() {
+            const txt = document.getElementById('pasteArea').value;
+            const matches = txt.match(/#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})/g);
+            if (matches) {
+                [...new Set(matches)].forEach(hex => {
+                    if (hex.length === 4) hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
+                    hex = hex.toUpperCase();
+                    palette.colors.push({ id: 'color_' + hex.replace('#', '').toLowerCase(), name: hex, hex: hex });
+                });
+                document.getElementById('pasteArea').value = '';
+                renderGrid();
+            }
+        }
+
+        function updateSetMeta() {
+            const nameVal = document.getElementById('setName').value;
+            palette.name = nameVal;
+
+            // Auto-update ID from name
+            const cleanId = nameVal.replace(/[^a-zA-Z0-9]/g, '');
+            document.getElementById('setId').value = cleanId;
+
+            generateCode();
+        }
+        function addNewColor() { const hex = '#94A3B8'; palette.colors.push({ id: 'color_' + Math.floor(Math.random() * 10000), name: hex, hex: hex }); selectColor(palette.colors.length - 1); switchTab('studio'); }
+        function deleteActiveColor() {
+            if (selectedIndex === -1) return;
+            palette.colors.splice(selectedIndex, 1);
+            selectedIndex = -1;
+            document.getElementById('btnDeleteGlobal').classList.add('hidden'); // Hide button
+            document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('editorState').classList.add('hidden');
+            document.getElementById('editorState').classList.remove('flex');
+            renderGrid();
+        }
+        function handleTextUpdate(f, v) { if (selectedIndex !== -1) palette.colors[selectedIndex][f] = v; renderGrid(); }
+
+        // --- Code Gen ---
+        function generateCode() {
+            const rootInput = document.getElementById('rootParentId').value || 'swi_folder';
+            const setID = document.getElementById('setId').value || 'colorset';
+            let vRootVal = (rootInput.startsWith('t.') || rootInput.startsWith('root.') || rootInput.startsWith('this.')) ? rootInput : 't.' + rootInput;
+            let c = `/* COLORS GENERATED BY CORA */\n`;
+            c += `vFolder := ${vRootVal}\n\n`;
+            c += `// Palette: ${palette.name}\n`;
+            c += `vSet := vFolder.add(CorpoColorSet, id := '${setID}', name := '${palette.name}')\n`;
+            palette.colors.forEach(col => { c += `vSet.add(CorpoColor, id := '${col.id}', name := '${col.name}', color := '${col.hex}')\n`; });
+            c += `\nvSet`;
+            document.getElementById('codeOutput').value = c;
+        }
+
+        // --- UI ---
+        function switchTab(t) {
+            ['viewStudio', 'viewGenerate', 'viewImport', 'viewCode'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            ['btnTabStudio', 'btnTabGen', 'btnTabImport', 'btnTabCode'].forEach(id => { document.getElementById(id).classList.remove('border-brand-500', 'bg-white', 'dark:bg-slate-900', 'text-slate-800', 'dark:text-white'); document.getElementById(id).classList.add('text-slate-500'); });
+
+            if (t === 'studio') { document.getElementById('viewStudio').classList.remove('hidden'); activateBtn('btnTabStudio'); setTimeout(updateStudioUI, 50); }
+            if (t === 'generate') { document.getElementById('viewGenerate').classList.remove('hidden'); activateBtn('btnTabGen'); }
+            if (t === 'import') { document.getElementById('viewImport').classList.remove('hidden'); activateBtn('btnTabImport'); }
+            if (t === 'code') { document.getElementById('viewCode').classList.remove('hidden'); activateBtn('btnTabCode'); generateCode(); }
+        }
+        function activateBtn(id) { const btn = document.getElementById(id); btn.classList.add('border-brand-500', 'bg-white', 'dark:bg-slate-900', 'text-slate-800', 'dark:text-white'); btn.classList.remove('text-slate-500'); }
+        function copyCode() { generateCode(); const el = document.getElementById('codeOutput'); el.select(); document.execCommand('copy'); const btn = document.getElementById('copyBtn'); const og = btn.innerHTML; btn.innerHTML = `<i class="fas fa-check"></i> Copied`; setTimeout(() => btn.innerHTML = og, 1500); }
+
+        // --- Math Utils ---
+        function hexToRGB(hex) {
+            let r = 0, g = 0, b = 0;
+            if (hex.length == 4) { r = "0x" + hex[1] + hex[1]; g = "0x" + hex[2] + hex[2]; b = "0x" + hex[3] + hex[3]; }
+            else if (hex.length == 7) { r = "0x" + hex[1] + hex[2]; g = "0x" + hex[3] + hex[4]; b = "0x" + hex[5] + hex[6]; }
+            return [+r, +g, +b];
+        }
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        }
+        function hexToHSV(hex) {
+            let [r, g, b] = hexToRGB(hex);
+            r /= 255; g /= 255; b /= 255;
+            let cmax = Math.max(r, g, b), cmin = Math.min(r, g, b), d = cmax - cmin;
+            let h = 0, s = cmax == 0 ? 0 : d / cmax, v = cmax;
+            if (d != 0) {
+                if (cmax == r) h = ((g - b) / d) % 6; else if (cmax == g) h = (b - r) / d + 2; else h = (r - g) / d + 4;
+            }
+            h = Math.round(h * 60); if (h < 0) h += 360;
+            return [h, s * 100, v * 100];
+        }
+        function hsvToHex(h, s, v) {
+            s /= 100; v /= 100;
+            let c = v * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = v - c, r = 0, g = 0, b = 0;
+            if (0 <= h && h < 60) { r = c; g = x; b = 0; } else if (60 <= h && h < 120) { r = x; g = c; b = 0; } else if (120 <= h && h < 180) { r = 0; g = c; b = x; } else if (180 <= h && h < 240) { r = 0; g = x; b = c; } else if (240 <= h && h < 300) { r = x; g = 0; b = c; } else { r = c; g = 0; b = x; }
+            return rgbToHex(Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255));
+        }
+        function hexToHSL(hex) {
+            let [r, g, b] = hexToRGB(hex); r /= 255; g /= 255; b /= 255;
+            let max = Math.max(r, g, b), min = Math.min(r, g, b), h, s, l = (max + min) / 2;
+            if (max == min) h = s = 0; else {
+                let d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                if (max == r) h = (g - b) / d + (g < b ? 6 : 0); else if (max == g) h = (b - r) / d + 2; else h = (r - g) / d + 4; h /= 6;
+            }
+            return [h * 360, s * 100, l * 100];
+        }
+        function hslToHex(h, s, l) {
+            s /= 100; l /= 100; let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2, r = 0, g = 0, b = 0;
+            if (0 <= h && h < 60) { r = c; g = x; b = 0 } else if (60 <= h && h < 120) { r = x; g = c; b = 0 } else if (120 <= h && h < 180) { r = 0; g = c; b = x } else if (180 <= h && h < 240) { r = 0; g = x; b = c } else if (240 <= h && h < 300) { r = x; g = 0; b = c } else { r = c; g = 0; b = x }
+            return rgbToHex(Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255));
+        }
+
+        // --- Theme Toggle ---
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            html.classList.add('dark');
+            moonIcon.classList.add('hidden');
+            sunIcon.classList.remove('hidden');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            moonIcon.classList.toggle('hidden');
+            sunIcon.classList.toggle('hidden');
         });
-    }
 
-    function commitGenerated() {
-        generatedCache.forEach(c => { palette.colors.push({ id: 'color_' + c.hex.replace('#', '').toLowerCase(), name: c.hex, hex: c.hex }); });
+        // Init
         renderGrid();
-    }
-
-    function processPaste() {
-        const txt = document.getElementById('pasteArea').value;
-        const matches = txt.match(/#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})/g);
-        if (matches) {
-            [...new Set(matches)].forEach(hex => {
-                if (hex.length === 4) hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
-                hex = hex.toUpperCase();
-                palette.colors.push({ id: 'color_' + hex.replace('#', '').toLowerCase(), name: hex, hex: hex });
-            });
-            document.getElementById('pasteArea').value = '';
-            renderGrid();
-        }
-    }
-
-    function updateSetMeta() {
-        const nameVal = document.getElementById('setName').value;
-        palette.name = nameVal;
-
-        // Auto-update ID from name
-        const cleanId = nameVal.replace(/[^a-zA-Z0-9]/g, '');
-        document.getElementById('setId').value = cleanId;
-
-        generateCode();
-    }
-    function addNewColor() { const hex = '#94A3B8'; palette.colors.push({ id: 'color_' + Math.floor(Math.random() * 10000), name: hex, hex: hex }); selectColor(palette.colors.length - 1); switchTab('studio'); }
-    function deleteActiveColor() {
-        if (selectedIndex === -1) return;
-        palette.colors.splice(selectedIndex, 1);
-        selectedIndex = -1;
-        document.getElementById('btnDeleteGlobal').classList.add('hidden'); // Hide button
-        document.getElementById('emptyState').classList.remove('hidden');
-        document.getElementById('editorState').classList.add('hidden');
-        document.getElementById('editorState').classList.remove('flex');
-        renderGrid();
-    }
-    function handleTextUpdate(f, v) { if (selectedIndex !== -1) palette.colors[selectedIndex][f] = v; renderGrid(); }
-
-    // --- Code Gen ---
-    function generateCode() {
-        const rootInput = document.getElementById('rootParentId').value || 'swi_folder';
-        const setID = document.getElementById('setId').value || 'colorset';
-        let vRootVal = (rootInput.startsWith('t.') || rootInput.startsWith('root.') || rootInput.startsWith('this.')) ? rootInput : 't.' + rootInput;
-        let c = `/* COLORS GENERATED BY CORA */\n`;
-        c += `vFolder := ${vRootVal}\n\n`;
-        c += `// Palette: ${palette.name}\n`;
-        c += `vSet := vFolder.add(CorpoColorSet, id := '${setID}', name := '${palette.name}')\n`;
-        palette.colors.forEach(col => { c += `vSet.add(CorpoColor, id := '${col.id}', name := '${col.name}', color := '${col.hex}')\n`; });
-        c += `\nvSet`;
-        document.getElementById('codeOutput').value = c;
-    }
-
-    // --- UI ---
-    function switchTab(t) {
-        ['viewStudio', 'viewGenerate', 'viewImport', 'viewCode'].forEach(id => document.getElementById(id).classList.add('hidden'));
-        ['btnTabStudio', 'btnTabGen', 'btnTabImport', 'btnTabCode'].forEach(id => { document.getElementById(id).classList.remove('border-brand-500', 'bg-white', 'dark:bg-slate-900', 'text-slate-800', 'dark:text-white'); document.getElementById(id).classList.add('text-slate-500'); });
-
-        if (t === 'studio') { document.getElementById('viewStudio').classList.remove('hidden'); activateBtn('btnTabStudio'); setTimeout(updateStudioUI, 50); }
-        if (t === 'generate') { document.getElementById('viewGenerate').classList.remove('hidden'); activateBtn('btnTabGen'); }
-        if (t === 'import') { document.getElementById('viewImport').classList.remove('hidden'); activateBtn('btnTabImport'); }
-        if (t === 'code') { document.getElementById('viewCode').classList.remove('hidden'); activateBtn('btnTabCode'); generateCode(); }
-    }
-    function activateBtn(id) { const btn = document.getElementById(id); btn.classList.add('border-brand-500', 'bg-white', 'dark:bg-slate-900', 'text-slate-800', 'dark:text-white'); btn.classList.remove('text-slate-500'); }
-    function copyCode() { generateCode(); const el = document.getElementById('codeOutput'); el.select(); document.execCommand('copy'); const btn = document.getElementById('copyBtn'); const og = btn.innerHTML; btn.innerHTML = `<i class="fas fa-check"></i> Copied`; setTimeout(() => btn.innerHTML = og, 1500); }
-
-    // --- Math Utils ---
-    function hexToRGB(hex) {
-        let r = 0, g = 0, b = 0;
-        if (hex.length == 4) { r = "0x" + hex[1] + hex[1]; g = "0x" + hex[2] + hex[2]; b = "0x" + hex[3] + hex[3]; }
-        else if (hex.length == 7) { r = "0x" + hex[1] + hex[2]; g = "0x" + hex[3] + hex[4]; b = "0x" + hex[5] + hex[6]; }
-        return [+r, +g, +b];
-    }
-    function rgbToHex(r, g, b) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
-    }
-    function hexToHSV(hex) {
-        let [r, g, b] = hexToRGB(hex);
-        r /= 255; g /= 255; b /= 255;
-        let cmax = Math.max(r, g, b), cmin = Math.min(r, g, b), d = cmax - cmin;
-        let h = 0, s = cmax == 0 ? 0 : d / cmax, v = cmax;
-        if (d != 0) {
-            if (cmax == r) h = ((g - b) / d) % 6; else if (cmax == g) h = (b - r) / d + 2; else h = (r - g) / d + 4;
-        }
-        h = Math.round(h * 60); if (h < 0) h += 360;
-        return [h, s * 100, v * 100];
-    }
-    function hsvToHex(h, s, v) {
-        s /= 100; v /= 100;
-        let c = v * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = v - c, r = 0, g = 0, b = 0;
-        if (0 <= h && h < 60) { r = c; g = x; b = 0; } else if (60 <= h && h < 120) { r = x; g = c; b = 0; } else if (120 <= h && h < 180) { r = 0; g = c; b = x; } else if (180 <= h && h < 240) { r = 0; g = x; b = c; } else if (240 <= h && h < 300) { r = x; g = 0; b = c; } else { r = c; g = 0; b = x; }
-        return rgbToHex(Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255));
-    }
-    function hexToHSL(hex) {
-        let [r, g, b] = hexToRGB(hex); r /= 255; g /= 255; b /= 255;
-        let max = Math.max(r, g, b), min = Math.min(r, g, b), h, s, l = (max + min) / 2;
-        if (max == min) h = s = 0; else {
-            let d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            if (max == r) h = (g - b) / d + (g < b ? 6 : 0); else if (max == g) h = (b - r) / d + 2; else h = (r - g) / d + 4; h /= 6;
-        }
-        return [h * 360, s * 100, l * 100];
-    }
-    function hslToHex(h, s, l) {
-        s /= 100; l /= 100; let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2, r = 0, g = 0, b = 0;
-        if (0 <= h && h < 60) { r = c; g = x; b = 0 } else if (60 <= h && h < 120) { r = x; g = c; b = 0 } else if (120 <= h && h < 180) { r = 0; g = c; b = x } else if (180 <= h && h < 240) { r = 0; g = x; b = c } else if (240 <= h && h < 300) { r = x; g = 0; b = c } else { r = c; g = 0; b = x }
-        return rgbToHex(Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255));
-    }
-
-    // --- Theme Toggle ---
-    const themeToggle = document.getElementById('themeToggle');
-    const html = document.documentElement;
-    const sunIcon = document.getElementById('sunIcon');
-    const moonIcon = document.getElementById('moonIcon');
-
-    // Check system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        html.classList.add('dark');
-        moonIcon.classList.add('hidden');
-        sunIcon.classList.remove('hidden');
-    }
-
-    themeToggle.addEventListener('click', () => {
-        html.classList.toggle('dark');
-        moonIcon.classList.toggle('hidden');
-        sunIcon.classList.toggle('hidden');
-    });
-
-    // Init
-    renderGrid();
-    setTimeout(updateStudioUI, 100);
-</script>
+        setTimeout(updateStudioUI, 100);
+    </script>
 </body>
 
 </html>

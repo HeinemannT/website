@@ -1,599 +1,694 @@
 ---
-<div class="flex-1 relative overflow-hidden flex flex-col" :class="bgClass">
+layout: null
+permalink: /tools/svg-tuner/
+---
+<!DOCTYPE html>
+<html lang="en">
 
-    <!-- Toolbar -->
-    <div class="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
-        <!-- Zoom Control -->
-        <div
-            class="bg-white/90 dark:bg-slate-800/90 backdrop-blur border border-slate-200 dark:border-slate-700 shadow-xl rounded-lg px-2 py-1.5 flex items-center text-slate-500 dark:text-slate-400">
-            <button @click="zoomOut"
-                class="p-1.5 hover:text-brand-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"><i
-                    data-lucide="minus" class="w-3.5 h-3.5"></i></button>
-            <span class="text-[10px] font-mono font-bold w-12 text-center select-none">{{ Math.round(zoom * 100)
-                }}%</span>
-            <button @click="zoomIn"
-                class="p-1.5 hover:text-brand-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"><i
-                    data-lucide="plus" class="w-3.5 h-3.5"></i></button>
-            <div class="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-2"></div>
-            <button @click="resetView"
-                class="text-[10px] font-bold hover:text-brand-600 dark:hover:text-white px-2 uppercase tracking-wide">Reset</button>
-        </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Tuner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    animation: {
+                        'bounce-in': 'bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    },
+                    keyframes: {
+                        bounceIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.3) translateY(20px)' },
+                            '50%': { opacity: '1', transform: 'scale(1.05) translateY(-5px)' },
+                            '70%': { transform: 'scale(0.9)' },
+                            '100%': { transform: 'scale(1) translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Grid Patterns */
+        .bg-grid-light {
+            background-color: #f8fafc;
+            background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
 
-        <!-- Background Toggles -->
-        <div
-            class="bg-white/90 dark:bg-slate-800/90 backdrop-blur border border-slate-200 dark:border-slate-700 shadow-xl rounded-lg p-1 flex items-center gap-1">
-            <button @click="bgMode = 'light'"
-                :class="{'bg-slate-100 text-brand-600': bgMode === 'light', 'text-slate-400 hover:text-slate-600': bgMode !== 'light'}"
-                class="p-1.5 rounded transition-all" title="Light Grid">
-                <i data-lucide="sun" class="w-3.5 h-3.5"></i>
-            </button>
-            <button @click="bgMode = 'dark'"
-                :class="{'bg-slate-700 text-white': bgMode === 'dark', 'text-slate-400 hover:text-slate-600': bgMode !== 'dark'}"
-                class="p-1.5 rounded transition-all" title="Dark Grid">
-                <i data-lucide="moon" class="w-3.5 h-3.5"></i>
-            </button>
-            <button @click="bgMode = 'checker'"
-                :class="{'bg-brand-100 text-brand-600 dark:bg-slate-700 dark:text-white': bgMode === 'checker', 'text-slate-400 hover:text-slate-600': bgMode !== 'checker'}"
-                class="p-1.5 rounded transition-all" title="Transparency Checker">
-                <i data-lucide="grid" class="w-3.5 h-3.5"></i>
-            </button>
-        </div>
-    </div>
+        .bg-grid-dark {
+            background-color: #0f172a;
+            background-image: linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
 
-    <!-- Canvas Area -->
-    <div ref="canvasContainer" class="flex-1 flex items-center justify-center overflow-auto p-12 relative group/canvas"
-        @wheel.ctrl.prevent="handleWheel">
-        <!-- SVG Container -->
-        <div class="relative shadow-2xl transition-transform duration-100 ease-out origin-center"
-            :style="{ transform: `scale(${zoom})` }">
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
 
-            <!-- Dynamic Scaling Bounding Box -->
-            <div class="absolute inset-0 border-dashed border-brand-500/40 pointer-events-none z-10"
-                :style="{ borderWidth: `${2/zoom}px` }"></div>
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-            <!-- Dynamic Scaling Corner Markers -->
-            <div class="absolute -top-1 -left-1 border-brand-500 z-10 pointer-events-none"
-                :style="{ width: `${12/zoom}px`, height: `${12/zoom}px`, borderTopWidth: `${2/zoom}px`, borderLeftWidth: `${2/zoom}px`, top: `-${4/zoom}px`, left: `-${4/zoom}px` }">
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .dark .custom-scroll::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+
+<body
+    class="h-screen flex overflow-hidden bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300"
+    id="app">
+    <main class="flex h-full w-full overflow-hidden">
+        <div class="flex-1 relative overflow-hidden flex flex-col" :class="bgClass">
+
+            <!-- Toolbar -->
+            <div class="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+                <!-- Zoom Control -->
+                <div
+                    class="bg-white/90 dark:bg-slate-800/90 backdrop-blur border border-slate-200 dark:border-slate-700 shadow-xl rounded-lg px-2 py-1.5 flex items-center text-slate-500 dark:text-slate-400">
+                    <button @click="zoomOut"
+                        class="p-1.5 hover:text-brand-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"><i
+                            data-lucide="minus" class="w-3.5 h-3.5"></i></button>
+                    <span class="text-[10px] font-mono font-bold w-12 text-center select-none">{{ Math.round(zoom * 100)
+                        }}%</span>
+                    <button @click="zoomIn"
+                        class="p-1.5 hover:text-brand-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"><i
+                            data-lucide="plus" class="w-3.5 h-3.5"></i></button>
+                    <div class="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-2"></div>
+                    <button @click="resetView"
+                        class="text-[10px] font-bold hover:text-brand-600 dark:hover:text-white px-2 uppercase tracking-wide">Reset</button>
+                </div>
+
+                <!-- Background Toggles -->
+                <div
+                    class="bg-white/90 dark:bg-slate-800/90 backdrop-blur border border-slate-200 dark:border-slate-700 shadow-xl rounded-lg p-1 flex items-center gap-1">
+                    <button @click="bgMode = 'light'"
+                        :class="{'bg-slate-100 text-brand-600': bgMode === 'light', 'text-slate-400 hover:text-slate-600': bgMode !== 'light'}"
+                        class="p-1.5 rounded transition-all" title="Light Grid">
+                        <i data-lucide="sun" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button @click="bgMode = 'dark'"
+                        :class="{'bg-slate-700 text-white': bgMode === 'dark', 'text-slate-400 hover:text-slate-600': bgMode !== 'dark'}"
+                        class="p-1.5 rounded transition-all" title="Dark Grid">
+                        <i data-lucide="moon" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button @click="bgMode = 'checker'"
+                        :class="{'bg-brand-100 text-brand-600 dark:bg-slate-700 dark:text-white': bgMode === 'checker', 'text-slate-400 hover:text-slate-600': bgMode !== 'checker'}"
+                        class="p-1.5 rounded transition-all" title="Transparency Checker">
+                        <i data-lucide="grid" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
             </div>
 
-            <div class="absolute -top-1 -right-1 border-brand-500 z-10 pointer-events-none"
-                :style="{ width: `${12/zoom}px`, height: `${12/zoom}px`, borderTopWidth: `${2/zoom}px`, borderRightWidth: `${2/zoom}px`, top: `-${4/zoom}px`, right: `-${4/zoom}px` }">
-            </div>
+            <!-- Canvas Area -->
+            <div ref="canvasContainer"
+                class="flex-1 flex items-center justify-center overflow-auto p-12 relative group/canvas"
+                @wheel.ctrl.prevent="handleWheel">
+                <!-- SVG Container -->
+                <div class="relative shadow-2xl transition-transform duration-100 ease-out origin-center"
+                    :style="{ transform: `scale(${zoom})` }">
 
-            <div class="absolute -bottom-1 -left-1 border-brand-500 z-10 pointer-events-none"
-                :style="{ width: `${12/zoom}px`, height: `${12/zoom}px`, borderBottomWidth: `${2/zoom}px`, borderLeftWidth: `${2/zoom}px`, bottom: `-${4/zoom}px`, left: `-${4/zoom}px` }">
-            </div>
+                    <!-- Dynamic Scaling Bounding Box -->
+                    <div class="absolute inset-0 border-dashed border-brand-500/40 pointer-events-none z-10"
+                        :style="{ borderWidth: `${2/zoom}px` }"></div>
 
-            <div class="absolute -bottom-1 -right-1 border-brand-500 z-10 pointer-events-none"
-                :style="{ width: `${12/zoom}px`, height: `${12/zoom}px`, borderBottomWidth: `${2/zoom}px`, borderRightWidth: `${2/zoom}px`, bottom: `-${4/zoom}px`, right: `-${4/zoom}px` }">
-            </div>
+                    <!-- Dynamic Scaling Corner Markers -->
+                    <div class="absolute -top-1 -left-1 border-brand-500 z-10 pointer-events-none"
+                        :style="{ width: `${12/zoom}px`, height: `${12/zoom}px`, borderTopWidth: `${2/zoom}px`, borderLeftWidth: `${2/zoom}px`, top: `-${4/zoom}px`, left: `-${4/zoom}px` }">
+                    </div>
 
-            <!-- Dimension Label -->
-            <div class="absolute left-1/2 -translate-x-1/2 bg-slate-800 text-white font-mono rounded border border-slate-700 shadow-sm whitespace-nowrap z-20 opacity-0 group-hover/canvas:opacity-100 transition-opacity flex items-center justify-center"
-                :style="{ 
+                    <div class="absolute -top-1 -right-1 border-brand-500 z-10 pointer-events-none"
+                        :style="{ width: `${12/zoom}px`, height: `${12/zoom}px`, borderTopWidth: `${2/zoom}px`, borderRightWidth: `${2/zoom}px`, top: `-${4/zoom}px`, right: `-${4/zoom}px` }">
+                    </div>
+
+                    <div class="absolute -bottom-1 -left-1 border-brand-500 z-10 pointer-events-none"
+                        :style="{ width: `${12/zoom}px`, height: `${12/zoom}px`, borderBottomWidth: `${2/zoom}px`, borderLeftWidth: `${2/zoom}px`, bottom: `-${4/zoom}px`, left: `-${4/zoom}px` }">
+                    </div>
+
+                    <div class="absolute -bottom-1 -right-1 border-brand-500 z-10 pointer-events-none"
+                        :style="{ width: `${12/zoom}px`, height: `${12/zoom}px`, borderBottomWidth: `${2/zoom}px`, borderRightWidth: `${2/zoom}px`, bottom: `-${4/zoom}px`, right: `-${4/zoom}px` }">
+                    </div>
+
+                    <!-- Dimension Label -->
+                    <div class="absolute left-1/2 -translate-x-1/2 bg-slate-800 text-white font-mono rounded border border-slate-700 shadow-sm whitespace-nowrap z-20 opacity-0 group-hover/canvas:opacity-100 transition-opacity flex items-center justify-center"
+                        :style="{ 
                              top: `-${30/zoom}px`, 
                              fontSize: `${10/zoom}px`, 
                              padding: `${4/zoom}px ${8/zoom}px`,
                              borderRadius: `${4/zoom}px`,
                              borderWidth: `${1/zoom}px`
                          }">
-                {{ dimensions.width || 'Auto' }} x {{ dimensions.height || 'Auto' }}
+                        {{ dimensions.width || 'Auto' }} x {{ dimensions.height || 'Auto' }}
+                    </div>
+
+                    <div v-html="svgCode" class="block bg-transparent" id="svg-render-target"></div>
+                </div>
             </div>
 
-            <div v-html="svgCode" class="block bg-transparent" id="svg-render-target"></div>
+            <!-- Notification Toast -->
+            <div v-if="toast.show"
+                class="absolute bottom-6 right-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 animate-bounce-in z-50">
+                <i :data-lucide="toast.icon" class="w-5 h-5" :class="toast.color"></i>
+                <div class="flex flex-col">
+                    <span class="text-sm font-bold">{{ toast.title }}</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">{{ toast.desc }}</span>
+                </div>
+            </div>
+
         </div>
-    </div>
 
-    <!-- Notification Toast -->
-    <div v-if="toast.show"
-        class="absolute bottom-6 right-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 animate-bounce-in z-50">
-        <i :data-lucide="toast.icon" class="w-5 h-5" :class="toast.color"></i>
-        <div class="flex flex-col">
-            <span class="text-sm font-bold">{{ toast.title }}</span>
-            <span class="text-xs text-slate-500 dark:text-slate-400">{{ toast.desc }}</span>
-        </div>
-    </div>
+        <!-- Right Sidebar: Controls & Code -->
+        <div
+            class="w-80 flex flex-col border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 z-10 shadow-xl">
 
-</div>
+            <!-- Tabs -->
+            <div class="grid grid-cols-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+                <button @click="activeTab = 'tune'"
+                    :class="{'border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-900': activeTab === 'tune', 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200': activeTab !== 'tune'}"
+                    class="py-3 text-xs font-bold transition-all uppercase tracking-wider">Tuner</button>
+                <button @click="activeTab = 'palette'"
+                    :class="{'border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-900': activeTab === 'palette', 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200': activeTab !== 'palette'}"
+                    class="py-3 text-xs font-bold transition-all uppercase tracking-wider">Colors</button>
+                <button @click="activeTab = 'code'"
+                    :class="{'border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-900': activeTab === 'code', 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200': activeTab !== 'code'}"
+                    class="py-3 text-xs font-bold transition-all uppercase tracking-wider">Code</button>
+            </div>
 
-<!-- Right Sidebar: Controls & Code -->
-<div
-    class="w-80 flex flex-col border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 z-10 shadow-xl">
+            <!-- Tab: Tuner -->
+            <div v-if="activeTab === 'tune'" class="flex-1 overflow-y-auto p-6 custom-scroll space-y-8">
+                <!-- Cropping -->
+                <div>
+                    <h3 class="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider mb-3">
+                        Geometry & Crop</h3>
+                    <div
+                        class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">Automatically
+                            detect the bounding box
+                            of your shape and snap the ViewBox to fit perfectly.</p>
+                        <button @click="autoCrop"
+                            class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="crop" class="w-3.5 h-3.5"></i> Auto-Crop to Content
+                        </button>
+                    </div>
+                </div>
 
-    <!-- Tabs -->
-    <div class="grid grid-cols-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
-        <button @click="activeTab = 'tune'"
-            :class="{'border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-900': activeTab === 'tune', 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200': activeTab !== 'tune'}"
-            class="py-3 text-xs font-bold transition-all uppercase tracking-wider">Tuner</button>
-        <button @click="activeTab = 'palette'"
-            :class="{'border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-900': activeTab === 'palette', 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200': activeTab !== 'palette'}"
-            class="py-3 text-xs font-bold transition-all uppercase tracking-wider">Colors</button>
-        <button @click="activeTab = 'code'"
-            :class="{'border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-900': activeTab === 'code', 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200': activeTab !== 'code'}"
-            class="py-3 text-xs font-bold transition-all uppercase tracking-wider">Code</button>
-    </div>
+                <!-- Padding / Crop -->
+                <div>
+                    <h3 class="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider mb-3">
+                        Padding / Crop</h3>
+                    <div
+                        class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                        <div class="flex justify-between mb-3">
+                            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Space around
+                                content</span>
+                            <span class="text-[10px] font-mono font-bold"
+                                :class="paddingVal < 0 ? 'text-pink-500' : 'text-emerald-500'">{{ paddingVal > 0 ? '+' :
+                                ''}}{{ paddingVal }}px</span>
+                        </div>
+                        <div class="relative flex items-center mb-2">
+                            <input type="range" v-model.number="paddingVal" min="-100" max="100" step="1"
+                                @input="applyPadding"
+                                class="w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer relative z-10">
+                            <!-- Center marker -->
+                            <div class="absolute left-1/2 top-0 bottom-0 w-px bg-slate-300 dark:bg-slate-600 h-3 -mt-1">
+                            </div>
+                        </div>
+                        <div
+                            class="flex justify-between mt-1 text-[9px] font-bold text-slate-400 dark:text-slate-600 uppercase">
+                            <span>-100px</span>
+                            <span>0</span>
+                            <span>100px</span>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Tab: Tuner -->
-    <div v-if="activeTab === 'tune'" class="flex-1 overflow-y-auto p-6 custom-scroll space-y-8">
-        <!-- Cropping -->
-        <div>
-            <h3 class="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider mb-3">
-                Geometry & Crop</h3>
-            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
-                <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">Automatically
-                    detect the bounding box
-                    of your shape and snap the ViewBox to fit perfectly.</p>
-                <button @click="autoCrop"
-                    class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
-                    <i data-lucide="crop" class="w-3.5 h-3.5"></i> Auto-Crop to Content
+                <!-- Optimization -->
+                <div>
+                    <h3 class="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider mb-3">
+                        Safe Optimization
+                    </h3>
+                    <button @click="safeMinify"
+                        class="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-800 transition-all group text-left shadow-sm">
+                        <div>
+                            <span class="text-xs text-slate-700 dark:text-slate-200 block font-bold mb-0.5">Smart
+                                Minify</span>
+                            <span class="text-[10px] text-slate-500">Safe removal of junk data</span>
+                        </div>
+                        <div
+                            class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                            <i data-lucide="zap"
+                                class="w-4 h-4 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors"></i>
+                        </div>
+                    </button>
+                    <div v-if="optimizationStats"
+                        class="mt-2 text-[10px] font-bold text-emerald-500 flex items-center gap-1">
+                        <i data-lucide="check" class="w-3 h-3"></i> {{ optimizationStats }}
+                    </div>
+                </div>
+
+                <!-- Dimensions -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label
+                            class="text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-1.5 block uppercase tracking-wider">Width</label>
+                        <input type="text" v-model="dimensions.width" @change="updateDimensions"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none font-mono transition-colors">
+                    </div>
+                    <div>
+                        <label
+                            class="text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-1.5 block uppercase tracking-wider">Height</label>
+                        <input type="text" v-model="dimensions.height" @change="updateDimensions"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none font-mono transition-colors">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Palette -->
+            <div v-if="activeTab === 'palette'" class="flex-1 overflow-y-auto p-6 custom-scroll">
+
+                <!-- Default Black / No Color Handler -->
+                <div v-if="colors.length === 0"
+                    class="text-center py-8 px-4 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 mb-4">
+                    <div
+                        class="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="palette" class="w-6 h-6 text-slate-400"></i>
+                    </div>
+                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-4">No explicit colors
+                        detected.<br>Icon is likely default black.
+                    </p>
+
+                    <div class="flex items-center justify-center gap-2">
+                        <div class="relative group">
+                            <input type="color" @input="e => injectColor(e.target.value)"
+                                class="w-full h-8 absolute inset-0 opacity-0 cursor-pointer">
+                            <button
+                                class="bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg shadow-brand-500/20 flex items-center gap-2 transition-all hover:-translate-y-0.5">
+                                <i data-lucide="paint-bucket" class="w-3.5 h-3.5"></i> Colorize
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-else class="space-y-3">
+                    <div v-for="(color, index) in colors" :key="index"
+                        class="flex items-center gap-3 bg-white dark:bg-slate-900/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600 transition-colors shadow-sm">
+                        <div class="relative group shrink-0">
+                            <input type="color" v-model="color.val" @input="updateColor(color.original, color.val)"
+                                class="w-9 h-9 block bg-transparent border-0 cursor-pointer rounded-md overflow-hidden shadow-sm">
+                            <div
+                                class="absolute inset-0 rounded-md ring-1 ring-inset ring-black/5 dark:ring-white/10 pointer-events-none">
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <input type="text" v-model="color.val" @change="updateColor(color.original, color.val)"
+                                class="w-full bg-transparent text-xs font-mono font-bold text-slate-600 dark:text-slate-300 focus:outline-none focus:text-brand-600 dark:focus:text-white uppercase">
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono truncate max-w-[60px]"
+                            title="Original Color">
+                            {{ color.original }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Code -->
+            <div v-if="activeTab === 'code'"
+                class="flex-1 flex flex-col h-full relative group bg-slate-50 dark:bg-[#0f172a]">
+                <textarea ref="codeTextarea" v-model="svgCode" @input="manualCodeUpdate"
+                    class="flex-1 w-full bg-transparent text-slate-600 dark:text-slate-300 font-mono text-[11px] p-6 resize-none focus:outline-none custom-scroll leading-relaxed"
+                    spellcheck="false"></textarea>
+                <button @click="copyCode"
+                    class="absolute top-4 right-4 p-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md text-slate-500 dark:text-slate-400 opacity-0 group-hover:opacity-100 transition-all">
+                    <i v-if="!copied" data-lucide="copy" class="w-4 h-4"></i>
+                    <i v-else data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
                 </button>
             </div>
-        </div>
 
-        <!-- Padding / Crop -->
-        <div>
-            <h3 class="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider mb-3">
-                Padding / Crop</h3>
-            <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
-                <div class="flex justify-between mb-3">
-                    <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Space around
-                        content</span>
-                    <span class="text-[10px] font-mono font-bold"
-                        :class="paddingVal < 0 ? 'text-pink-500' : 'text-emerald-500'">{{ paddingVal > 0 ? '+' :
-                        ''}}{{ paddingVal }}px</span>
-                </div>
-                <div class="relative flex items-center mb-2">
-                    <input type="range" v-model.number="paddingVal" min="-100" max="100" step="1" @input="applyPadding"
-                        class="w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer relative z-10">
-                    <!-- Center marker -->
-                    <div class="absolute left-1/2 top-0 bottom-0 w-px bg-slate-300 dark:bg-slate-600 h-3 -mt-1">
-                    </div>
-                </div>
-                <div
-                    class="flex justify-between mt-1 text-[9px] font-bold text-slate-400 dark:text-slate-600 uppercase">
-                    <span>-100px</span>
-                    <span>0</span>
-                    <span>100px</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Optimization -->
-        <div>
-            <h3 class="text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider mb-3">
-                Safe Optimization
-            </h3>
-            <button @click="safeMinify"
-                class="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-emerald-500/50 hover:bg-white dark:hover:bg-slate-800 transition-all group text-left shadow-sm">
-                <div>
-                    <span class="text-xs text-slate-700 dark:text-slate-200 block font-bold mb-0.5">Smart
-                        Minify</span>
-                    <span class="text-[10px] text-slate-500">Safe removal of junk data</span>
-                </div>
-                <div
-                    class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                    <i data-lucide="zap"
-                        class="w-4 h-4 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors"></i>
-                </div>
-            </button>
-            <div v-if="optimizationStats" class="mt-2 text-[10px] font-bold text-emerald-500 flex items-center gap-1">
-                <i data-lucide="check" class="w-3 h-3"></i> {{ optimizationStats }}
-            </div>
-        </div>
-
-        <!-- Dimensions -->
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label
-                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-1.5 block uppercase tracking-wider">Width</label>
-                <input type="text" v-model="dimensions.width" @change="updateDimensions"
-                    class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none font-mono transition-colors">
-            </div>
-            <div>
-                <label
-                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 mb-1.5 block uppercase tracking-wider">Height</label>
-                <input type="text" v-model="dimensions.height" @change="updateDimensions"
-                    class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 focus:border-brand-500 focus:outline-none font-mono transition-colors">
-            </div>
-        </div>
-    </div>
-
-    <!-- Tab: Palette -->
-    <div v-if="activeTab === 'palette'" class="flex-1 overflow-y-auto p-6 custom-scroll">
-
-        <!-- Default Black / No Color Handler -->
-        <div v-if="colors.length === 0"
-            class="text-center py-8 px-4 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 mb-4">
+            <!-- Stats Footer -->
             <div
-                class="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i data-lucide="palette" class="w-6 h-6 text-slate-400"></i>
-            </div>
-            <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-4">No explicit colors
-                detected.<br>Icon is likely default black.
-            </p>
-
-            <div class="flex items-center justify-center gap-2">
-                <div class="relative group">
-                    <input type="color" @input="e => injectColor(e.target.value)"
-                        class="w-full h-8 absolute inset-0 opacity-0 cursor-pointer">
-                    <button
-                        class="bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg shadow-brand-500/20 flex items-center gap-2 transition-all hover:-translate-y-0.5">
-                        <i data-lucide="paint-bucket" class="w-3.5 h-3.5"></i> Colorize
-                    </button>
-                </div>
+                class="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500 flex justify-between font-mono uppercase tracking-wider">
+                <span>{{ svgSize }}</span>
+                <span>{{ colors.length }} Colors</span>
             </div>
         </div>
 
-        <div v-else class="space-y-3">
-            <div v-for="(color, index) in colors" :key="index"
-                class="flex items-center gap-3 bg-white dark:bg-slate-900/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600 transition-colors shadow-sm">
-                <div class="relative group shrink-0">
-                    <input type="color" v-model="color.val" @input="updateColor(color.original, color.val)"
-                        class="w-9 h-9 block bg-transparent border-0 cursor-pointer rounded-md overflow-hidden shadow-sm">
-                    <div
-                        class="absolute inset-0 rounded-md ring-1 ring-inset ring-black/5 dark:ring-white/10 pointer-events-none">
-                    </div>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <input type="text" v-model="color.val" @change="updateColor(color.original, color.val)"
-                        class="w-full bg-transparent text-xs font-mono font-bold text-slate-600 dark:text-slate-300 focus:outline-none focus:text-brand-600 dark:focus:text-white uppercase">
-                </div>
-                <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono truncate max-w-[60px]"
-                    title="Original Color">
-                    {{ color.original }}
-                </div>
-            </div>
-        </div>
-    </div>
+    </main>
 
-    <!-- Tab: Code -->
-    <div v-if="activeTab === 'code'" class="flex-1 flex flex-col h-full relative group bg-slate-50 dark:bg-[#0f172a]">
-        <textarea ref="codeTextarea" v-model="svgCode" @input="manualCodeUpdate"
-            class="flex-1 w-full bg-transparent text-slate-600 dark:text-slate-300 font-mono text-[11px] p-6 resize-none focus:outline-none custom-scroll leading-relaxed"
-            spellcheck="false"></textarea>
-        <button @click="copyCode"
-            class="absolute top-4 right-4 p-2 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md text-slate-500 dark:text-slate-400 opacity-0 group-hover:opacity-100 transition-all">
-            <i v-if="!copied" data-lucide="copy" class="w-4 h-4"></i>
-            <i v-else data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
-        </button>
-    </div>
+    <script>
+        const { createApp, ref, computed, watch, onMounted, nextTick } = Vue;
 
-    <!-- Stats Footer -->
-    <div
-        class="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-400 dark:text-slate-500 flex justify-between font-mono uppercase tracking-wider">
-        <span>{{ svgSize }}</span>
-        <span>{{ colors.length }} Colors</span>
-    </div>
-</div>
-
-</main>
-
-<script>
-    const { createApp, ref, computed, watch, onMounted, nextTick } = Vue;
-
-    createApp({
-        setup() {
-            const defaultSVG = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        createApp({
+            setup() {
+                const defaultSVG = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
     <rect width="400" height="400" fill="#ffffff" rx="20"/>
     <circle cx="200" cy="200" r="120" fill="#4f46e5" fill-opacity="0.1"/>
     <path d="M200 80 L320 300 L80 300 Z" fill="#6366f1" stroke="#4338ca" stroke-width="10" stroke-linejoin="round"/>
     <circle cx="200" cy="240" r="40" fill="#ffffff"/>
 </svg>`;
 
-            const svgCode = ref(defaultSVG);
-            const colors = ref([]);
-            const activeTab = ref('tune');
-            const bgMode = ref('light'); // light, dark, checker
-            const zoom = ref(0.8);
-            const copied = ref(false);
-            const optimizationStats = ref('');
-            const dimensions = ref({ width: '', height: '' });
-            const paddingVal = ref(0);
-            const toast = ref({ show: false, title: '', desc: '', icon: 'check', color: 'text-emerald-400' });
-            const canvasContainer = ref(null);
-            const codeTextarea = ref(null);
-            const exportName = ref('tuned-design');
-            const isDark = ref(false);
+                const svgCode = ref(defaultSVG);
+                const colors = ref([]);
+                const activeTab = ref('tune');
+                const bgMode = ref('light'); // light, dark, checker
+                const zoom = ref(0.8);
+                const copied = ref(false);
+                const optimizationStats = ref('');
+                const dimensions = ref({ width: '', height: '' });
+                const paddingVal = ref(0);
+                const toast = ref({ show: false, title: '', desc: '', icon: 'check', color: 'text-emerald-400' });
+                const canvasContainer = ref(null);
+                const codeTextarea = ref(null);
+                const exportName = ref('tuned-design');
+                const isDark = ref(false);
 
-            const baseViewBox = ref(null);
+                const baseViewBox = ref(null);
 
-            const refreshIcons = () => nextTick(() => lucide.createIcons());
+                const refreshIcons = () => nextTick(() => lucide.createIcons());
 
-            onMounted(() => {
-                // Check system preference
-                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    isDark.value = true;
-                    document.documentElement.classList.add('dark');
-                    bgMode.value = 'dark';
-                }
-
-                refreshIcons();
-                analyzeSVG();
-                nextTick(() => fitToScreen());
-            });
-
-            watch(activeTab, refreshIcons);
-            watch(svgCode, (newVal, oldVal) => {
-                if (activeTab.value === 'code') analyzeSVG();
-            });
-
-            const toggleTheme = () => {
-                isDark.value = !isDark.value;
-                if (isDark.value) {
-                    document.documentElement.classList.add('dark');
-                    if (bgMode.value === 'light') bgMode.value = 'dark';
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    if (bgMode.value === 'dark') bgMode.value = 'light';
-                }
-            };
-
-            const bgClass = computed(() => {
-                if (bgMode.value === 'light') return 'bg-grid-light';
-                if (bgMode.value === 'dark') return 'bg-grid-dark';
-                return 'bg-[url("https://www.transparenttextures.com/patterns/stardust.png")] bg-slate-200';
-            });
-
-            const analyzeSVG = () => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
-
-                const svgEl = doc.querySelector('svg');
-                if (svgEl) {
-                    dimensions.value.width = svgEl.getAttribute('width') || '';
-                    dimensions.value.height = svgEl.getAttribute('height') || '';
-
-                    const vb = svgEl.getAttribute('viewBox');
-                    if (vb && !baseViewBox.value) {
-                        const parts = vb.split(/[\s,]+/).map(Number);
-                        if (parts.length === 4) baseViewBox.value = { x: parts[0], y: parts[1], w: parts[2], h: parts[3] };
+                onMounted(() => {
+                    // Check system preference
+                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        isDark.value = true;
+                        document.documentElement.classList.add('dark');
+                        bgMode.value = 'dark';
                     }
-                }
 
-                const foundColors = new Set();
-                const walker = document.createTreeWalker(doc, NodeFilter.SHOW_ELEMENT);
-                while (walker.nextNode()) {
-                    const el = walker.currentNode;
-                    ['fill', 'stroke'].forEach(attr => {
-                        const val = el.getAttribute(attr);
-                        if (val && val !== 'none' && !val.startsWith('url(')) foundColors.add(val);
-                    });
-                    if (el.style) {
-                        if (el.style.fill && el.style.fill !== 'none') foundColors.add(el.style.fill);
-                        if (el.style.stroke && el.style.stroke !== 'none') foundColors.add(el.style.stroke);
-                    }
-                }
-                colors.value = Array.from(foundColors).map(c => ({ original: c, val: c }));
-            };
-
-            const updateColor = (original, newVal) => {
-                let newCode = svgCode.value;
-                newCode = newCode.replaceAll(`="${original}"`, `="${newVal}"`);
-                newCode = newCode.replaceAll(`: ${original}`, `: ${newVal}`);
-                newCode = newCode.replaceAll(`:${original}`, `:${newVal}`);
-                svgCode.value = newCode;
-                const cIndex = colors.value.findIndex(c => c.original === original);
-                if (cIndex !== -1) colors.value[cIndex].original = newVal;
-            };
-
-            const injectColor = (color) => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
-                const svgEl = doc.querySelector('svg');
-                if (svgEl) {
-                    svgEl.setAttribute('fill', color);
-                    svgCode.value = new XMLSerializer().serializeToString(doc);
-                    // Analyze will run automatically via watcher, finding the new color
-                    showToast('Colorized', 'Applied fill to root SVG', 'paint-bucket', 'text-brand-400');
-                }
-            };
-
-            const switchToCode = () => {
-                activeTab.value = 'code';
-                showToast('Code Mode', 'Paste your SVG code here', 'terminal', 'text-brand-400');
-                nextTick(() => {
-                    if (codeTextarea.value) {
-                        codeTextarea.value.focus();
-                        codeTextarea.value.select();
-                    }
+                    refreshIcons();
+                    analyzeSVG();
+                    nextTick(() => fitToScreen());
                 });
-            };
 
-            const fitToScreen = () => {
-                if (!canvasContainer.value) return;
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
-                const svgEl = doc.querySelector('svg');
-                if (!svgEl) return;
+                watch(activeTab, refreshIcons);
+                watch(svgCode, (newVal, oldVal) => {
+                    if (activeTab.value === 'code') analyzeSVG();
+                });
 
-                let w = parseFloat(svgEl.getAttribute('width'));
-                let h = parseFloat(svgEl.getAttribute('height'));
-                if (!w || !h) {
-                    const vb = svgEl.getAttribute('viewBox');
-                    if (vb) {
-                        const parts = vb.split(/[\s,]+/).map(Number);
-                        if (parts.length === 4) { w = parts[2]; h = parts[3]; }
+                const toggleTheme = () => {
+                    isDark.value = !isDark.value;
+                    if (isDark.value) {
+                        document.documentElement.classList.add('dark');
+                        if (bgMode.value === 'light') bgMode.value = 'dark';
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        if (bgMode.value === 'dark') bgMode.value = 'light';
                     }
-                }
-                if (!w) w = 300;
-                if (!h) h = 150;
+                };
 
-                const containerW = canvasContainer.value.clientWidth;
-                const containerH = canvasContainer.value.clientHeight;
-                const scaleX = containerW / w;
-                const scaleY = containerH / h;
-                const scale = Math.min(scaleX, scaleY) * 0.8;
-                zoom.value = parseFloat(Math.max(0.1, Math.min(scale, 20)).toFixed(2));
-            };
+                const bgClass = computed(() => {
+                    if (bgMode.value === 'light') return 'bg-grid-light';
+                    if (bgMode.value === 'dark') return 'bg-grid-dark';
+                    return 'bg-[url("https://www.transparenttextures.com/patterns/stardust.png")] bg-slate-200';
+                });
 
-            const autoCrop = () => {
-                const container = document.getElementById('svg-render-target');
-                const svgEl = container ? container.querySelector('svg') : null;
-                if (!svgEl) return;
-                try {
-                    const bbox = svgEl.getBBox();
-                    const x = Math.floor(bbox.x);
-                    const y = Math.floor(bbox.y);
-                    const w = Math.ceil(bbox.width);
-                    const h = Math.ceil(bbox.height);
-                    const newVB = `${x} ${y} ${w} ${h}`;
+                const analyzeSVG = () => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
+
+                    const svgEl = doc.querySelector('svg');
+                    if (svgEl) {
+                        dimensions.value.width = svgEl.getAttribute('width') || '';
+                        dimensions.value.height = svgEl.getAttribute('height') || '';
+
+                        const vb = svgEl.getAttribute('viewBox');
+                        if (vb && !baseViewBox.value) {
+                            const parts = vb.split(/[\s,]+/).map(Number);
+                            if (parts.length === 4) baseViewBox.value = { x: parts[0], y: parts[1], w: parts[2], h: parts[3] };
+                        }
+                    }
+
+                    const foundColors = new Set();
+                    const walker = document.createTreeWalker(doc, NodeFilter.SHOW_ELEMENT);
+                    while (walker.nextNode()) {
+                        const el = walker.currentNode;
+                        ['fill', 'stroke'].forEach(attr => {
+                            const val = el.getAttribute(attr);
+                            if (val && val !== 'none' && !val.startsWith('url(')) foundColors.add(val);
+                        });
+                        if (el.style) {
+                            if (el.style.fill && el.style.fill !== 'none') foundColors.add(el.style.fill);
+                            if (el.style.stroke && el.style.stroke !== 'none') foundColors.add(el.style.stroke);
+                        }
+                    }
+                    colors.value = Array.from(foundColors).map(c => ({ original: c, val: c }));
+                };
+
+                const updateColor = (original, newVal) => {
+                    let newCode = svgCode.value;
+                    newCode = newCode.replaceAll(`="${original}"`, `="${newVal}"`);
+                    newCode = newCode.replaceAll(`: ${original}`, `: ${newVal}`);
+                    newCode = newCode.replaceAll(`:${original}`, `:${newVal}`);
+                    svgCode.value = newCode;
+                    const cIndex = colors.value.findIndex(c => c.original === original);
+                    if (cIndex !== -1) colors.value[cIndex].original = newVal;
+                };
+
+                const injectColor = (color) => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
+                    const svgEl = doc.querySelector('svg');
+                    if (svgEl) {
+                        svgEl.setAttribute('fill', color);
+                        svgCode.value = new XMLSerializer().serializeToString(doc);
+                        // Analyze will run automatically via watcher, finding the new color
+                        showToast('Colorized', 'Applied fill to root SVG', 'paint-bucket', 'text-brand-400');
+                    }
+                };
+
+                const switchToCode = () => {
+                    activeTab.value = 'code';
+                    showToast('Code Mode', 'Paste your SVG code here', 'terminal', 'text-brand-400');
+                    nextTick(() => {
+                        if (codeTextarea.value) {
+                            codeTextarea.value.focus();
+                            codeTextarea.value.select();
+                        }
+                    });
+                };
+
+                const fitToScreen = () => {
+                    if (!canvasContainer.value) return;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
+                    const svgEl = doc.querySelector('svg');
+                    if (!svgEl) return;
+
+                    let w = parseFloat(svgEl.getAttribute('width'));
+                    let h = parseFloat(svgEl.getAttribute('height'));
+                    if (!w || !h) {
+                        const vb = svgEl.getAttribute('viewBox');
+                        if (vb) {
+                            const parts = vb.split(/[\s,]+/).map(Number);
+                            if (parts.length === 4) { w = parts[2]; h = parts[3]; }
+                        }
+                    }
+                    if (!w) w = 300;
+                    if (!h) h = 150;
+
+                    const containerW = canvasContainer.value.clientWidth;
+                    const containerH = canvasContainer.value.clientHeight;
+                    const scaleX = containerW / w;
+                    const scaleY = containerH / h;
+                    const scale = Math.min(scaleX, scaleY) * 0.8;
+                    zoom.value = parseFloat(Math.max(0.1, Math.min(scale, 20)).toFixed(2));
+                };
+
+                const autoCrop = () => {
+                    const container = document.getElementById('svg-render-target');
+                    const svgEl = container ? container.querySelector('svg') : null;
+                    if (!svgEl) return;
+                    try {
+                        const bbox = svgEl.getBBox();
+                        const x = Math.floor(bbox.x);
+                        const y = Math.floor(bbox.y);
+                        const w = Math.ceil(bbox.width);
+                        const h = Math.ceil(bbox.height);
+                        const newVB = `${x} ${y} ${w} ${h}`;
+
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
+                        const domSvg = doc.querySelector('svg');
+                        if (domSvg) {
+                            domSvg.setAttribute('viewBox', newVB);
+                            domSvg.setAttribute('width', w);
+                            domSvg.setAttribute('height', h);
+                            dimensions.value.width = w;
+                            dimensions.value.height = h;
+                            svgCode.value = new XMLSerializer().serializeToString(doc);
+                            baseViewBox.value = { x, y, w, h };
+                            paddingVal.value = 0;
+                            showToast('Cropped', 'ViewBox snapped to content', 'crop', 'text-brand-400');
+                            nextTick(() => fitToScreen());
+                        }
+                    } catch (e) {
+                        showToast('Error', 'Could not calculate bounding box', 'alert-circle', 'text-red-400');
+                    }
+                };
+
+                const applyPadding = () => {
+                    if (!baseViewBox.value) return;
+                    const p = paddingVal.value;
+                    const b = baseViewBox.value;
+                    const newX = b.x - p;
+                    const newY = b.y - p;
+                    const newW = b.w + (p * 2);
+                    const newH = b.h + (p * 2);
+                    const newVB = `${newX} ${newY} ${newW} ${newH}`;
 
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
                     const domSvg = doc.querySelector('svg');
                     if (domSvg) {
                         domSvg.setAttribute('viewBox', newVB);
-                        domSvg.setAttribute('width', w);
-                        domSvg.setAttribute('height', h);
-                        dimensions.value.width = w;
-                        dimensions.value.height = h;
                         svgCode.value = new XMLSerializer().serializeToString(doc);
-                        baseViewBox.value = { x, y, w, h };
-                        paddingVal.value = 0;
-                        showToast('Cropped', 'ViewBox snapped to content', 'crop', 'text-brand-400');
-                        nextTick(() => fitToScreen());
                     }
-                } catch (e) {
-                    showToast('Error', 'Could not calculate bounding box', 'alert-circle', 'text-red-400');
-                }
-            };
+                };
 
-            const applyPadding = () => {
-                if (!baseViewBox.value) return;
-                const p = paddingVal.value;
-                const b = baseViewBox.value;
-                const newX = b.x - p;
-                const newY = b.y - p;
-                const newW = b.w + (p * 2);
-                const newH = b.h + (p * 2);
-                const newVB = `${newX} ${newY} ${newW} ${newH}`;
-
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
-                const domSvg = doc.querySelector('svg');
-                if (domSvg) {
-                    domSvg.setAttribute('viewBox', newVB);
-                    svgCode.value = new XMLSerializer().serializeToString(doc);
-                }
-            };
-
-            const safeMinify = () => {
-                const originalSize = new Blob([svgCode.value]).size;
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
-                const clean = (node) => {
-                    const children = Array.from(node.childNodes);
-                    for (const child of children) {
-                        if (child.nodeType === Node.COMMENT_NODE) {
-                            node.removeChild(child);
-                        } else if (child.nodeType === Node.TEXT_NODE) {
-                            if (!child.textContent.trim()) {
+                const safeMinify = () => {
+                    const originalSize = new Blob([svgCode.value]).size;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
+                    const clean = (node) => {
+                        const children = Array.from(node.childNodes);
+                        for (const child of children) {
+                            if (child.nodeType === Node.COMMENT_NODE) {
                                 node.removeChild(child);
-                            } else {
-                                child.textContent = child.textContent.trim();
+                            } else if (child.nodeType === Node.TEXT_NODE) {
+                                if (!child.textContent.trim()) {
+                                    node.removeChild(child);
+                                } else {
+                                    child.textContent = child.textContent.trim();
+                                }
+                            } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                clean(child);
                             }
-                        } else if (child.nodeType === Node.ELEMENT_NODE) {
-                            clean(child);
                         }
+                    };
+                    const svgRoot = doc.querySelector('svg');
+                    if (svgRoot) clean(svgRoot);
+                    let result = new XMLSerializer().serializeToString(doc);
+                    result = result.replace(/>\s+</g, '><');
+                    svgCode.value = result;
+                    const newSize = new Blob([svgCode.value]).size;
+                    const saved = ((originalSize - newSize) / 1024).toFixed(2);
+                    optimizationStats.value = `Saved ${saved} KB`;
+                    showToast('Optimized', `Safely reduced size by ${saved} KB`, 'zap', 'text-emerald-400');
+                };
+
+                const updateDimensions = () => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
+                    const svgEl = doc.querySelector('svg');
+                    if (svgEl) {
+                        if (dimensions.value.width) svgEl.setAttribute('width', dimensions.value.width);
+                        if (dimensions.value.height) svgEl.setAttribute('height', dimensions.value.height);
+                        svgCode.value = new XMLSerializer().serializeToString(doc);
                     }
                 };
-                const svgRoot = doc.querySelector('svg');
-                if (svgRoot) clean(svgRoot);
-                let result = new XMLSerializer().serializeToString(doc);
-                result = result.replace(/>\s+</g, '><');
-                svgCode.value = result;
-                const newSize = new Blob([svgCode.value]).size;
-                const saved = ((originalSize - newSize) / 1024).toFixed(2);
-                optimizationStats.value = `Saved ${saved} KB`;
-                showToast('Optimized', `Safely reduced size by ${saved} KB`, 'zap', 'text-emerald-400');
-            };
 
-            const updateDimensions = () => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(svgCode.value, "image/svg+xml");
-                const svgEl = doc.querySelector('svg');
-                if (svgEl) {
-                    if (dimensions.value.width) svgEl.setAttribute('width', dimensions.value.width);
-                    if (dimensions.value.height) svgEl.setAttribute('height', dimensions.value.height);
-                    svgCode.value = new XMLSerializer().serializeToString(doc);
-                }
-            };
-
-            const handleFileUpload = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    svgCode.value = evt.target.result;
-                    // Use filename without extension as default export name
-                    const fname = file.name.replace(/\.[^/.]+$/, "");
-                    exportName.value = fname || 'tuned-design';
-                    activeTab.value = 'tune';
-                    baseViewBox.value = null;
-                    paddingVal.value = 0;
-                    nextTick(() => {
-                        analyzeSVG();
-                        fitToScreen();
-                    });
+                const handleFileUpload = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        svgCode.value = evt.target.result;
+                        // Use filename without extension as default export name
+                        const fname = file.name.replace(/\.[^/.]+$/, "");
+                        exportName.value = fname || 'tuned-design';
+                        activeTab.value = 'tune';
+                        baseViewBox.value = null;
+                        paddingVal.value = 0;
+                        nextTick(() => {
+                            analyzeSVG();
+                            fitToScreen();
+                        });
+                    };
+                    reader.readAsText(file);
                 };
-                reader.readAsText(file);
-            };
 
-            const copyCode = () => { navigator.clipboard.writeText(svgCode.value); copied.value = true; setTimeout(() => copied.value = false, 2000); showToast('Copied!', 'Raw SVG code in clipboard', 'clipboard', 'text-blue-400'); };
+                const copyCode = () => { navigator.clipboard.writeText(svgCode.value); copied.value = true; setTimeout(() => copied.value = false, 2000); showToast('Copied!', 'Raw SVG code in clipboard', 'clipboard', 'text-blue-400'); };
 
-            const downloadSVG = () => {
-                const blob = new Blob([svgCode.value], { type: 'image/svg+xml' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${exportName.value || 'tuned-design'}.svg`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            };
-
-            const downloadPNG = () => {
-                const svgBlob = new Blob([svgCode.value], { type: 'image/svg+xml;charset=utf-8' });
-                const url = URL.createObjectURL(svgBlob);
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const w = parseFloat(dimensions.value.width) || 800;
-                    const h = parseFloat(dimensions.value.height) || 800;
-                    canvas.width = w; canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
-                    const pngUrl = canvas.toDataURL('image/png');
+                const downloadSVG = () => {
+                    const blob = new Blob([svgCode.value], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
-                    a.href = pngUrl;
-                    a.download = `${exportName.value || 'tuned-design'}.png`;
+                    a.href = url;
+                    a.download = `${exportName.value || 'tuned-design'}.svg`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
-                    showToast('PNG Downloaded', 'Converted to raster', 'image', 'text-pink-400');
                 };
-                img.src = url;
-            };
 
-            const showToast = (title, desc, icon, color) => { toast.value = { show: true, title, desc, icon, color }; setTimeout(() => toast.value.show = false, 3000); refreshIcons(); };
-            const manualCodeUpdate = () => analyzeSVG();
-            const zoomIn = () => zoom.value = Math.min(zoom.value + 0.1, 5);
-            const zoomOut = () => zoom.value = Math.max(zoom.value - 0.1, 0.1);
-            const resetView = () => fitToScreen();
-            const handleWheel = (e) => { if (e.deltaY < 0) zoomIn(); else zoomOut(); };
-            const svgSize = computed(() => { const bytes = new Blob([svgCode.value]).size; return bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(2)} KB`; });
+                const downloadPNG = () => {
+                    const svgBlob = new Blob([svgCode.value], { type: 'image/svg+xml;charset=utf-8' });
+                    const url = URL.createObjectURL(svgBlob);
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const w = parseFloat(dimensions.value.width) || 800;
+                        const h = parseFloat(dimensions.value.height) || 800;
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const pngUrl = canvas.toDataURL('image/png');
+                        const a = document.createElement('a');
+                        a.href = pngUrl;
+                        a.download = `${exportName.value || 'tuned-design'}.png`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showToast('PNG Downloaded', 'Converted to raster', 'image', 'text-pink-400');
+                    };
+                    img.src = url;
+                };
 
-            return {
-                svgCode, colors, activeTab, bgMode, zoom, copied, optimizationStats, dimensions, paddingVal, toast, bgClass, canvasContainer, codeTextarea, exportName, isDark,
-                updateColor, updateDimensions, manualCodeUpdate, safeMinify, handleFileUpload, switchToCode,
-                autoCrop, applyPadding, fitToScreen, injectColor, toggleTheme,
-                copyCode, downloadSVG, downloadPNG, zoomIn, zoomOut, resetView, handleWheel, svgSize
-            };
-        }
-    }).mount('#app');
-</script>
+                const showToast = (title, desc, icon, color) => { toast.value = { show: true, title, desc, icon, color }; setTimeout(() => toast.value.show = false, 3000); refreshIcons(); };
+                const manualCodeUpdate = () => analyzeSVG();
+                const zoomIn = () => zoom.value = Math.min(zoom.value + 0.1, 5);
+                const zoomOut = () => zoom.value = Math.max(zoom.value - 0.1, 0.1);
+                const resetView = () => fitToScreen();
+                const handleWheel = (e) => { if (e.deltaY < 0) zoomIn(); else zoomOut(); };
+                const svgSize = computed(() => { const bytes = new Blob([svgCode.value]).size; return bytes < 1024 ? `${bytes} B` : `${(bytes / 1024).toFixed(2)} KB`; });
+
+                return {
+                    svgCode, colors, activeTab, bgMode, zoom, copied, optimizationStats, dimensions, paddingVal, toast, bgClass, canvasContainer, codeTextarea, exportName, isDark,
+                    updateColor, updateDimensions, manualCodeUpdate, safeMinify, handleFileUpload, switchToCode,
+                    autoCrop, applyPadding, fitToScreen, injectColor, toggleTheme,
+                    copyCode, downloadSVG, downloadPNG, zoomIn, zoomOut, resetView, handleWheel, svgSize
+                };
+            }
+        }).mount('#app');
+    </script>
 </body>
 
 </html>

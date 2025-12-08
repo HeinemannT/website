@@ -6,4 +6,4 @@ permalink: /thoughts/
 
 ## Reflections
 
-I haven't had any thoughts since 2005.
+I haven't had any thoughts since 2006.

@@ -1,4 +1,5 @@
 <head>
+  <!-- FIXED SPACES VIA ASSIGN -->
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta http-equiv="Content-Security-Policy"
@@ -14,14 +15,18 @@
   {% endif %}
 
   {%- if site.listen_for_clients_preferred_style -%}
-  <link rel="stylesheet" type="text/css" href="{{ " /assets/main.css" | relative_url }}">
+  {% assign css_path = "/assets/main.css" %}
+  <link rel="stylesheet" type="text/css" href="{{ css_path | relative_url }}">
   {%- else -%}
   {%- if site.style == 'light' -%}
-  <link rel="stylesheet" type="text/css" href="{{ " /assets/main-light.css" | relative_url }}">
+  {% assign css_path = "/assets/main-light.css" %}
+  <link rel="stylesheet" type="text/css" href="{{ css_path | relative_url }}">
   {%- elsif site.style == 'hacker' -%}
-  <link rel="stylesheet" type="text/css" href="{{ " /assets/main-hacker.css" | relative_url }}">
+  {% assign css_path = "/assets/main-hacker.css" %}
+  <link rel="stylesheet" type="text/css" href="{{ css_path | relative_url }}">
   {%- else -%}
-  <link rel="stylesheet" type="text/css" href="{{ " /assets/main-dark.css" | relative_url }}">
+  {% assign css_path = "/assets/main-dark.css" %}
+  <link rel="stylesheet" type="text/css" href="{{ css_path | relative_url }}">
   {%- endif -%}
   {%- endif -%}
 

@@ -1,7 +1,7 @@
 # Site settings
 #google_analytics: UA-NNNNNNNN-N
 
-url: "https://theinemann.de" 
+url: "https://theinemann.de"
 
 header_pages:
   - index.md

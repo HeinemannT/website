@@ -2,7 +2,6 @@
 #google_analytics: UA-NNNNNNNN-N
 
 url: "https://theinemann.de" 
-baseurl: ""
 
 header_pages:
   - index.md

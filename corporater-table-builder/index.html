@@ -1,0 +1,914 @@
+---
+layout: null
+permalink: /tools/corporater-table-builder/
+---
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cora's Table Architect v21 (Deployment Ready)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        input,
+        textarea,
+        button,
+        select {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Background */
+        .bg-grid-pattern {
+            background-color: #f8fafc;
+            background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* --- Drag & Drop Mechanics (Source-as-Placeholder) --- */
+        .col-item.drag-source {
+            background-color: #eff6ff !important;
+            border: 2px dashed #6366f1 !important;
+            opacity: 1;
+        }
+
+        .col-item.drag-source>* {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .drag-avatar {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            background: white;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid #6366f1;
+            border-radius: 0.375rem;
+            width: var(--drag-width);
+            height: var(--drag-height);
+            transform: rotate(1deg) scale(1.02);
+            transform-origin: center center;
+        }
+
+        .handle {
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .handle:active {
+            cursor: grabbing;
+        }
+
+        /* --- Hierarchy Visuals --- */
+        .hierarchy-container {
+            position: relative;
+            padding-left: 16px;
+        }
+
+        .hierarchy-spine {
+            position: absolute;
+            left: 7px;
+            top: 10px;
+            bottom: 20px;
+            width: 2px;
+            background-color: #cbd5e1;
+            z-index: 0;
+        }
+
+        .level-card {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .level-node {
+            position: absolute;
+            left: -17px;
+            top: 10px;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            z-index: 10;
+        }
+
+        .level-node-inner {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #6366f1;
+        }
+
+        /* Highlighting */
+        .syn-kwd {
+            color: #c084fc;
+            font-weight: bold;
+        }
+
+        .syn-mtd {
+            color: #fbbf24;
+        }
+
+        .syn-str {
+            color: #60a5fa;
+        }
+
+        .syn-var {
+            color: #f472b6;
+        }
+
+        .syn-prop {
+            color: #4ade80;
+        }
+
+        .syn-cmt {
+            color: #94a3b8;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body class="h-screen flex flex-col overflow-hidden text-slate-800">
+
+    <!-- Header -->
+    <header
+        class="bg-white/90 backdrop-blur border-b border-slate-200 h-12 px-4 flex justify-between items-center z-20 sticky top-0 shrink-0 shadow-sm">
+        <div class="flex items-center gap-2">
+            <div
+                class="w-6 h-6 bg-indigo-600 rounded-md shadow-md shadow-indigo-200 text-white flex items-center justify-center font-bold text-xs">
+                T</div>
+            <h1 class="text-xs font-bold tracking-tight text-slate-700 uppercase">Table Architect <span
+                    class="text-indigo-500">v21</span></h1>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div class="flex bg-slate-100 p-0.5 rounded-md border border-slate-200">
+                <button onclick="setMethod(1)" id="btnMethod1"
+                    class="px-2.5 py-1 text-[9px] font-bold rounded transition-all text-slate-500 hover:text-slate-800">Simple</button>
+                <button onclick="setMethod(2)" id="btnMethod2"
+                    class="px-2.5 py-1 text-[9px] font-bold rounded transition-all text-slate-500 hover:text-slate-800">Headers</button>
+                <button onclick="setMethod(3)" id="btnMethod3"
+                    class="px-2.5 py-1 text-[9px] font-bold rounded transition-all text-slate-500 hover:text-slate-800">Manual</button>
+                <button onclick="setMethod(4)" id="btnMethod4"
+                    class="px-2.5 py-1 text-[9px] font-bold rounded transition-all text-slate-500 hover:text-slate-800 flex items-center gap-1"><i
+                        class="fas fa-stream text-[8px]"></i> Hierarchy</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- Left Panel: Config -->
+        <div class="w-1/2 flex flex-col border-r border-slate-200 bg-slate-50 overflow-hidden">
+
+            <!-- Global Config -->
+            <div class="p-3 border-b border-slate-200 bg-white z-10 shadow-sm shrink-0">
+                <div class="grid grid-cols-2 gap-3">
+                    <div id="simpleSourceConfig">
+                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5 tracking-wider">Source
+                            List</label>
+                        <div
+                            class="flex items-center bg-slate-50 border border-slate-200 rounded hover:border-indigo-300 focus-within:border-indigo-500 transition-all h-7 bg-white">
+                            <span class="pl-2 text-indigo-400 text-[10px] font-mono font-bold">:=</span>
+                            <input type="text" id="inpSourceList" value="vListOfObjects" onkeyup="generateCode()"
+                                class="bg-transparent border-none text-[10px] font-mono font-bold text-slate-700 w-full px-2 focus:outline-none placeholder-slate-400 h-full">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5 tracking-wider">Output
+                            Variable</label>
+                        <div
+                            class="flex items-center bg-slate-50 border border-slate-200 rounded hover:border-indigo-300 focus-within:border-indigo-500 transition-all h-7 bg-white">
+                            <span class="pl-2 text-indigo-400 text-[10px] font-mono font-bold">:=</span>
+                            <input type="text" id="inpTableVar" value="vTable" onkeyup="generateCode()"
+                                class="bg-transparent border-none text-[10px] font-mono font-bold text-slate-700 w-full px-2 focus:outline-none placeholder-slate-400 h-full">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scrollable Config Area -->
+            <div class="flex-1 overflow-y-auto bg-grid-pattern p-4 space-y-5">
+
+                <!-- HIERARCHY LEVELS -->
+                <div id="hierarchyConfig" class="hidden">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="text-[10px] uppercase font-bold text-indigo-900 tracking-wider">
+                            Hierarchy Levels
+                        </label>
+                    </div>
+
+                    <div class="hierarchy-container">
+                        <div class="hierarchy-spine"></div>
+                        <div id="levelsContainer">
+                            <!-- Levels Injected Here -->
+                        </div>
+                    </div>
+
+                    <button onclick="addLevel()"
+                        class="w-full py-1.5 mt-2 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-md text-slate-400 hover:text-indigo-600 text-[9px] font-bold transition-all flex items-center justify-center gap-2 group bg-slate-50/50 hover:bg-white">
+                        <div
+                            class="w-3.5 h-3.5 rounded-full bg-slate-200 group-hover:bg-indigo-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 transition-colors">
+                            <i class="fas fa-plus text-[7px]"></i>
+                        </div>
+                        Add Nested Level
+                    </button>
+
+                    <div class="h-px bg-slate-200 w-full my-5"></div>
+                </div>
+
+                <!-- COLUMNS CONFIG -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] uppercase font-bold text-indigo-900 tracking-wider">
+                            Table Columns
+                        </label>
+                    </div>
+
+                    <!-- CONTAINER -->
+                    <div id="columnsContainer" class="space-y-2 pb-2 relative">
+                        <!-- Columns injected here -->
+                    </div>
+
+                    <button onclick="addColumn()"
+                        class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md text-[10px] font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-1.5 group">
+                        <i class="fas fa-plus text-indigo-200 group-hover:text-white transition-colors"></i>
+                        Add Column
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Code -->
+        <div class="w-1/2 bg-slate-900 flex flex-col relative border-l border-slate-800 shadow-2xl">
+            <div
+                class="flex justify-between items-center px-4 py-2 border-b border-slate-800 bg-slate-950 h-10 shrink-0">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Extended Code Preview</span>
+                <button onclick="copyCode()" id="btnCopy"
+                    class="text-[9px] font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition-colors px-2 py-1 rounded hover:bg-emerald-500/10">
+                    <i class="far fa-copy"></i> Copy
+                </button>
+            </div>
+
+            <div id="codeOutput"
+                class="flex-1 p-4 font-mono text-[10px] text-slate-300 bg-slate-900 overflow-auto whitespace-pre leading-relaxed selection:bg-emerald-900/50 outline-none"
+                contenteditable="false"></div>
+        </div>
+    </div>
+
+    <!-- TEMPLATES -->
+
+    <!-- LEVEL TEMPLATE -->
+    <template id="tplLevel">
+        <div class="level-card group">
+            <div class="level-node">
+                <div class="level-node-inner"></div>
+            </div>
+            <div
+                class="bg-white border border-slate-200 hover:border-indigo-200 rounded-md p-2 shadow-sm transition-colors relative">
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-[9px] font-bold text-indigo-600 uppercase tracking-wider level-title">Root
+                        Level</span>
+                    <button onclick="removeLevel(this)"
+                        class="btn-remove-level text-slate-300 hover:text-red-500 transition-colors"
+                        title="Remove Level">
+                        <i class="fas fa-trash-alt text-[9px]"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-12 gap-2 items-center">
+                    <div class="col-span-6 space-y-0.5">
+                        <label class="text-[8px] font-bold text-slate-400 uppercase block">Source</label>
+                        <div
+                            class="flex items-center bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 transition-colors hover:border-indigo-300 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-100">
+                            <input type="text"
+                                class="level-source w-full bg-transparent text-[10px] font-mono font-medium text-slate-700 focus:outline-none placeholder-slate-300 h-5"
+                                value="vList" onkeyup="generateCode()">
+                        </div>
+                    </div>
+                    <div class="col-span-3 space-y-0.5">
+                        <label class="text-[8px] font-bold text-slate-400 uppercase block">Indent</label>
+                        <input type="number" min="0" max="10"
+                            class="level-indent w-full bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[10px] font-bold text-center text-indigo-600 focus:border-indigo-500 focus:outline-none hover:border-indigo-300 transition-colors h-6"
+                            value="0" onchange="generateCode()">
+                    </div>
+                    <div class="col-span-3 space-y-0.5 flex flex-col items-center justify-center">
+                        <label class="text-[8px] font-bold text-slate-400 uppercase block">Collapsed</label>
+                        <input type="checkbox"
+                            class="level-collapse w-3.5 h-3.5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer mt-0.5"
+                            onchange="generateCode()">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- COLUMN TEMPLATE -->
+    <template id="tplColumn">
+        <div class="col-item draggable-item bg-white border border-slate-200 rounded-md shadow-sm transition-all relative overflow-hidden mb-2"
+            draggable="true">
+            <!-- Main Row -->
+            <div class="flex items-center h-9">
+
+                <!-- Hybrid Control Stack -->
+                <div class="flex h-full bg-slate-50 border-r border-slate-100/80">
+                    <!-- Drag Handle -->
+                    <div class="handle w-5 h-full flex items-center justify-center text-slate-300 hover:text-indigo-600 hover:bg-slate-100 transition-colors cursor-grab active:cursor-grabbing border-r border-slate-200/50"
+                        onmousedown="startDrag(event, this)">
+                        <i class="fas fa-grip-vertical text-[10px]"></i>
+                    </div>
+
+                    <!-- Arrows -->
+                    <div class="flex flex-col w-5 h-full">
+                        <button onclick="moveUp(this)"
+                            class="h-1/2 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white transition-colors border-b border-slate-200/50">
+                            <i class="fas fa-caret-up text-[10px]"></i>
+                        </button>
+                        <button onclick="moveDown(this)"
+                            class="h-1/2 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white transition-colors">
+                            <i class="fas fa-caret-down text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Inputs -->
+                <div class="flex-1 flex gap-2 px-3 items-center">
+                    <input type="text"
+                        class="col-header flex-1 bg-transparent border-b border-transparent focus:border-indigo-300 text-[10px] font-bold text-slate-700 focus:outline-none placeholder-slate-300 h-6 transition-colors"
+                        placeholder="Header Name" onkeyup="generateCode()">
+                    <div class="text-[8px] font-mono text-slate-300 select-none">::</div>
+                    <input type="text"
+                        class="col-prop flex-1 bg-transparent border-b border-transparent focus:border-indigo-300 text-[10px] font-mono text-indigo-600 focus:outline-none placeholder-slate-300 h-6 transition-colors"
+                        placeholder="property.id" onkeyup="generateCode()">
+                </div>
+
+                <!-- Settings Toggle -->
+                <button onclick="toggleSettings(this)"
+                    class="w-8 h-full flex items-center justify-center text-slate-300 hover:text-indigo-600 hover:bg-slate-50 transition-colors border-l border-slate-100/50"
+                    title="Format & Style">
+                    <i class="fas fa-cog text-[10px]"></i>
+                </button>
+
+                <!-- Delete -->
+                <button onclick="removeColumn(this)"
+                    class="w-8 h-full flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors border-l border-slate-100/50"
+                    title="Remove Column">
+                    <i class="fas fa-times text-[10px]"></i>
+                </button>
+            </div>
+
+            <!-- Settings Panel -->
+            <div class="settings-panel hidden bg-slate-50 border-t border-slate-100 p-2 flex flex-col gap-2">
+
+                <div class="flex items-center justify-between">
+                    <div class="flex gap-1">
+                        <button onclick="toggleAlign(this, 'left')"
+                            class="align-btn px-2 py-1 rounded text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                            title="Align Left"><i class="fas fa-align-left"></i></button>
+                        <button onclick="toggleAlign(this, 'center')"
+                            class="align-btn px-2 py-1 rounded text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                            title="Align Center"><i class="fas fa-align-center"></i></button>
+                        <button onclick="toggleAlign(this, 'right')"
+                            class="align-btn px-2 py-1 rounded text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                            title="Align Right"><i class="fas fa-align-right"></i></button>
+                    </div>
+
+                    <div class="h-4 w-px bg-slate-200"></div>
+
+                    <div class="flex gap-1">
+                        <button onclick="toggleStyle(this, 'separator')" title="Add Vertical Separator"
+                            class="style-btn px-2 py-1 rounded text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors">|</button>
+                        <button onclick="toggleStyle(this, 'hidden')" title="Hidden Column"
+                            class="style-btn px-2 py-1 rounded text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors"><i
+                                class="far fa-eye-slash"></i></button>
+                        <button onclick="toggleStyle(this, 'wrapped')" title="Wrap Text"
+                            class="style-btn px-2 py-1 rounded text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors">Wrap</button>
+                        <button onclick="toggleStyle(this, 'readonly')" title="Readonly"
+                            class="style-btn px-2 py-1 rounded text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors"><i
+                                class="fas fa-lock"></i></button>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 pt-1 border-t border-slate-200/50">
+                    <label class="text-[9px] font-bold text-slate-400 uppercase whitespace-nowrap">Format</label>
+                    <div class="flex flex-wrap gap-1 w-full">
+                        <button onclick="setFormat(this, '')"
+                            class="format-btn active px-2 py-0.5 rounded-full text-[9px] font-bold border border-slate-200 text-indigo-600 bg-indigo-50 border-indigo-200 transition-colors"
+                            data-val="">Text</button>
+                        <button onclick="setFormat(this, 'decimals(0)')"
+                            class="format-btn px-2 py-0.5 rounded-full text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                            data-val="decimals(0)">123</button>
+                        <button onclick="setFormat(this, 'decimals(2)')"
+                            class="format-btn px-2 py-0.5 rounded-full text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                            data-val="decimals(2)">.00</button>
+                        <button onclick="setFormat(this, 'formatType(PERCENTAGE)')"
+                            class="format-btn px-2 py-0.5 rounded-full text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                            data-val="formatType(PERCENTAGE)">%</button>
+                        <button onclick="setFormat(this, 'formatType(THOUSANDS).postfix(\u0022 €\u0022)')"
+                            class="format-btn px-2 py-0.5 rounded-full text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                            data-val="formatType(THOUSANDS).postfix(' €')">€</button>
+                        <button onclick="setFormat(this, 'formatType(DATE)')"
+                            class="format-btn px-2 py-0.5 rounded-full text-[9px] font-bold border border-slate-200 text-slate-400 bg-white hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                            data-val="formatType(DATE)">Date</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // --- State ---
+        let currentMethod = 2;
+
+        // Physics Engine State
+        let isDragging = false;
+        let dragSrcEl = null;
+        let dragAvatar = null;
+        let dragStartY = 0;
+        let dragStartTop = 0;
+
+        // --- Init ---
+        window.onload = () => {
+            addColumn('Name', 'name');
+            addColumn('Description', 'description');
+            addColumn('ID', 'id');
+            setMethod(2);
+            addLevel();
+
+            // Global Mouse Listeners for Physics Drag
+            window.addEventListener('mousemove', onDragMove);
+            window.addEventListener('mouseup', onDragEnd);
+        };
+
+        // --- CUSTOM PHYSICS DRAG ENGINE (SOURCE-AS-PLACEHOLDER) ---
+        function startDrag(e, handle) {
+            e.preventDefault();
+            const item = handle.closest('.col-item');
+            if (!item) return;
+
+            isDragging = true;
+            dragSrcEl = item;
+
+            // 1. Create Avatar (Visual Clone)
+            const rect = item.getBoundingClientRect();
+            dragAvatar = item.cloneNode(true);
+            dragAvatar.classList.add('drag-avatar');
+
+            // Fix dimensions explicitly
+            dragAvatar.style.width = rect.width + 'px';
+            dragAvatar.style.height = rect.height + 'px';
+            dragAvatar.style.left = rect.left + 'px';
+            dragAvatar.style.top = rect.top + 'px';
+
+            // Ensure inputs in avatar are visually same
+            const origInputs = item.querySelectorAll('input');
+            const cloneInputs = dragAvatar.querySelectorAll('input');
+            origInputs.forEach((inp, i) => cloneInputs[i].value = inp.value);
+
+            document.body.appendChild(dragAvatar);
+
+            // 2. Transform Source to Placeholder
+            item.classList.add('drag-source');
+
+            // 3. Init Positions
+            dragStartY = e.clientY;
+            dragStartTop = rect.top;
+        }
+
+        function onDragMove(e) {
+            if (!isDragging || !dragAvatar) return;
+
+            // 1. Move Avatar
+            const deltaY = e.clientY - dragStartY;
+            dragAvatar.style.top = (dragStartTop + deltaY) + 'px';
+
+            // 2. Detect Sort Position (Live Swap)
+            const container = document.getElementById('columnsContainer');
+            const siblings = [...container.querySelectorAll('.col-item:not(.drag-source)')];
+
+            const nextSibling = siblings.find(sibling => {
+                const box = sibling.getBoundingClientRect();
+                const center = box.top + box.height / 2;
+                return e.clientY < center;
+            });
+
+            // 3. Move Source (The Placeholder)
+            if (nextSibling) {
+                if (nextSibling !== dragSrcEl.nextElementSibling) {
+                    container.insertBefore(dragSrcEl, nextSibling);
+                }
+            } else {
+                if (dragSrcEl.nextElementSibling !== null) {
+                    container.appendChild(dragSrcEl);
+                }
+            }
+        }
+
+        function onDragEnd(e) {
+            if (!isDragging) return;
+
+            // 1. Cleanup
+            if (dragAvatar) dragAvatar.remove();
+            if (dragSrcEl) dragSrcEl.classList.remove('drag-source');
+
+            // 2. Reset
+            isDragging = false;
+            dragSrcEl = null;
+            dragAvatar = null;
+
+            generateCode();
+        }
+
+
+        // --- Arrow Sort ---
+        function moveUp(btn) {
+            const row = btn.closest('.col-item');
+            if (row.previousElementSibling) {
+                row.parentNode.insertBefore(row, row.previousElementSibling);
+                generateCode();
+            }
+        }
+
+        function moveDown(btn) {
+            const row = btn.closest('.col-item');
+            if (row.nextElementSibling) {
+                row.parentNode.insertBefore(row.nextElementSibling, row);
+                generateCode();
+            }
+        }
+
+        // --- Logic ---
+        function setMethod(m) {
+            currentMethod = m;
+            [1, 2, 3, 4].forEach(i => {
+                const btn = document.getElementById(`btnMethod${i}`);
+                if (i === m) {
+                    btn.classList.remove('text-slate-500', 'hover:text-slate-800');
+                    btn.classList.add('text-indigo-600', 'bg-white', 'shadow-sm', 'border', 'border-slate-200');
+                } else {
+                    btn.classList.add('text-slate-500', 'hover:text-slate-800');
+                    btn.classList.remove('text-indigo-600', 'bg-white', 'shadow-sm', 'border', 'border-slate-200');
+                }
+            });
+
+            const headerInputs = document.querySelectorAll('.col-header');
+            const simpleSource = document.getElementById('simpleSourceConfig');
+            const hierConfig = document.getElementById('hierarchyConfig');
+
+            if (m === 4) {
+                simpleSource.classList.add('hidden');
+                hierConfig.classList.remove('hidden');
+            } else {
+                simpleSource.classList.remove('hidden');
+                hierConfig.classList.add('hidden');
+            }
+
+            headerInputs.forEach(inp => {
+                if (m === 1) {
+                    inp.disabled = true;
+                    inp.parentNode.classList.add('opacity-40', 'pointer-events-none');
+                } else {
+                    inp.disabled = false;
+                    inp.parentNode.classList.remove('opacity-40', 'pointer-events-none');
+                }
+            });
+
+            generateCode();
+        }
+
+        function addColumn(name = '', prop = '', styles = []) {
+            const container = document.getElementById('columnsContainer');
+            const tpl = document.getElementById('tplColumn');
+            const clone = tpl.content.cloneNode(true);
+            const div = clone.querySelector('.col-item');
+
+            div.querySelector('.col-header').value = name;
+            div.querySelector('.col-prop').value = prop;
+
+            if (currentMethod === 1) {
+                div.querySelector('.col-header').disabled = true;
+                div.querySelector('.col-header').parentNode.classList.add('opacity-40', 'pointer-events-none');
+            }
+
+            container.appendChild(div);
+            generateCode();
+        }
+
+        function removeColumn(btn) {
+            const el = btn.closest('.col-item');
+            el.remove();
+            generateCode();
+        }
+
+        function toggleSettings(btn) {
+            const row = btn.closest('.col-item');
+            const panel = row.querySelector('.settings-panel');
+            panel.classList.toggle('hidden');
+            btn.classList.toggle('text-indigo-600');
+            btn.classList.toggle('bg-slate-50');
+        }
+
+        // --- Hierarchy ---
+        function addLevel() {
+            const container = document.getElementById('levelsContainer');
+            const tpl = document.getElementById('tplLevel');
+            const clone = tpl.content.cloneNode(true);
+            const el = clone.querySelector('.level-card');
+            const index = container.children.length;
+
+            const title = el.querySelector('.level-title');
+            const srcInput = el.querySelector('.level-source');
+            const indentInput = el.querySelector('.level-indent');
+
+            if (index === 0) {
+                title.innerText = "Root Level";
+                srcInput.value = 'vList';
+                indentInput.value = 0;
+                el.querySelector('.btn-remove-level').classList.add('hidden');
+            } else {
+                title.innerText = `Nested Level ${index}`;
+                const prevVar = `item_${index}`;
+                srcInput.value = `${prevVar}.children`;
+                indentInput.value = index;
+            }
+
+            container.appendChild(el);
+            generateCode();
+        }
+
+        function removeLevel(btn) {
+            btn.closest('.level-card').remove();
+            const levels = document.querySelectorAll('.level-card');
+            levels.forEach((lvl, idx) => {
+                const t = lvl.querySelector('.level-title');
+                if (idx === 0) t.innerText = "Root Level";
+                else t.innerText = `Nested Level ${idx}`;
+            });
+            generateCode();
+        }
+
+        // --- Code Gen ---
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function escapeString(str) {
+            if (!str) return '';
+            return str.replace(/"/g, '\\"');
+        }
+
+        function colorize(code) {
+            const placeholders = [];
+            const mask = (match, type) => {
+                placeholders.push({ text: match, type });
+                return `___TOKEN${placeholders.length - 1}___`;
+            };
+
+            let safe = code
+                .replace(/(".*?")/g, m => mask(m, 'str'))
+                .replace(/(\/\/.*)/g, m => mask(m, 'cmt'));
+
+            safe = safe.replace(/\b(createTable|addColumn|addRow|foreach|table|indent|collapse|align|style|hidden|decimals|formatType|postfix|prefix|readonly)\b/g, '<span class="syn-mtd">$1</span>');
+            safe = safe.replace(/\b(if|else|then|endif)\b/gi, '<span class="syn-kwd">$1</span>');
+            safe = safe.replace(/\b(v[A-Za-z0-9_]*|item_[0-9]+)\b/g, '<span class="syn-var">$1</span>');
+
+            return safe.replace(/___TOKEN(\d+)___/g, (_, id) => {
+                const t = placeholders[id];
+                const cls = t.type === 'str' ? 'syn-str' : 'syn-cmt';
+                return `<span class="${cls}">${escapeHtml(t.text)}</span>`;
+            });
+        }
+
+        function generateCode() {
+            const tableVar = document.getElementById('inpTableVar').value || 'vTable';
+            const listVar = document.getElementById('inpSourceList').value || 'vList';
+            const cols = getColumnsData();
+
+            let c = `// Table created by Cora Table Architect v21\n`;
+
+            if (currentMethod === 3 || currentMethod === 4) {
+                c += `${tableVar} := createTable()\n`;
+                cols.forEach(col => {
+                    c += `${tableVar}.addColumn("${escapeString(col.header)}", "")`;
+                    c += buildStyleChain(col);
+                    c += `\n`;
+                });
+            } else {
+                c += `${tableVar} := ${listVar}.table()\n`;
+                cols.forEach(col => {
+                    if (currentMethod === 1) {
+                        c += `${tableVar}.addColumn(${col.prop})`;
+                    } else {
+                        c += `${tableVar}.addColumn("${escapeString(col.header)}", ${col.prop})`;
+                    }
+                    c += buildStyleChain(col);
+                    c += `\n`;
+                });
+            }
+
+            if (currentMethod === 3) {
+                c += `\n// --- Population ---\n`;
+                c += `${listVar}.foreach(item:\n`;
+                c += `    ${tableVar}.addRow(item, ${cols.map(c => c.prop).join(', ')})\n`;
+                c += `)\n`;
+            } else if (currentMethod === 4) {
+                c += `\n// --- Hierarchy Population ---\n`;
+                const levels = getLevelsData();
+                c += generateNestedLoop(0, levels, cols, tableVar);
+            }
+
+            c += `\n${tableVar}`;
+            document.getElementById('codeOutput').innerHTML = colorize(c);
+        }
+
+        function generateNestedLoop(levelIdx, levels, cols, tableVar) {
+            if (levelIdx >= levels.length) return '';
+            const lvl = levels[levelIdx];
+            const itemVar = lvl.varName;
+            const codeIndent = "    ".repeat(levelIdx);
+
+            let s = `${codeIndent}${lvl.source}.foreach(${itemVar}:\n`;
+
+            const rowProps = cols.map(c => {
+                if (/^[a-zA-Z0-9_]+$/.test(c.prop)) return `${itemVar}.${c.prop}`;
+                return c.prop;
+            }).join(', ');
+
+            s += `${codeIndent}    ${tableVar}.addRow(${itemVar}, ${rowProps})`;
+            if (parseInt(lvl.indent) > 0) s += `.indent(${lvl.indent})`;
+            if (lvl.collapse) s += `.collapse()`;
+            s += `\n`;
+
+            s += generateNestedLoop(levelIdx + 1, levels, cols, tableVar);
+            s += `${codeIndent})\n`;
+            return s;
+        }
+
+        function buildStyleChain(col) {
+            let chain = '';
+            if (col.align && col.align !== 'left') chain += `.align(${col.align.toUpperCase()})`;
+
+            let args = [];
+            let methods = [];
+            col.styles.forEach(st => {
+                if (st === 'hidden') methods.push('.hidden()');
+                else if (st === 'readonly') methods.push('.readonly()');
+                else args.push(st);
+            });
+            if (args.length > 0) chain += `.style(${args.join(', ')})`;
+
+            // Format
+            if (col.format) chain += `.${col.format}`;
+
+            if (methods.length > 0) chain += methods.join('');
+            return chain;
+        }
+
+        function getColumnsData() {
+            const cols = [];
+            document.querySelectorAll('#columnsContainer > .col-item').forEach(div => {
+                // Ensure we don't pick up the placeholder
+                if (div.classList.contains('drag-placeholder')) return;
+
+                const header = div.querySelector('.col-header').value;
+                const prop = div.querySelector('.col-prop').value;
+                const styles = [];
+                div.querySelectorAll('.style-btn').forEach(btn => {
+                    if (btn.dataset.active === 'true') {
+                        if (btn.title === 'Add Vertical Separator') styles.push('separator');
+                        if (btn.title === 'Hidden Column') styles.push('hidden');
+                        if (btn.title === 'Wrap Text') styles.push('wrapped');
+                        if (btn.title === 'Readonly') styles.push('readonly');
+                    }
+                });
+
+                let align = 'left';
+                div.querySelectorAll('.align-btn').forEach(btn => {
+                    if (btn.dataset.active === 'true') align = btn.title.includes('Center') ? 'center' : btn.title.includes('Right') ? 'right' : 'left';
+                });
+
+                // Format
+                let format = '';
+                div.querySelectorAll('.format-btn').forEach(btn => {
+                    if (btn.classList.contains('active')) format = btn.dataset.val;
+                });
+
+                cols.push({ header, prop, styles, align, format });
+            });
+            return cols;
+        }
+
+        function getLevelsData() {
+            const lvls = [];
+            document.querySelectorAll('.level-card').forEach((div, idx) => {
+                lvls.push({
+                    varName: `item_${idx + 1}`,
+                    source: div.querySelector('.level-source').value || 'vList',
+                    indent: div.querySelector('.level-indent').value || 0,
+                    collapse: div.querySelector('.level-collapse').checked
+                });
+            });
+            return lvls;
+        }
+
+        function setFormat(btn, val) {
+            const parent = btn.closest('.flex');
+            parent.querySelectorAll('.format-btn').forEach(b => {
+                b.classList.remove('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-200');
+                b.classList.add('text-slate-400', 'bg-white', 'border-slate-200');
+            });
+
+            btn.classList.add('active', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-200');
+            btn.classList.remove('text-slate-400', 'bg-white', 'border-slate-200');
+            generateCode();
+        }
+
+        function toggleStyle(btn, styleName) {
+            const isActive = btn.dataset.active === 'true';
+            btn.dataset.active = isActive ? 'false' : 'true';
+            updateBtnStyle(btn);
+            generateCode();
+        }
+
+        function toggleAlign(btn, align) {
+            const isActive = btn.dataset.active === 'true';
+            const parent = btn.closest('.settings-panel');
+            parent.querySelectorAll('.align-btn').forEach(b => {
+                b.dataset.active = 'false';
+                updateBtnStyle(b);
+            });
+            if (!isActive) {
+                btn.dataset.active = 'true';
+                btn.dataset.alignValue = align;
+                updateBtnStyle(btn);
+            }
+            generateCode();
+        }
+
+        function updateBtnStyle(btn) {
+            if (btn.dataset.active === 'true') {
+                btn.classList.remove('text-slate-400', 'border-slate-200', 'bg-white');
+                btn.classList.add('text-indigo-600', 'bg-indigo-50', 'border-indigo-200');
+            } else {
+                btn.classList.add('text-slate-400', 'border-slate-200', 'bg-white');
+                btn.classList.remove('text-indigo-600', 'bg-indigo-50', 'border-indigo-200');
+            }
+        }
+
+        function copyCode() {
+            const el = document.getElementById('codeOutput');
+            const text = el.innerText;
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+
+            const btn = document.getElementById('btnCopy');
+            const ogHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-check"></i> Copied`;
+            setTimeout(() => btn.innerHTML = ogHtml, 1500);
+        }
+
+    </script>
+</body>
+
+</html>

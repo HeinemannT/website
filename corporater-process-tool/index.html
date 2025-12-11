@@ -1,0 +1,850 @@
+---
+layout: null
+permalink: /tools/corporater-process-tool/
+---
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cora | BPMN Architect</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- BPMN Modeler -->
+    <script src="https://unpkg.com/bpmn-js@14.0.0/dist/bpmn-modeler.development.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@14.0.0/dist/assets/diagram-js.css" />
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js@14.0.0/dist/assets/bpmn-font/css/bpmn.css" />
+
+    <!-- Pako for Gzip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Grid Pattern */
+        .bg-grid-slate {
+            background-color: #f1f5f9;
+            background-image: linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        /* BPMN Overrides */
+        .bjs-container {
+            background: transparent !important;
+        }
+
+        .djs-palette {
+            background: #fff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 4px;
+            left: 10px;
+            top: 10px;
+        }
+
+        .djs-context-pad {
+            background: #fff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 4px;
+        }
+
+        /* Resizer Handle */
+        .resizer {
+            width: 4px;
+            cursor: col-resize;
+            background-color: #334155;
+            transition: background-color 0.2s;
+            z-index: 50;
+        }
+
+        .resizer:hover,
+        .resizer.active {
+            background-color: #6366f1;
+            /* Indigo-500 */
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="h-screen w-screen overflow-hidden bg-slate-900 text-slate-100 selection:bg-indigo-500/30 flex flex-col"
+    id="app" v-cloak>
+
+    <!-- Header -->
+    <header
+        class="h-14 border-b border-slate-700 bg-slate-800 flex items-center justify-between px-4 shrink-0 z-20 relative shadow-md">
+        <div class="flex items-center gap-3">
+            <div
+                class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i data-lucide="activity" class="text-white w-5 h-5"></i>
+            </div>
+            <h1 class="font-semibold text-lg tracking-tight">BPMN Architect <span
+                    class="text-slate-500 text-xs font-mono ml-1 px-1.5 py-0.5 bg-slate-700 rounded border border-slate-600">v2.6</span>
+            </h1>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- File Actions -->
+            <div class="flex items-center bg-slate-700/50 rounded-lg p-0.5 border border-slate-600/50">
+                <button @click="createNewDiagram"
+                    class="flex items-center gap-2 px-3 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-600 rounded-md transition-all">
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> New
+                </button>
+                <div class="w-px h-3 bg-slate-600 mx-1"></div>
+                <button @click="clearAll"
+                    class="flex items-center gap-2 px-3 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-600 rounded-md transition-all">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+                </button>
+            </div>
+
+            <div class="h-4 w-px bg-slate-600 mx-1"></div>
+
+            <!-- Export Actions -->
+            <div class="flex items-center gap-2">
+
+                <!-- Target Object Input -->
+                <div class="relative group flex items-center">
+                    <span class="text-[10px] text-slate-400 mr-2 font-mono">Target:</span>
+                    <input type="text" v-model="targetObject"
+                        class="bg-slate-900 border border-slate-600 text-emerald-400 text-xs font-mono rounded px-2 py-1.5 w-32 focus:w-48 transition-all focus:border-emerald-500 focus:outline-none placeholder-slate-600"
+                        placeholder="t.object">
+                </div>
+
+                <!-- Extended Script Export -->
+                <button @click="copyAsExtendedScript"
+                    class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded shadow-lg shadow-emerald-600/20 transition-all active:scale-95 group relative border border-emerald-500">
+                    <i data-lucide="code" class="w-3.5 h-3.5"></i>
+                    <span>Copy Script</span>
+                </button>
+
+                <div class="h-4 w-px bg-slate-600 mx-1"></div>
+
+                <div class="relative group">
+                    <input type="text" v-model="filename"
+                        class="bg-slate-900 border border-slate-600 text-slate-200 text-xs rounded px-2 py-1.5 w-32 focus:w-40 transition-all focus:border-indigo-500 focus:outline-none placeholder-slate-500"
+                        placeholder="Filename">
+                    <span
+                        class="absolute right-2 top-1.5 text-slate-500 text-[10px] pointer-events-none group-focus-within:opacity-0 transition-opacity">.bpmn</span>
+                </div>
+
+                <button @click="downloadSVG"
+                    class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded shadow-lg shadow-indigo-600/20 transition-all active:scale-95">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> SVG
+                </button>
+                <button @click="downloadXML"
+                    class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-pink-600 hover:bg-pink-500 text-white rounded shadow-lg shadow-pink-600/20 transition-all active:scale-95">
+                    <i data-lucide="file-code" class="w-3.5 h-3.5"></i> XML
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow flex flex-row overflow-hidden" @mousemove="handleResize" @mouseup="stopResize">
+
+        <!-- Left Panel: Input & Raw XML -->
+        <div class="bg-slate-800 border-r border-slate-700 flex flex-col z-10 shadow-2xl shrink-0"
+            :style="{ width: sidebarWidth + 'px' }">
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-700">
+                <button @click="activeTab = 'input'"
+                    :class="activeTab === 'input' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-slate-200'"
+                    class="flex-1 py-3 text-xs font-semibold uppercase border-b-2 transition-colors">Input</button>
+                <button @click="activeTab = 'xml'"
+                    :class="activeTab === 'xml' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-slate-200'"
+                    class="flex-1 py-3 text-xs font-semibold uppercase border-b-2 transition-colors">XML Editor</button>
+            </div>
+
+            <!-- Input Tab Content -->
+            <div v-show="activeTab === 'input'" class="flex-grow flex flex-col p-4">
+                <label class="text-xs font-semibold uppercase text-slate-400 mb-2">Extended Code / Gzip</label>
+                <div class="relative flex-grow flex flex-col">
+                    <textarea v-model="inputString" @input="processInput"
+                        class="w-full h-full p-3 text-xs font-mono bg-slate-900 border border-slate-700 rounded text-slate-300 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none resize-none custom-scroll placeholder-slate-600"
+                        placeholder="Paste content string here..."></textarea>
+                    <div class="absolute bottom-2 right-2">
+                        <i v-if="isValidInput" data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs h-4" :class="statusType === 'error' ? 'text-red-400' : 'text-emerald-400'">{{
+                    statusMsg }}</div>
+            </div>
+
+            <!-- XML Tab Content -->
+            <div v-show="activeTab === 'xml'" class="flex-grow flex flex-col bg-slate-900 relative">
+                <div class="absolute top-2 right-2 z-10">
+                    <button @click="copyToClipboard"
+                        class="bg-slate-800/80 hover:bg-slate-700 text-indigo-300 hover:text-indigo-200 text-xs px-2 py-1 rounded border border-slate-600 backdrop-blur flex items-center gap-1 transition-all">
+                        <i data-lucide="copy" class="w-3 h-3"></i> Copy
+                    </button>
+                </div>
+                <textarea v-model="xmlContent" @input="handleXmlEdit"
+                    class="w-full h-full p-4 text-xs font-mono bg-slate-900 text-blue-200 focus:outline-none resize-none custom-scroll leading-relaxed"
+                    spellcheck="false"></textarea>
+            </div>
+        </div>
+
+        <!-- Resizer Handle -->
+        <div class="resizer" @mousedown="startResize" :class="{ 'active': isResizing }"></div>
+
+        <!-- Center: Canvas -->
+        <div class="flex-grow relative bg-grid-slate overflow-hidden">
+            <div id="canvas" class="w-full h-full"></div>
+
+            <div v-if="!hasDiagram"
+                class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none">
+                <div class="w-16 h-16 mb-4 rounded-full bg-slate-200 flex items-center justify-center">
+                    <i data-lucide="layout-template" class="w-8 h-8 text-slate-400"></i>
+                </div>
+                <p class="text-sm font-medium text-slate-500">Waiting for BPMN data...</p>
+                <div class="flex gap-2 mt-4">
+                    <button @click="createNewDiagram"
+                        class="pointer-events-auto bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md shadow-lg text-xs font-bold transition-all">
+                        Create New Diagram
+                    </button>
+                </div>
+            </div>
+
+            <!-- Toast Notification -->
+            <div v-if="toastMsg"
+                class="absolute bottom-6 right-6 bg-slate-800 text-white px-4 py-2 rounded-md shadow-lg border border-slate-700 flex items-center gap-2 animate-bounce-in">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+                <span class="text-xs font-medium">{{ toastMsg }}</span>
+            </div>
+        </div>
+
+        <!-- Right Panel: Corporater Inspector -->
+        <div class="w-72 bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-xl overflow-y-auto custom-scroll z-20"
+            v-if="inspectorVisible">
+            <div class="p-4 border-b border-slate-100 bg-slate-50">
+                <h2 class="text-xs font-bold uppercase text-slate-500 tracking-wider mb-1">Properties</h2>
+                <div class="text-sm font-semibold text-slate-800 truncate">{{ inspectorTitle }}</div>
+                <div class="text-[10px] text-slate-400 font-mono mt-0.5">{{ inspectorType }}</div>
+            </div>
+
+            <div class="p-4 space-y-4">
+                <!-- Common Props -->
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold text-slate-500">ID</label>
+                    <input type="text" v-model="props.id" @change="updateProps"
+                        class="w-full text-xs text-black p-2 border border-slate-300 rounded bg-white focus:ring-1 focus:ring-indigo-500 outline-none font-medium">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold text-slate-500">Name</label>
+                    <input type="text" v-model="props.name" @change="updateProps"
+                        class="w-full text-xs text-black p-2 border border-slate-300 rounded bg-white focus:ring-1 focus:ring-indigo-500 outline-none font-medium">
+                </div>
+
+                <!-- Service Task (Corporater Extended) -->
+                <div v-if="isServiceTask" class="pt-4 border-t border-slate-100 space-y-3">
+                    <div class="flex items-center gap-2 text-indigo-600 mb-1">
+                        <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                        <span class="text-xs font-bold uppercase tracking-wider">Extended Logic</span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="block text-xs font-bold text-slate-500">Topic (Raw)</label>
+                        <input type="text" v-model="props.topic" @change="updateProps"
+                            class="w-full text-[10px] text-black font-mono p-2 border border-slate-300 rounded bg-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                        <p class="text-[10px] text-slate-400">Format: Extended;scriptName;varName</p>
+                    </div>
+
+                    <!-- Helper Builders -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-500">Script Name</label>
+                            <input type="text" v-model="helper.script" @input="buildTopic"
+                                class="w-full text-xs text-black p-1.5 border border-slate-300 rounded focus:border-indigo-500 outline-none font-medium">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-500">Variable</label>
+                            <input type="text" v-model="helper.variable" @input="buildTopic"
+                                class="w-full text-xs text-black p-1.5 border border-slate-300 rounded focus:border-indigo-500 outline-none font-medium">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Task (Corporater Form) -->
+                <div v-if="isUserTask" class="pt-4 border-t border-slate-100 space-y-3">
+                    <div class="flex items-center gap-2 text-pink-600 mb-1">
+                        <i data-lucide="user" class="w-3.5 h-3.5"></i>
+                        <span class="text-xs font-bold uppercase tracking-wider">Form Config</span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="block text-xs font-bold text-slate-500">Form Key (Page ID)</label>
+                        <input type="text" v-model="props.formKey" @change="updateProps"
+                            class="w-full text-xs text-black p-2 border border-slate-300 rounded bg-white focus:ring-1 focus:ring-pink-500 outline-none font-medium">
+                    </div>
+
+                    <!-- Roles (Camunda Properties) -->
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-xs font-bold text-slate-500">Roles</label>
+                            <button @click="addRole"
+                                class="text-[10px] bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded text-slate-600 transition-colors border border-slate-200">+
+                                Add</button>
+                        </div>
+                        <div class="space-y-1 bg-slate-50 p-2 rounded border border-slate-100">
+                            <div v-for="(role, idx) in props.roles" :key="idx" class="flex gap-1 mb-1">
+                                <input type="text" v-model="role.value" @change="updateRoles"
+                                    class="flex-1 text-[10px] text-black p-1 border border-slate-300 rounded focus:border-pink-500 outline-none font-medium"
+                                    placeholder="Property ID">
+                                <button @click="removeRole(idx)" class="text-slate-400 hover:text-red-500 px-1"><i
+                                        data-lucide="x" class="w-3 h-3"></i></button>
+                            </div>
+                            <p v-if="props.roles.length === 0" class="text-[10px] text-slate-400 italic text-center">No
+                                roles assigned</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- 1. Expanded Camunda Moddle Definition ---
+        const camundaModdleDescriptor = {
+            "name": "Camunda",
+            "uri": "http://camunda.org/schema/1.0/bpmn",
+            "prefix": "camunda",
+            "xml": { "tagAlias": "lowerCase" },
+            "associations": [],
+            "types": [
+                {
+                    "name": "Topic",
+                    "isAbstract": true,
+                    "extends": ["bpmn:ServiceTask"],
+                    "properties": [
+                        { "name": "topic", "isAttr": true, "type": "String" },
+                        { "name": "type", "isAttr": true, "type": "String" }
+                    ]
+                },
+                {
+                    "name": "Form",
+                    "isAbstract": true,
+                    "extends": ["bpmn:UserTask"],
+                    "properties": [
+                        { "name": "formKey", "isAttr": true, "type": "String" },
+                        { "name": "formData", "type": "FormData" }
+                    ]
+                },
+                {
+                    "name": "FormData",
+                    "superClass": ["Element"],
+                    "properties": [
+                        { "name": "fields", "isMany": true, "type": "FormField" }
+                    ]
+                },
+                {
+                    "name": "FormField",
+                    "superClass": ["Element"],
+                    "properties": [
+                        { "name": "id", "isAttr": true, "type": "String" },
+                        { "name": "label", "isAttr": true, "type": "String" },
+                        { "name": "type", "isAttr": true, "type": "String" },
+                        { "name": "validation", "type": "Validation" },
+                        { "name": "values", "isMany": true, "type": "Value" }
+                    ]
+                },
+                {
+                    "name": "Validation",
+                    "superClass": ["Element"],
+                    "properties": [
+                        { "name": "constraints", "isMany": true, "type": "Constraint" }
+                    ]
+                },
+                {
+                    "name": "Constraint",
+                    "superClass": ["Element"],
+                    "properties": [
+                        { "name": "name", "isAttr": true, "type": "String" },
+                        { "name": "config", "isAttr": true, "type": "String" }
+                    ]
+                },
+                {
+                    "name": "Value",
+                    "superClass": ["Element"],
+                    "properties": [
+                        { "name": "id", "isAttr": true, "type": "String" },
+                        { "name": "name", "isAttr": true, "type": "String" }
+                    ]
+                },
+                {
+                    "name": "Properties",
+                    "superClass": ["Element"],
+                    "meta": { "allowedIn": ["bpmn:ExtensionElements"] },
+                    "properties": [
+                        { "name": "values", "isMany": true, "type": "Property" }
+                    ]
+                },
+                {
+                    "name": "Property",
+                    "superClass": ["Element"],
+                    "properties": [
+                        { "name": "id", "isAttr": true, "type": "String" },
+                        { "name": "name", "isAttr": true, "type": "String" },
+                        { "name": "value", "isAttr": true, "type": "String" }
+                    ]
+                }
+            ]
+        };
+
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    // UI State
+                    activeTab: 'input',
+                    sidebarWidth: 320,
+                    isResizing: false,
+
+                    // Logic State
+                    inputString: '',
+                    xmlContent: '',
+                    statusMsg: '',
+                    statusType: 'info',
+                    toastMsg: '',
+                    filename: 'process_diagram',
+                    targetObject: 't.exampleProcess', // Default target
+                    hasDiagram: false,
+                    // modeler and selectedElement removed from data to prevent Proxying
+                    isValidInput: false,
+                    isInternalUpdate: false,
+                    debounceTimer: null,
+
+                    // Inspector State
+                    inspectorVisible: false,
+                    inspectorTitle: '',
+                    inspectorType: '',
+                    isServiceTask: false,
+                    isUserTask: false,
+
+                    props: {
+                        id: '',
+                        name: '',
+                        topic: '', // Service Task
+                        formKey: '', // User Task
+                        roles: [] // User Task Properties
+                    },
+                    helper: {
+                        script: '',
+                        variable: ''
+                    }
+                }
+            },
+            created() {
+                // Non-reactive instance properties
+                this.modeler = null;
+                this.selectedElement = null;
+            },
+            mounted() {
+                this.initIcons();
+                this.initModeler();
+            },
+            updated() {
+                this.initIcons();
+            },
+            methods: {
+                initIcons() { lucide.createIcons(); },
+                showToast(msg) {
+                    this.toastMsg = msg;
+                    setTimeout(() => this.toastMsg = '', 3000);
+                },
+                initModeler() {
+                    // modeler is initialized on the instance, NOT in data()
+                    this.modeler = new BpmnJS({
+                        container: '#canvas',
+                        keyboard: { bindTo: window },
+                        moddleExtensions: {
+                            camunda: camundaModdleDescriptor
+                        }
+                    });
+
+                    this.modeler.on('commandStack.changed', async () => {
+                        try {
+                            const { xml } = await this.modeler.saveXML({ format: true });
+                            this.isInternalUpdate = true;
+                            this.xmlContent = xml;
+                            this.isInternalUpdate = false;
+                        } catch (err) { console.error(err); }
+                    });
+
+                    this.modeler.on('selection.changed', (e) => {
+                        const selection = e.newSelection;
+                        if (selection.length === 1) {
+                            this.loadInspector(selection[0]);
+                        } else {
+                            this.selectedElement = null;
+                            this.inspectorVisible = false;
+                        }
+                    });
+                },
+
+                // --- New Diagram Logic ---
+                async createNewDiagram() {
+                    try {
+                        await this.modeler.createDiagram();
+                        this.hasDiagram = true;
+                        this.activeTab = 'xml';
+                        this.statusMsg = 'Created new diagram';
+                        this.inputString = '';
+                    } catch (err) {
+                        console.error('Error creating diagram', err);
+                        this.statusMsg = 'Error creating diagram';
+                    }
+                },
+
+                // --- Resize Logic ---
+                startResize() {
+                    this.isResizing = true;
+                    document.body.style.cursor = 'col-resize';
+                },
+                handleResize(e) {
+                    if (this.isResizing) {
+                        this.sidebarWidth = Math.max(200, Math.min(e.clientX, 600)); // Clamp between 200 and 600
+                    }
+                },
+                stopResize() {
+                    this.isResizing = false;
+                    document.body.style.cursor = '';
+                },
+
+                // --- Inspector Logic ---
+                loadInspector(element) {
+                    // element is NOT Proxied because it's not in data()
+                    this.selectedElement = element;
+                    const bo = element.businessObject;
+
+                    // Copy values to Reactive State
+                    this.inspectorVisible = true;
+                    this.inspectorTitle = bo.name || bo.id;
+                    this.inspectorType = element.type;
+                    this.isServiceTask = element.type === 'bpmn:ServiceTask';
+                    this.isUserTask = element.type === 'bpmn:UserTask';
+
+                    this.props.id = bo.id;
+                    this.props.name = bo.name || '';
+
+                    if (this.isServiceTask) {
+                        this.props.topic = bo.topic || '';
+                        const parts = this.props.topic.split(';');
+                        if (parts.length >= 3) {
+                            this.helper.script = parts[1];
+                            this.helper.variable = parts[2];
+                        } else {
+                            this.helper.script = '';
+                            this.helper.variable = '';
+                        }
+                    }
+
+                    if (this.isUserTask) {
+                        this.props.formKey = bo.formKey || '';
+                        this.props.roles = [];
+
+                        if (bo.extensionElements && bo.extensionElements.values) {
+                            const camProps = bo.extensionElements.values.find(e => e.$type === 'camunda:Properties');
+                            if (camProps && camProps.values) {
+                                this.props.roles = camProps.values
+                                    .filter(p => p.name === 'role-participant')
+                                    .map(p => ({ value: p.value, obj: p }));
+                            }
+                        }
+                    }
+                },
+                updateProps() {
+                    if (!this.selectedElement) return;
+                    const modeling = this.modeler.get('modeling');
+                    let updates = { id: this.props.id, name: this.props.name };
+
+                    if (this.isServiceTask) {
+                        updates['camunda:topic'] = this.props.topic;
+                        updates['camunda:type'] = 'external';
+                    }
+                    if (this.isUserTask) {
+                        updates['camunda:formKey'] = this.props.formKey;
+                    }
+
+                    modeling.updateProperties(this.selectedElement, updates);
+
+                    // Update header title immediately
+                    this.inspectorTitle = this.props.name || this.props.id;
+                },
+                buildTopic() {
+                    if (this.helper.script || this.helper.variable) {
+                        const s = this.helper.script || 'null';
+                        const v = this.helper.variable || 'null';
+                        this.props.topic = `Extended;${s};${v}`;
+                        this.updateProps();
+                    }
+                },
+
+                addRole() {
+                    if (!this.selectedElement) return;
+                    const moddle = this.modeler.get('moddle');
+                    const modeling = this.modeler.get('modeling');
+                    const bo = this.selectedElement.businessObject;
+
+                    let extensions = bo.extensionElements;
+                    if (!extensions) {
+                        extensions = moddle.create('bpmn:ExtensionElements');
+                        modeling.updateProperties(this.selectedElement, { extensionElements: extensions });
+                    }
+
+                    let camProps = extensions.values.find(e => e.$type === 'camunda:Properties');
+                    if (!camProps) {
+                        camProps = moddle.create('camunda:Properties');
+                        extensions.get('values').push(camProps);
+                    }
+
+                    const newProp = moddle.create('camunda:Property', {
+                        name: 'role-participant',
+                        value: 'newPropID'
+                    });
+                    camProps.get('values').push(newProp);
+                    this.loadInspector(this.selectedElement);
+                },
+                removeRole(idx) {
+                    if (!this.selectedElement) return;
+                    const modeling = this.modeler.get('modeling');
+                    const bo = this.selectedElement.businessObject;
+
+                    // 1. Get the Moddle Element Reference from Vue Proxy state
+                    const roleRef = this.props.roles[idx].obj;
+
+                    // 2. Find the camunda:Properties collection
+                    const camProps = bo.extensionElements?.values.find(e => e.$type === 'camunda:Properties');
+
+                    if (camProps) {
+                        // 3. Remove from the moddle values array
+                        const values = camProps.get('values');
+                        const i = values.indexOf(roleRef);
+                        if (i > -1) {
+                            values.splice(i, 1);
+
+                            // 4. Force Update to register change in Undo/Redo stack and trigger XML regen
+                            // We re-set the extensionElements to themselves to trigger the event bus
+                            modeling.updateProperties(this.selectedElement, {
+                                extensionElements: bo.extensionElements
+                            });
+
+                            // 5. Refresh Inspector
+                            this.loadInspector(this.selectedElement);
+                        }
+                    }
+                },
+                updateRoles() {
+                    this.props.roles.forEach(role => {
+                        role.obj.value = role.value;
+                    });
+                },
+
+                // --- Core Logic ---
+                processInput() {
+                    this.statusMsg = '';
+                    this.isValidInput = false;
+                    let raw = this.inputString.trim();
+                    if (!raw) return;
+
+                    try {
+                        if (raw.includes(":=")) {
+                            const match = raw.match(/content\s*:=\s*'([^']+)'/);
+                            if (match && match[1]) raw = match[1];
+                        }
+                        if (raw.includes(';')) {
+                            const parts = raw.split(';');
+                            const gzipPart = parts.find(p => p.trim().startsWith('H4s'));
+                            raw = gzipPart ? gzipPart.trim() : parts[parts.length - 1].trim();
+                        }
+                        raw = raw.replace(/^'|'$/g, '').replace(/,$/, '');
+
+                        const binaryString = atob(raw);
+                        const charData = binaryString.split('').map(x => x.charCodeAt(0));
+                        const binData = new Uint8Array(charData);
+                        const decompressed = pako.inflate(binData, { to: 'string' });
+
+                        this.xmlContent = decompressed;
+                        this.renderDiagram(decompressed);
+                        this.isValidInput = true;
+                        this.statusMsg = 'Decoded successfully';
+                        this.statusType = 'info';
+                        this.activeTab = 'xml';
+                    } catch (err) {
+                        if (raw.length > 20) {
+                            this.statusMsg = 'Invalid format';
+                            this.statusType = 'error';
+                        }
+                    }
+                },
+                handleXmlEdit() {
+                    clearTimeout(this.debounceTimer);
+                    this.debounceTimer = setTimeout(() => {
+                        if (!this.isInternalUpdate) {
+                            this.renderDiagram(this.xmlContent);
+                        }
+                    }, 500);
+                },
+                async renderDiagram(xml) {
+                    try {
+                        await this.modeler.importXML(xml);
+                        this.hasDiagram = true;
+                        this.modeler.get('canvas').zoom('fit-viewport');
+                    } catch (err) {
+                        this.statusMsg = 'Invalid BPMN XML';
+                        this.statusType = 'error';
+                    }
+                },
+
+                // --- Export Logic ---
+
+                // 1. Helper for Clipboard
+                copyTextToClipboard(text) {
+                    const el = document.createElement('textarea');
+                    el.value = text;
+                    el.setAttribute('readonly', '');
+                    el.style.position = 'absolute';
+                    el.style.left = '-9999px';
+                    document.body.appendChild(el);
+                    el.select();
+
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful) {
+                            return true;
+                        } else {
+                            throw new Error('Fallback copy failed');
+                        }
+                    } catch (err) {
+                        console.error('Copy failed', err);
+                        return false;
+                    } finally {
+                        document.body.removeChild(el);
+                    }
+                },
+
+                // 2. Copy as Extended Script
+                async copyAsExtendedScript() {
+                    if (!this.hasDiagram) return;
+                    try {
+                        // 1. Get XML
+                        const { xml } = await this.modeler.saveXML({ format: true });
+
+                        // 2. Gzip
+                        const binaryString = pako.gzip(xml);
+
+                        // 3. Base64
+                        let binary = '';
+                        const len = binaryString.byteLength;
+                        for (let i = 0; i < len; i++) {
+                            binary += String.fromCharCode(binaryString[i]);
+                        }
+                        const base64 = btoa(binary);
+
+                        // 4. Prefix & Formatting
+                        let name = this.filename.trim() || 'process_diagram';
+                        if (!name.toLowerCase().endsWith('.bpmn')) name += '.bpmn';
+
+                        const fullPayload = `${name};application/xml;${base64}`;
+
+                        // Chunk into 76-char lines
+                        const chunked = fullPayload.match(/.{1,76}/g).join('\n');
+
+                        // Final Wrapper with Custom Target
+                        const target = this.targetObject.trim() || 'this.object';
+                        const finalString = `${target}.change(content := '${chunked}')`;
+
+                        if (this.copyTextToClipboard(finalString)) {
+                            this.showToast('Copied Extended Script to clipboard!');
+                        } else {
+                            this.showToast('Copy failed. Check console.');
+                        }
+
+                    } catch (err) {
+                        console.error("Export failed", err);
+                        this.showToast('Export failed: ' + err.message);
+                    }
+                },
+
+                // 3. Download SVG
+                async downloadSVG() {
+                    if (!this.hasDiagram) return;
+                    try {
+                        const { svg } = await this.modeler.saveSVG();
+                        const blob = new Blob([svg], { type: 'image/svg+xml' });
+                        this.triggerDownload(blob, '.svg');
+                    } catch (err) { console.error(err); }
+                },
+                // 4. Download XML
+                async downloadXML() {
+                    if (!this.hasDiagram) return;
+                    try {
+                        const { xml } = await this.modeler.saveXML({ format: true });
+                        const blob = new Blob([xml], { type: 'application/xml' });
+                        this.triggerDownload(blob, '.bpmn');
+                    } catch (err) { console.error(err); }
+                },
+                triggerDownload(blob, ext) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = (this.filename || 'diagram') + ext;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                },
+                copyToClipboard() {
+                    if (this.copyTextToClipboard(this.xmlContent)) {
+                        this.showToast('XML Copied to clipboard!');
+                    } else {
+                        this.showToast('Copy failed. Check console.');
+                    }
+                },
+                clearAll() {
+                    this.inputString = '';
+                    this.xmlContent = '';
+                    this.hasDiagram = false;
+                    this.statusMsg = '';
+                    this.selectedElement = null;
+                    this.inspectorVisible = false;
+                    this.modeler.clear();
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>

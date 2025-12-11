@@ -12,4 +12,5 @@ Here are some tools:
 *   [Corporater Color Set Builder]({{ '/tools/corporater-colorset-builder/' | relative_url }}) - A visual color set designer for Corporater.
 *   [Corporater Image Uploader]({{ '/tools/corporater-image-upload/' | relative_url }}) - A image-to-extended-script converter for Corporater.
 *   [Corporater Table Builder]({{ '/tools/corporater-table-builder/' | relative_url }}) - A visual extended table designer for Corporater.
+*   [Corporater Process Tool]({{ '/tools/corporater-process-tool/' | relative_url }}) - A visual extended process designer for Corporater.
 *   [SVG Tuner]({{ '/tools/svg-tuner/' | relative_url }}) - A tool to recolor and resize SVGs

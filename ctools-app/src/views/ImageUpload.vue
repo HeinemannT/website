@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Trash2, Image as ImageIcon, CheckCircle, AlertCircle, FileCode } from 'lucide-vue-next'
+import { Trash2, Image as ImageIcon, CheckCircle, AlertCircle } from 'lucide-vue-next'
 import FileDropZone from '../components/ui/FileDropZone.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
@@ -185,9 +185,7 @@ const processImages = async () => {
         <!-- Right Panel: Output -->
         <div class="md:w-1/3 border-l border-slate-200 dark:border-slate-800">
              <CodeOutputPanel title="Output Script" :code="generatedScript">
-                 <template #icon>
-                     <FileCode class="w-4 h-4 text-indigo-500" />
-                 </template>
+
              </CodeOutputPanel>
         </div>
 

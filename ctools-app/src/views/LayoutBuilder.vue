@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { 
     Folder, Trash2, Plus, X, Minimize2, Maximize2, 
     Monitor, Smartphone, Layout, Layers,
-    Code, HelpCircle
+    HelpCircle
 } from 'lucide-vue-next'
 import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
 
@@ -344,9 +344,7 @@ if (data.value.length === 0) addTabSet()
         <!-- Right Panel: Output -->
         <div class="w-80 border-l border-slate-200 dark:border-slate-800 shadow-2xl relative z-40">
              <CodeOutputPanel title="Code Output" :code="scriptOutput">
-                 <template #icon>
-                     <Code class="w-4 h-4 text-slate-400" />
-                 </template>
+
              </CodeOutputPanel>
         </div>
 

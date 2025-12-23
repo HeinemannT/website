@@ -36,19 +36,7 @@ const emit = defineEmits<{
                     CTools is a specialized suite of utilities designed to streamline the workflow for Corporater implementation consultants and developers.
                 </p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-                    <div>
-                        <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2">The Suite</h4>
-                        <ul class="space-y-2 text-slate-600 dark:text-slate-400">
-                            <li><strong>Colorset Builder:</strong> Create, manage, and generate color palettes with automatic script export.</li>
-                            <li><strong>Layout Builder:</strong> Visual designer for complex Corporater layouts (Tabs, Rows, Columns).</li>
-                            <li><strong>Process Tool:</strong> BPMN editor with extended attributes for Camunda integration.</li>
-                            <li><strong>Table Builder:</strong> Configure Extended Tables with hierarchical headers and properties.</li>
-                            <li><strong>SVG Tuner:</strong> Optimize, colorize, and fix SVG assets for dashboards.</li>
-                            <li><strong>Image Upload:</strong> Convert images to Base64 resources optimized for Corporater.</li>
-                        </ul>
-                    </div>
-
+                <div class="mt-8 space-y-8">
                     <div>
                         <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2">Changelog</h4>
                         <div class="space-y-4">
@@ -57,13 +45,13 @@ const emit = defineEmits<{
                                 <p class="text-xs text-slate-500 mt-1">Consolidated individual tools into a single unified application suite.</p>
                             </div>
                         </div>
+                    </div>
 
-                         <div class="mt-8">
-                             <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2">Contact</h4>
-                             <a href="mailto:tassiloDheinemann@gmail.com" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline">
-                                 <Mail class="w-4 h-4" /> tassiloDheinemann@gmail.com
-                             </a>
-                         </div>
+                    <div>
+                         <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2">Contact</h4>
+                         <a href="mailto:tassiloDheinemann@gmail.com" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline">
+                             <Mail class="w-4 h-4" /> tassiloDheinemann@gmail.com
+                         </a>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
-import { Plus, Trash2, Palette, Wand2, ArrowRight, ExternalLink, FileCode } from 'lucide-vue-next'
+import { Plus, Trash2, Palette, Wand2, ArrowRight, ExternalLink } from 'lucide-vue-next'
 import {
     hexToHsv, hsvToHex, hexToHsl, hslToHex, interpolateColors, hexToRgb, rgbToHex
 } from '../utils/colors'
@@ -392,6 +392,14 @@ const processPaste = () => {
                             </div>
                         </div>
 
+                        <!-- Brightness Slider -->
+                        <div class="space-y-2 mb-6">
+                            <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <span>Brightness ({{ Math.round(currentVal) }}%)</span>
+                            </div>
+                            <input type="range" v-model.number="currentVal" min="0" max="100" @input="updateColorFromHsv" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
+                        </div>
+
                         <!-- Data Inputs & Preview -->
                         <div class="flex gap-4">
                             <div class="w-20 h-20 rounded-xl shadow-lg border border-slate-200 dark:border-slate-600 shrink-0" 
@@ -508,9 +516,6 @@ const processPaste = () => {
                 <!-- SCRIPT -->
                 <div v-if="activeTab === 'script'" class="h-full flex flex-col">
                      <CodeOutputPanel title="Generated Script" :code="scriptOutput">
-                         <template #icon>
-                             <FileCode class="w-4 h-4 text-indigo-500" />
-                         </template>
                          <template #actions>
                              <div class="w-40">
                                  <input v-model="rootParentId" placeholder="Context Folder" class="w-full text-xs border-b border-slate-200 dark:border-slate-700 bg-transparent focus:border-indigo-500 outline-none pb-1 placeholder-slate-400" />

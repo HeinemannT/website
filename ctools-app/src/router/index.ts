@@ -9,8 +9,8 @@ import ColorsetBuilder from '../views/ColorsetBuilder.vue'
 import LayoutBuilder from '../views/LayoutBuilder.vue'
 import TableBuilder from '../views/TableBuilder.vue'
 
-// Placeholder views for now
-const Dashboard = { template: '<div class="p-8 text-slate-500">Select a tool from the sidebar to begin.</div>' }
+import Dashboard from '../views/Dashboard.vue'
+
 // const Placeholder = (name: string) => ({ template: `<div class="p-8"><h2 class="text-xl font-bold mb-4">${name}</h2><p class="text-slate-500">Coming soon...</p></div>` })
 
 const router = createRouter({
@@ -27,6 +27,7 @@ const router = createRouter({
                 { path: 'table', component: TableBuilder },
                 { path: 'image', component: ImageUpload },
                 { path: 'tuner', component: SvgTuner },
+                { path: '/:pathMatch(.*)*', redirect: '/' }
             ]
         }
     ]

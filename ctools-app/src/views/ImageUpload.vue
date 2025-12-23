@@ -5,7 +5,7 @@ import FileDropZone from '../components/ui/FileDropZone.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import { useToast } from '../composables/useToast'
 import { useClipboard } from '../composables/useClipboard'
-import { gzipAndBase64, chunkString } from '../utils/gzip'
+import { gzipAndBase64Async, chunkString } from '../utils/gzip'
 
 const { add: toast } = useToast()
 const { copy } = useClipboard()
@@ -87,7 +87,7 @@ const processImages = async () => {
                 throw new Error('URL processing not yet implemented')
             }
 
-            const base64 = gzipAndBase64(data)
+            const base64 = await gzipAndBase64Async(data)
             const chunked = chunkString(base64)
             const contentString = `${item.name};${item.mimeType};${chunked}`
             
@@ -120,7 +120,7 @@ const copyResult = () => {
 </script>
 
 <template>
-    <div class="h-full flex flex-col md:flex-row overflow-hidden bg-slate-50 dark:bg-slate-900">
+    <div class="h-full flex flex-col md:flex-row overflow-hidden bg-slate-50 dark:bg-slate-900 bg-grid-pattern">
         
         <!-- Left Panel: Input -->
         <div class="flex-1 flex flex-col p-6 min-w-0 overflow-y-auto">
@@ -132,7 +132,7 @@ const copyResult = () => {
             <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 mb-6 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                      <span class="text-sm font-semibold text-slate-500">Target Folder Variable:</span>
-                     <input v-model="folderName" type="text" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-3 py-1 text-sm font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none w-48" />
+                     <input v-model="folderName" type="text" autocomplete="off" spellcheck="false" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-3 py-1 text-sm font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none w-48" />
                 </div>
                 <button @click="clearAll" v-if="items.length" class="text-xs text-red-500 hover:text-red-600 font-medium px-2 py-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">Clear All</button>
             </div>
@@ -194,7 +194,7 @@ const copyResult = () => {
                  </button>
              </div>
              <textarea v-model="generatedScript" readonly placeholder="// Processed script will appear here..." 
-                class="flex-1 w-full bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-xs text-slate-700 dark:text-slate-300 resize-none outline-none focus:ring-0"></textarea>
+                class="flex-1 w-full bg-slate-50 dark:bg-slate-950 p-4 font-mono text-xs text-slate-700 dark:text-slate-300 resize-none outline-none focus:ring-0"></textarea>
         </div>
 
     </div>

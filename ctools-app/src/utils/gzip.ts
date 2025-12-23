@@ -2,6 +2,7 @@ import pako from 'pako'
 
 /**
  * Compresses data using Gzip and returns a Base64 string (without data URI prefix).
+ * Synchronous version using btoa (good for small chunks).
  */
 export const gzipAndBase64 = (data: string | Uint8Array): string => {
     const compressed = pako.gzip(data)
@@ -12,6 +13,26 @@ export const gzipAndBase64 = (data: string | Uint8Array): string => {
         if (byte !== undefined) binary += String.fromCharCode(byte)
     }
     return btoa(binary)
+}
+
+/**
+ * Async version using Blob and FileReader.
+ * Matches legacy behavior perfectly and handles large files better without main thread blocking concerns during base64 conversion.
+ */
+export const gzipAndBase64Async = async (data: Uint8Array): Promise<string> => {
+    const compressed = pako.gzip(data)
+    const blob = new Blob([compressed], { type: 'application/gzip' })
+
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+            const res = reader.result as string
+            // remove data:application/gzip;base64,
+            resolve(res.split(',')[1] || '')
+        }
+        reader.onerror = reject
+        reader.readAsDataURL(blob)
+    })
 }
 
 /**

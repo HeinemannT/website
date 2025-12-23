@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { 
     Folder, Trash2, Plus, Copy, X, Minimize2, Maximize2, 
     Monitor, Smartphone, Layout, Layers,
-    Code
+    Code, HelpCircle
 } from 'lucide-vue-next'
 // import BaseButton from '../components/ui/BaseButton.vue'
 // import BaseInput from '../components/ui/BaseInput.vue'
@@ -50,6 +50,8 @@ interface TabSet {
 const rootParentId = ref('swi_folder')
 const mobileStrategy = ref<'mirror' | 'stack' | 'grid'>('mirror')
 const data = ref<TabSet[]>([])
+
+const showMobileHelp = ref(false)
 
 // --- Actions ---
 const createId = () => crypto.randomUUID()
@@ -224,13 +226,26 @@ if (data.value.length === 0) addTabSet()
         </div>
 
         <!-- Main Canvas -->
-        <div class="flex-1 flex flex-col overflow-hidden bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:20px_20px] relative">
+        <div class="flex-1 flex flex-col overflow-hidden bg-grid-pattern relative">
             
              <!-- Settings Bar (Desktop) -->
             <div class="absolute top-0 left-0 right-0 z-20 px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
                 <div class="flex items-center gap-6">
-                    <div class="flex flex-col">
-                         <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Mobile Strategy</label>
+                    <div class="flex flex-col relative">
+                         <div class="flex items-center gap-1 mb-1">
+                             <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mobile Strategy</label>
+                             <button @click="showMobileHelp = !showMobileHelp" class="text-slate-400 hover:text-indigo-500 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors p-0.5"><HelpCircle class="w-3 h-3" /></button>
+                             
+                             <div v-if="showMobileHelp" class="absolute top-0 left-full ml-2 w-64 p-4 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-50 text-xs">
+                                 <h4 class="font-bold text-slate-700 dark:text-slate-200 mb-2">Strategy Guide</h4>
+                                 <ul class="space-y-2 text-slate-500">
+                                     <li><strong class="text-indigo-500">Mirror:</strong> Mobile layout exactly matches desktop widths.</li>
+                                     <li><strong class="text-indigo-500">Stack:</strong> All items become full width (12 cols) on mobile.</li>
+                                     <li><strong class="text-indigo-500">Grid:</strong> Items smaller than 50% become 50% width, others full width.</li>
+                                 </ul>
+                                 <button @click="showMobileHelp = false" class="mt-3 text-[10px] font-bold text-slate-400 hover:text-slate-600 underline">Close</button>
+                             </div>
+                         </div>
                          <div class="flex items-center gap-2 text-xs font-bold bg-slate-100 dark:bg-slate-800 rounded p-1">
                              <button @click="mobileStrategy = 'mirror'" :class="mobileStrategy === 'mirror' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300' : 'text-slate-400'" class="px-3 py-1 rounded transition-colors flex items-center gap-1"><Monitor class="w-3 h-3" /> Mirror</button>
                              <button @click="mobileStrategy = 'stack'" :class="mobileStrategy === 'stack' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300' : 'text-slate-400'" class="px-3 py-1 rounded transition-colors flex items-center gap-1"><Smartphone class="w-3 h-3" /> Stack</button>
@@ -241,7 +256,7 @@ if (data.value.length === 0) addTabSet()
 
                 <div class="flex items-center gap-3">
                      <span class="text-xs font-bold text-slate-400 uppercase">Context: t.</span>
-                     <input v-model="rootParentId" class="bg-transparent border-b border-slate-300 dark:border-slate-700 w-32 text-xs font-mono font-bold focus:outline-none focus:border-indigo-500" />
+                     <input v-model="rootParentId" class="bg-transparent border-b border-slate-300 dark:border-slate-700 w-32 text-xs font-mono font-medium focus:outline-none focus:border-indigo-500" />
                 </div>
             </div>
 

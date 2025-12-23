@@ -160,7 +160,9 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                         font-serif-tc text-xl leading-[1.5] tracking-widest
                         transition-all duration-300 select-none whitespace-nowrap
                         ${isRaised ? 'font-bold' : 'font-normal'}
-                        ${isInterlinear ? 'text-sm leading-relaxed opacity-80' : ''}
+                        ${isInterlinear 
+                          ? 'text-sm !tracking-normal opacity-75 font-body' 
+                          : 'text-xl tracking-widest'}
                         ${isActive
                           ? 'text-cinnabar dark:text-red-400 drop-shadow-sm font-semibold'
                           : 'text-stone-800 dark:text-zinc-400 opacity-90'}

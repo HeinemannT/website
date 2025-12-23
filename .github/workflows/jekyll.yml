@@ -52,6 +52,12 @@ jobs:
           npm ci
           npm run build
 
+      - name: Build CTools App
+        run: |
+          cd ctools-app
+          npm ci
+          npm run build
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5

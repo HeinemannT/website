@@ -53,7 +53,7 @@ migration:
 pages:
   - page_id: "img_01"
     metadata:
-      image_file: "img_01.jpg"
+      image_file: "img_01.webp"
       physical_page_number: null
       title: "Cover Page of the Xiaolao Village Lineage Record"
       marginalia: []
@@ -63,23 +63,111 @@ pages:
         is_interlinear: false
         text_zh: "小勞村宗派源流（族部）"
         translation: "Lineage Origins of Xiaolao Village (Clan Section)"
-        translator_note: "This title indicates that the volume focuses on the genealogical history and lineage branches specifically for the descendants of Xiaolao Village."
+        translator_note: "The main title on the cover page. Xiaolao refers to the village/lineage and is the main title of this genealogical history."
 
       - id: 2
-        elevation: 0
+        elevation: -1
         is_interlinear: false
         text_zh: "第三十二代小勞子冠斐紀錄"
         translation: "Recorded by Guanfei, son of Xiaolao, of the 32nd Generation"
-        translator_note: "Guanfei is likely the compiler or the scribe who transcribed this specific copy of the family record. Identifying as the 32nd generation provides a temporal anchor for the document's creation, likely in the late 19th or early 20th century."
-
+        translator_note: "Guanfei is the compiler who transcribed this specific copy of the family record. Identifying as the 32nd generation provides a temporal anchor for the document's creation, likely in the late 19th or early 20th century."
   - page_id: "img_02"
     metadata:
-      image_file: "img_02.jpg"
+      image_file: "img_02.webp"
+      physical_page_number: "1"
+      title: "Introduction to the Ancestral Temple"
+      marginalia:
+        - position: "top_left"
+          text: "1"
+          note: "Page index"
+    columns:
+      - id: 1
+        elevation: -1
+        is_interlinear: false
+        text_zh: "勞村鄉主廟"
+        translation: "The Principal Ancestral Temple of Lao Village"
+
+      - id: 2
+        elevation: 1
+        is_interlinear: false
+        text_zh: "三界廟頂椿長聯 勞熈載作"
+        translation: "The Long Couplet atop the Sanjie (Three Realms) Temple, composed by Lao Xizai."
+        translator_note: "Lao Xizai is likely a prominent scholar or ancestor of the clan."
+
+      - id: 3
+        elevation: 0
+        is_interlinear: false
+        text_zh: "在昔西粵黌宮一介為儒耳數十年亦羈養就即登般若之臺"
+        translation: "In the past at the academy of Western Yue (Guangdong), serving as a scholar for decades, enduring hardship only to eventually ascend the Platform of Prajna (wisdom)."
+
+      - id: 4
+        elevation: -1
+        is_interlinear: false
+        text_zh: "始知學問思辨中自具本來面目"
+        translation: "Only then did I realize that within the process of learning, questioning, and reflecting, one's true original nature is found."
+
+      - id: 5
+        elevation: -1
+        is_interlinear: false
+        text_zh: "直從仁義禮智内認出上界鬚眉"
+        translation: "By directly recognizing the virtues of benevolence, righteousness, propriety, and wisdom, one reveals the noble character (lit. 'brows and beard') of the upper realms."
+
+      - id: 6
+        elevation: 0
+        is_interlinear: false
+        text_zh: "於今高陽廟貌四方稱聖焉百千載玉關長輝共證真如之座"
+        translation: "Now, the appearance of the Gaoyang Temple is revered as sacred by all directions; for thousands of years, the Jade Pass shall shine forever, together witnessing the seat of True Suchness (Tathatā)."
+        translator_note: "'Gaoyang' (高陽) is a common ancestral choronym (hall name) for the Lao surname, tracing their origins back to the legendary Emperor Zhuanxu."
+  - page_id: "img_03"
+    metadata:
+      image_file: "img_03.webp"
+      physical_page_number: "2"
+      title: "The Generation Poem and Naming Taboos"
+      marginalia:
+        - position: "top_left"
+          text: "2"
+          note: "Page index"
+
+    columns:
+      - id: 1
+        elevation: 0
+        is_interlinear: false
+        text_zh: "宗派源流"
+        translation: "The Origin and Flow of the Lineage"
+
+      - id: 2
+        elevation: 1
+        is_interlinear: false
+        text_zh: "允彥式其用景和茂卓昇紹光昭偉遇令緒永登成"
+        translation: "Yun, Yan, Shi, Qi, Yong, Jing, He, Mao, Zhuo, Sheng, Shao, Guang, Zhao, Wei, Yu, Ling, Xu, Yong, Deng, Cheng."
+        translator_note: "This is a generation poem (Zhaomu). Each character is assigned to a specific generation to maintain order in the family hierarchy."
+
+      - id: 3
+        elevation: 1
+        is_interlinear: false
+        text_zh: "建德崇修廣邦家顯遂之英良隆遠業萬世大章維"
+        translation: "Jian, De, Chong, Xiu, Guang, Bang, Jia, Xian, Sui, Zhi, Ying, Liang, Long, Yuan, Ye, Wan, Shi, Da, Zhang, Wei."
+
+      - id: 4
+        elevation: 0
+        is_interlinear: false
+        text_zh: "以上四十字允字與建字同派德字與彥字同派餘做此每"
+        translation: "The forty characters above: the character 'Yun' (允) is of the same generation level as 'Jian' (建), 'De' (德) is of the same level as 'Yan' (彥), and so forth for the rest."
+
+      - id: 5
+        elevation: 0
+        is_interlinear: false
+        text_zh: "派定两個字以便避祖父及外祖舅父之當避者"
+        translation: "Each generation is assigned two possible characters to facilitate the avoidance of naming taboos regarding grandfathers, maternal grandfathers, and maternal uncles."
+        translator_note: "In Chinese culture, it is considered disrespectful to use the same characters as one's elders (避諱). Providing two options per generation helped families avoid these overlaps."
+  - page_id: "img_04"
+    metadata:
+      image_file: "img_04.webp"
       physical_page_number: "3"
       title: "Biography of Founding Ancestor Yanzhong"
       marginalia:
-        - position: "top_right"
-          text: "三"
+        - position: "top_left"
+          text: "2"
           note: "Physical page index"
     columns:
       - id: 1
@@ -151,7 +239,7 @@ pages:
 
   - page_id: "img_03"
     metadata:
-      image_file: "img_03.jpg"
+      image_file: "img_03.webp"
       physical_page_number: "2"
       title: "Lineage Naming Traditions"
       marginalia:
@@ -195,7 +283,7 @@ pages:
 
   - page_id: "img_04"
     metadata:
-      image_file: "img_04.jpg"
+      image_file: "img_04.webp"
       physical_page_number: "8"
       title: "Biographies of 2nd and 3rd Generation Ancestors"
       marginalia:
@@ -277,7 +365,7 @@ pages:
 
   - page_id: "img_05"
     metadata:
-      image_file: "img_05.jpg"
+      image_file: "img_05.webp"
       physical_page_number: "5"
       title: "Burial Records and Offspring of the 4th/5th Generations"
       marginalia:
@@ -356,7 +444,7 @@ pages:
 
   - page_id: "img_06"
     metadata:
-      image_file: "img_06.jpg"
+      image_file: "img_06.webp"
       physical_page_number: "6"
       title: "Biography of 6th Generation Ancestor Shixian"
       marginalia:
@@ -430,7 +518,7 @@ pages:
 
   - page_id: "img_07"
     metadata:
-      image_file: "img_07.jpg"
+      image_file: "img_07.webp"
       physical_page_number: "7"
       title: "Offspring and Biographies of the 10th Generation"
       marginalia:
@@ -497,7 +585,7 @@ pages:
 
   - page_id: "img_08"
     metadata:
-      image_file: "img_08.jpg"
+      image_file: "img_08.webp"
       physical_page_number: "占"
       title: "Biography of Master Hongdu and Master Hongjiong"
       marginalia:
@@ -567,7 +655,7 @@ pages:
 
   - page_id: "img_09"
     metadata:
-      image_file: "img_09.jpg"
+      image_file: "img_09.webp"
       physical_page_number: "9"
       title: "Biographies of Ancestors Junjie and Junxiu"
       marginalia:
@@ -646,7 +734,7 @@ pages:
 
   - page_id: "img_10"
     metadata:
-      image_file: "img_10.jpg"
+      image_file: "img_10.webp"
       physical_page_number: "10"
       title: "Biographies of Ancestors Wenlong and Dianyuan"
       marginalia:
@@ -722,7 +810,7 @@ pages:
 
   - page_id: "img_11"
     metadata:
-      image_file: "img_11.jpg"
+      image_file: "img_11.webp"
       physical_page_number: "11"
       title: "Property Record and Biography of 3rd Generation Shi'an"
       marginalia:
@@ -803,7 +891,7 @@ pages:
 
   - page_id: "img_12"
     metadata:
-      image_file: "img_12.jpg"
+      image_file: "img_12.webp"
       physical_page_number: "12"
       title: "Biographies of Ancestors Tingheng and Tingzan"
       marginalia:
@@ -885,7 +973,7 @@ pages:
 
   - page_id: "img_13"
     metadata:
-      image_file: "img_13.jpg"
+      image_file: "img_13.webp"
       physical_page_number: "12"
       title: "Biographies of Ancestors Tingzan and Tingyuan"
       marginalia:
@@ -965,7 +1053,7 @@ pages:
 
   - page_id: "img_14"
     metadata:
-      image_file: "img_14.jpg"
+      image_file: "img_14.webp"
       physical_page_number: "30"
       title: "Biographies of 23rd Generation Ancestors"
       marginalia:
@@ -1036,7 +1124,7 @@ pages:
 
   - page_id: "img_15"
     metadata:
-      image_file: "img_15.jpg"
+      image_file: "img_15.webp"
       physical_page_number: "15"
       title: "Biography of 16th Generation Guanxin"
       marginalia:
@@ -1122,7 +1210,7 @@ pages:
 
   - page_id: "img_16"
     metadata:
-      image_file: "img_16.jpg"
+      image_file: "img_16.webp"
       physical_page_number: "16"
       title: "Grave Dimensions and 16th Gen Zongrong"
       marginalia:
@@ -1201,7 +1289,7 @@ pages:
 
   - page_id: "img_17"
     metadata:
-      image_file: "img_17.jpg"
+      image_file: "img_17.webp"
       physical_page_number: "17"
       title: "Biography of 18th Generation Ancestor Yongzhao"
       marginalia:
@@ -1269,7 +1357,7 @@ pages:
 
   - page_id: "img_18"
     metadata:
-      image_file: "img_18.jpg"
+      image_file: "img_18.webp"
       physical_page_number: "18"
       title: "Burial Details and Family of Yongzhao"
       marginalia:
@@ -1355,7 +1443,7 @@ pages:
 
   - page_id: "img_19"
     metadata:
-      image_file: "img_19.jpg"
+      image_file: "img_19.webp"
       physical_page_number: "19"
       title: "Biographies of 19th and 20th Generation Ancestors"
       marginalia:
@@ -1426,7 +1514,7 @@ pages:
 
   - page_id: "img_20"
     metadata:
-      image_file: "img_20.jpg"
+      image_file: "img_20.webp"
       physical_page_number: "19"
       title: "Biography and Marriage of Ancestor Zhenbang"
       marginalia:
@@ -1474,7 +1562,7 @@ pages:
 
   - page_id: "img_21"
     metadata:
-      image_file: "img_21.jpg"
+      image_file: "img_21.webp"
       physical_page_number: "19"
       title: "Modern Record of Ancestor Zhenbang (Duplicate/Alternate View)"
       marginalia:
@@ -1522,7 +1610,7 @@ pages:
 
   - page_id: "img_22"
     metadata:
-      image_file: "img_22.jpg"
+      image_file: "img_22.webp"
       physical_page_number: "占"
       title: "Early Generation Records of Branch 'Zhan' (Duplicate/Alternate View)"
       marginalia:
@@ -1592,7 +1680,7 @@ pages:
 
   - page_id: "img_23"
     metadata:
-      image_file: "img_23.jpg"
+      image_file: "img_23.webp"
       physical_page_number: "1"
       title: "Biography of Founding Ancestor Yanzhong (Duplicate/Alternate View)"
       marginalia:
@@ -1657,7 +1745,7 @@ pages:
 
   - page_id: "img_24"
     metadata:
-      image_file: "img_24.jpg"
+      image_file: "img_24.webp"
       physical_page_number: "12"
       title: "Biographies of Ancestors Linju and Dianqu"
       marginalia:
@@ -1731,7 +1819,7 @@ pages:
 
   - page_id: "img_25"
     metadata:
-      image_file: "img_25.jpg"
+      image_file: "img_25.webp"
       physical_page_number: "2"
       title: "Instructions on Clan Naming Conventions and Taboos"
       marginalia:
@@ -1775,7 +1863,7 @@ pages:
 
   - page_id: "img_26"
     metadata:
-      image_file: "img_26.jpg"
+      image_file: "img_26.webp"
       physical_page_number: null
       title: "Biography of 4th Generation Progenitor Zong-Ang"
       marginalia: []
@@ -1848,7 +1936,7 @@ pages:
 
   - page_id: "img_27"
     metadata:
-      image_file: "img_27.jpg"
+      image_file: "img_27.webp"
       physical_page_number: "8"
       title: "Biography of Master Hongdu (Alternate Branch Record)"
       marginalia:
@@ -1913,7 +2001,7 @@ pages:
 
   - page_id: "img_28"
     metadata:
-      image_file: "img_28.jpg"
+      image_file: "img_28.webp"
       physical_page_number: "占"
       title: "Biography of Master Wenlong (7th Generation)"
       marginalia:
@@ -1993,7 +2081,7 @@ pages:
 
   - page_id: "img_29"
     metadata:
-      image_file: "img_29.jpg"
+      image_file: "img_29.webp"
       physical_page_number: "5"
       title: "Biography and Land Record of Master Ritai"
       marginalia:
@@ -2071,7 +2159,7 @@ pages:
 
   - page_id: "img_30"
     metadata:
-      image_file: "img_30.jpg"
+      image_file: "img_30.webp"
       physical_page_number: "10"
       title: "Offspring of Dianyuan and Diangui"
       marginalia:
@@ -2147,7 +2235,7 @@ pages:
 
   - page_id: "img_31"
     metadata:
-      image_file: "img_31.jpg"
+      image_file: "img_31.webp"
       physical_page_number: "11"
       title: "Biography of 12th Generation Tingheng and Tingzan"
       marginalia:
@@ -2233,7 +2321,7 @@ pages:
 
   - page_id: "img_32"
     metadata:
-      image_file: "img_32.jpg"
+      image_file: "img_32.webp"
       physical_page_number: "12"
       title: "Biography of 12th Generation Tingyuan"
       marginalia:
@@ -2297,7 +2385,7 @@ pages:
 
   - page_id: "img_33"
     metadata:
-      image_file: "img_33.jpg"
+      image_file: "img_33.webp"
       physical_page_number: "15"
       title: "Biography of 16th Generation Guanxin"
       marginalia:
@@ -2381,7 +2469,7 @@ pages:
 
   - page_id: "img_34"
     metadata:
-      image_file: "img_34.jpg"
+      image_file: "img_34.webp"
       physical_page_number: "16"
       title: "Grave Dimensions and 16th Gen Zongrong"
       marginalia:
@@ -2451,7 +2539,7 @@ pages:
 
   - page_id: "img_35"
     metadata:
-      image_file: "img_35.jpg"
+      image_file: "img_35.webp"
       physical_page_number: "17"
       title: "Biography of 18th Generation Yongzhao"
       marginalia:
@@ -2512,7 +2600,7 @@ pages:
 
   - page_id: "img_36"
     metadata:
-      image_file: "img_36.jpg"
+      image_file: "img_36.webp"
       physical_page_number: "18"
       title: "Burial Details and Family of Yongzhao"
       marginalia:

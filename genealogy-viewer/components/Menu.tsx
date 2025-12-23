@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, FileText, Code, Book, ChevronRight, Library, Save, AlertCircle } from 'lucide-react';
+import { X, Search, FileText, Code, Book, ChevronRight, Library, Save, AlertCircle, Info } from 'lucide-react';
 import { GenealogyData } from '../types';
 import { marked } from 'marked';
 import jsyaml from 'js-yaml';
@@ -11,12 +11,14 @@ interface MenuProps {
   onNavigate: (pageIndex: number, columnId?: number) => void;
   yamlSource: string;
   onUpdateYaml: (newSource: string, newData: GenealogyData) => void;
+  activeTab: 'toc' | 'search' | 'docs' | 'glossary' | 'source';
+  onTabChange: (tab: 'toc' | 'search' | 'docs' | 'glossary' | 'source') => void;
 }
 
 type Tab = 'toc' | 'search' | 'docs' | 'glossary' | 'source';
 
-const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSource, onUpdateYaml }) => {
-  const [activeTab, setActiveTab] = useState<Tab>('toc');
+const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSource, onUpdateYaml, activeTab, onTabChange }) => {
+
   const [searchQuery, setSearchQuery] = useState('');
   const [docHtml, setDocHtml] = useState('');
   const [glossaryHtml, setGlossaryHtml] = useState('');
@@ -110,15 +112,15 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
 
         <div className="flex border-b border-stone-200 dark:border-zinc-800 overflow-x-auto">
           {[
+            { id: 'docs', icon: Info, label: 'About' },
             { id: 'toc', icon: Book, label: 'Contents' },
             { id: 'search', icon: Search, label: 'Search' },
-            { id: 'docs', icon: FileText, label: 'Docs' },
             { id: 'glossary', icon: Library, label: 'Glossary' },
             { id: 'source', icon: Code, label: 'Source' }
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as Tab)}
+              onClick={() => onTabChange(tab.id as Tab)}
               className={`
                 flex-1 flex flex-col items-center gap-1 py-3 px-2 text-xs font-medium uppercase tracking-wider
                 transition-colors min-w-[70px]
@@ -226,15 +228,10 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
                   />
                 </div>
                 <div className={`p-3 text-xs font-medium flex items-center gap-2 border-t ${parseError ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800' : 'bg-white dark:bg-zinc-900 text-green-600 dark:text-green-400 border-stone-200 dark:border-zinc-800'}`}>
-                  {parseError ? (
+                  {parseError && (
                     <>
                       <AlertCircle size={14} />
                       <span>Error: {parseError}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save size={14} />
-                      <span>Live Editing Enabled - Changes applied automatically</span>
                     </>
                   )}
                 </div>

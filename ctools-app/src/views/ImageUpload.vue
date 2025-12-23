@@ -1,0 +1,201 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { Trash2, Copy, Image as ImageIcon, CheckCircle, AlertCircle, FileCode } from 'lucide-vue-next'
+import FileDropZone from '../components/ui/FileDropZone.vue'
+import BaseButton from '../components/ui/BaseButton.vue'
+import { useToast } from '../composables/useToast'
+import { useClipboard } from '../composables/useClipboard'
+import { gzipAndBase64, chunkString } from '../utils/gzip'
+
+const { add: toast } = useToast()
+const { copy } = useClipboard()
+
+interface ImageItem {
+    id: string
+    file?: File
+    url?: string
+    name: string
+    scriptId: string
+    status: 'pending' | 'processing' | 'done' | 'error'
+    previewUrl?: string
+    mimeType: string
+    sizeLabel: string
+}
+
+const items = ref<ImageItem[]>([])
+const folderName = ref('vFolder')
+const isProcessing = ref(false)
+const generatedScript = ref('')
+
+const handleFiles = (files: File[] | FileList) => {
+    const fileArray = Array.from(files).filter(f => f.type.startsWith('image/'))
+    
+    fileArray.forEach(file => {
+        if (!file) return
+        const parts = file.name.split('.')
+        const namePart = parts[0] || 'image'
+        const baseName = namePart.replace(/[^a-zA-Z0-9_-]/g, '_')
+        items.value.push({
+            id: crypto.randomUUID(),
+            file,
+            name: baseName,
+            scriptId: `img_${baseName}`,
+            status: 'pending',
+            previewUrl: URL.createObjectURL(file), // Create object URL for preview
+            mimeType: file.type || 'image/png',
+            sizeLabel: (file.size / 1024).toFixed(1) + ' KB'
+        })
+    })
+
+    if (fileArray.length === 0 && (files instanceof FileList ? files.length > 0 : files.length > 0)) {
+        toast('No image files found in selection', 'info')
+    }
+}
+
+const removeItem = (id: string) => {
+    const item = items.value.find(i => i.id === id)
+    if (item) {
+        if (item.previewUrl) URL.revokeObjectURL(item.previewUrl)
+        const idx = items.value.indexOf(item)
+        items.value.splice(idx, 1)
+    }
+}
+
+const clearAll = () => {
+    items.value.forEach(i => { if (i.previewUrl) URL.revokeObjectURL(i.previewUrl) })
+    items.value = []
+    generatedScript.value = ''
+}
+
+const processImages = async () => {
+    isProcessing.value = true
+    generatedScript.value = ''
+    let successCount = 0
+    const scripts: string[] = []
+
+    for (const item of items.value) {
+        if (item.status === 'done') continue // Skip already done
+
+        item.status = 'processing'
+        try {
+            let data: Uint8Array
+            
+            if (item.file) {
+                const buffer = await item.file.arrayBuffer()
+                data = new Uint8Array(buffer)
+            } else {
+                throw new Error('URL processing not yet implemented')
+            }
+
+            const base64 = gzipAndBase64(data)
+            const chunked = chunkString(base64)
+            const contentString = `${item.name};${item.mimeType};${chunked}`
+            
+            const script = `${folderName.value}.add(FileResource, id := '${item.scriptId}', name := '${item.name}', content := '${contentString}')`
+            
+            scripts.push(script)
+            item.status = 'done'
+            successCount++
+        } catch (err) {
+            console.error(err)
+            item.status = 'error'
+        }
+    }
+
+    generatedScript.value = scripts.join('\n\n')
+    isProcessing.value = false
+    
+    if (successCount > 0) {
+        toast(`Generated scripts for ${successCount} images`, 'success')
+        // Automatically output
+    } else {
+        toast('No images successfully processed', 'error')
+    }
+}
+
+const copyResult = () => {
+    copy(generatedScript.value, 'Generated Script')
+}
+
+</script>
+
+<template>
+    <div class="h-full flex flex-col md:flex-row overflow-hidden bg-slate-50 dark:bg-slate-900">
+        
+        <!-- Left Panel: Input -->
+        <div class="flex-1 flex flex-col p-6 min-w-0 overflow-y-auto">
+            <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 mb-6">Image Upload</h2>
+            
+            <FileDropZone @drop="handleFiles" class="mb-6 h-48" accept="image/*" description="Drag images here" />
+
+            <!-- Configuration -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 mb-6 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                     <span class="text-sm font-semibold text-slate-500">Target Folder Variable:</span>
+                     <input v-model="folderName" type="text" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-3 py-1 text-sm font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none w-48" />
+                </div>
+                <button @click="clearAll" v-if="items.length" class="text-xs text-red-500 hover:text-red-600 font-medium px-2 py-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">Clear All</button>
+            </div>
+
+            <!-- Staging List -->
+            <div class="flex-1 space-y-3">
+                <div v-if="items.length === 0" class="text-center py-12 text-slate-400 dark:text-slate-600 italic">
+                    Images to process will appear here...
+                </div>
+                
+                <div v-for="item in items" :key="item.id" 
+                     class="group flex items-center gap-4 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:border-indigo-300 dark:hover:border-indigo-700">
+                    
+                    <!-- Preview -->
+                    <div class="w-16 h-16 shrink-0 bg-slate-100 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 overflow-hidden flex items-center justify-center">
+                        <img v-if="item.previewUrl" :src="item.previewUrl" class="w-full h-full object-cover" />
+                        <ImageIcon v-else class="w-6 h-6 text-slate-400" />
+                    </div>
+
+                    <!-- Metadata Inputs -->
+                    <div class="flex-grow min-w-0 grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Script ID</label>
+                            <input v-model="item.scriptId" class="w-full text-xs font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 focus:border-indigo-500 outline-none" />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Resource Name</label>
+                            <input v-model="item.name" class="w-full text-xs font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 focus:border-indigo-500 outline-none" />
+                        </div>
+                    </div>
+
+                    <!-- Status / Actions -->
+                    <div class="flex flex-col items-end gap-2 shrink-0">
+                         <div v-if="item.status === 'done'" class="text-emerald-500 flex items-center text-xs font-bold"><CheckCircle class="w-3 h-3 mr-1" /> DONE</div>
+                         <div v-else-if="item.status === 'error'" class="text-pink-500 flex items-center text-xs font-bold"><AlertCircle class="w-3 h-3 mr-1" /> ERROR</div>
+                         <div v-else-if="item.status === 'processing'" class="text-indigo-500 text-xs font-bold animate-pulse">PROCESSING...</div>
+                         <div v-else class="text-slate-400 text-xs font-medium">{{ item.sizeLabel }}</div>
+
+                         <button @click="removeItem(item.id)" class="text-slate-400 hover:text-pink-500 p-1 rounded hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-colors">
+                             <Trash2 class="w-4 h-4" />
+                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <BaseButton v-if="items.length" @click="processImages" :disabled="isProcessing" class="mt-6 w-full py-4 text-base shadow-lg shadow-indigo-500/20">
+                <span v-if="isProcessing">Processing...</span>
+                <span v-else>Generate Script Block</span>
+            </BaseButton>
+
+        </div>
+
+        <!-- Right Panel: Output -->
+        <div class="md:w-1/3 bg-slate-100 dark:bg-slate-950/50 border-l border-slate-200 dark:border-slate-800 flex flex-col">
+             <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
+                 <h3 class="font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2"><FileCode class="w-4 h-4 text-indigo-500" /> Output Script</h3>
+                 <button @click="copyResult" :disabled="!generatedScript" class="text-xs flex items-center gap-1 text-indigo-600 hover:text-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium px-2 py-1 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors">
+                     <Copy class="w-3 h-3" /> Copy
+                 </button>
+             </div>
+             <textarea v-model="generatedScript" readonly placeholder="// Processed script will appear here..." 
+                class="flex-1 w-full bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-xs text-slate-700 dark:text-slate-300 resize-none outline-none focus:ring-0"></textarea>
+        </div>
+
+    </div>
+</template>

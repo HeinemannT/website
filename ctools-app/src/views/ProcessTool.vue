@@ -405,9 +405,7 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
                 :editable="true"
                 @update:code="(val: string) => { xmlContent = val; handleXmlEdit() }"
              >
-                 <template #icon>
-                     <FileCode class="w-4 h-4 text-indigo-500" />
-                 </template>
+
              </CodeOutputPanel>
         </div>
     </div>

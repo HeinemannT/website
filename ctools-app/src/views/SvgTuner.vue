@@ -433,12 +433,7 @@ watch(svgCode, () => {
         <!-- Tab: Code -->
         <div v-if="activeTab === 'code'" class="flex-1 flex flex-col min-h-0 -mx-4 -mb-4 border-t border-slate-200 dark:border-slate-800">
              <CodeOutputPanel title="SVG Code" :code="svgCode">
-                 <template #icon>
-                     <ClipboardPaste class="w-4 h-4 text-indigo-500" />
-                 </template>
-                 <template #actions>
-                     <!-- No extra actions needed -->
-                 </template>
+
              </CodeOutputPanel>
         </div>
 

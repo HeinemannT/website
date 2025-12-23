@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import draggable from 'vuedraggable'
 import { 
-    Table, Code, Plus, Trash2, GripVertical, Settings, 
+    Table, Plus, Trash2, GripVertical, Settings, 
     AlignLeft, AlignCenter, AlignRight, EyeOff,
     ListTree, Lock, WrapText
 } from 'lucide-vue-next'
@@ -337,9 +337,7 @@ const generateNestedLoop = (levelIdx: number): string => {
         <!-- Right Panel: Code -->
         <div class="w-full md:w-1/2 flex flex-col relative border-l border-slate-200 dark:border-slate-800 shadow-2xl z-20">
              <CodeOutputPanel title="Generated Code" :code="scriptOutput">
-                 <template #icon>
-                     <Code class="w-4 h-4 text-indigo-500" />
-                 </template>
+
              </CodeOutputPanel>
         </div>
     </div>

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import MainLayout from '../layouts/MainLayout.vue'
 
 import SvgTuner from '../views/SvgTuner.vue'
@@ -14,7 +14,7 @@ import Dashboard from '../views/Dashboard.vue'
 // const Placeholder = (name: string) => ({ template: `<div class="p-8"><h2 class="text-xl font-bold mb-4">${name}</h2><p class="text-slate-500">Coming soon...</p></div>` })
 
 const router = createRouter({
-    history: createWebHistory('/ctools/'),
+    history: createWebHashHistory(),
     routes: [
         {
             path: '/',

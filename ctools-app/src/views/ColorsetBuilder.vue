@@ -9,6 +9,8 @@ import BaseInput from '../components/ui/BaseInput.vue'
 import { useToast } from '../composables/useToast'
 import { useClipboard } from '../composables/useClipboard'
 
+import { onMounted } from 'vue'
+
 const { add: toast } = useToast()
 const { copy } = useClipboard()
 
@@ -43,7 +45,15 @@ const currentHex = ref('#EF4444')
 const currentHue = ref(0)
 const currentSat = ref(100)
 const currentVal = ref(100)
+
 const currentRgb = ref({ r: 239, g: 68, b: 68 })
+
+// Canvas Refs
+const matrixCanvasFn = ref<HTMLCanvasElement | null>(null)
+const matrixContainer = ref<HTMLDivElement | null>(null)
+const hueContainer = ref<HTMLDivElement | null>(null)
+let isMatrixDragging = false
+let isHueDragging = false
 
 // Generator State
 const genStrategy = ref('scale')
@@ -97,6 +107,77 @@ const updateColorFromRgb = () => {
     currentVal.value = hsv.v
     updateModel()
 }
+
+// --- Canvas Logic ---
+const drawMatrix = () => {
+    if (!matrixCanvasFn.value || !matrixContainer.value) return
+    const canvas = matrixCanvasFn.value
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
+    if (!ctx) return
+    
+    // Resize to container
+    const rect = matrixContainer.value.getBoundingClientRect()
+    canvas.width = rect.width
+    canvas.height = rect.height
+
+    // Hue Layer
+    ctx.fillStyle = `hsl(${currentHue.value}, 100%, 50%)`
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // White Gradient (Horizontal)
+    const grWhite = ctx.createLinearGradient(0, 0, canvas.width, 0)
+    grWhite.addColorStop(0, 'white')
+    grWhite.addColorStop(1, 'rgba(255,255,255,0)')
+    ctx.fillStyle = grWhite
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // Black Gradient (Vertical)
+    const grBlack = ctx.createLinearGradient(0, 0, 0, canvas.height)
+    grBlack.addColorStop(0, 'rgba(0,0,0,0)')
+    grBlack.addColorStop(1, 'black')
+    ctx.fillStyle = grBlack
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+}
+
+const updateMatrixFromMouse = (e: MouseEvent) => {
+    if (!matrixContainer.value) return
+    const rect = matrixContainer.value.getBoundingClientRect()
+    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width))
+    const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height))
+    
+    currentSat.value = (x / rect.width) * 100
+    currentVal.value = 100 - ((y / rect.height) * 100)
+    updateColorFromHsv()
+}
+
+const updateHueFromMouse = (e: MouseEvent) => {
+    if (!hueContainer.value) return
+    const rect = hueContainer.value.getBoundingClientRect()
+    const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height))
+    currentHue.value = (y / rect.height) * 360
+    updateColorFromHsv() // Triggers drawMatrix via watcher or direct
+}
+
+// Lifecycle Hooks for Canvas
+onMounted(() => {
+    window.addEventListener('mousemove', (e) => {
+        if (isMatrixDragging) updateMatrixFromMouse(e)
+        if (isHueDragging) updateHueFromMouse(e)
+    })
+    window.addEventListener('mouseup', () => {
+        isMatrixDragging = false
+        isHueDragging = false
+    })
+})
+
+// Update canvas when color changes
+watch([currentHue, currentSat, currentVal], () => {
+    requestAnimationFrame(drawMatrix)
+})
+
+watch(activeTab, () => {
+   if (activeTab.value === 'studio') setTimeout(drawMatrix, 50) 
+})
 
 const updateModel = () => {
     if (selectedIndex.value === -1) return
@@ -282,12 +363,38 @@ const processPaste = () => {
                     </div>
                     
                     <div v-else class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <!-- Photoshop Style Picker -->
+                        <div class="flex gap-4 h-64 mb-6 select-none">
+                            <!-- Sat/Val Matrix -->
+                            <div class="flex-1 relative rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden cursor-crosshair shadow-sm"
+                                 ref="matrixContainer"
+                                 @mousedown="isMatrixDragging = true; $event.preventDefault(); updateMatrixFromMouse($event)">
+                                <canvas ref="matrixCanvasFn" class="w-full h-full block"></canvas>
+                                <!-- Cursor -->
+                                <div class="absolute w-3 h-3 rounded-full border-2 border-white shadow-sm ring-1 ring-black/20 pointer-events-none -translate-x-1/2 -translate-y-1/2"
+                                     :style="{
+                                         left: `${currentSat}%`,
+                                         top: `${100 - currentVal}%`,
+                                         backgroundColor: currentHex
+                                     }"></div>
+                            </div>
+
+                            <!-- Hue Strip -->
+                            <div class="w-8 relative rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden cursor-ns-resize"
+                                 ref="hueContainer"
+                                 @mousedown="isHueDragging = true; $event.preventDefault(); updateHueFromMouse($event)"
+                                 style="background: linear-gradient(to bottom, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)">
+                                 <!-- Thumb -->
+                                 <div class="absolute left-0 right-0 h-1.5 bg-white border border-slate-400 rounded-sm shadow-sm pointer-events-none -translate-y-1/2"
+                                      :style="{ top: `${(currentHue / 360) * 100}%` }"></div>
+                            </div>
+                        </div>
+
                         <div class="flex gap-4">
-                            <div class="w-24 h-24 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-600" :style="{backgroundColor: currentHex}"></div>
                             <div class="flex-1 space-y-4">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-2xl font-mono font-bold text-slate-700 dark:text-slate-200">#</span>
-                                    <input v-model="currentHex" @input="(e: any) => updateColorFromHex(e.target.value)" class="text-3xl font-mono font-bold bg-transparent border-b border-slate-300 dark:border-slate-600 w-full focus:outline-none focus:border-indigo-500 uppercase" maxlength="7" />
+                                    <span class="text-2xl font-mono font-medium text-slate-700 dark:text-slate-200">#</span>
+                                    <input v-model="currentHex" @input="(e: any) => updateColorFromHex(e.target.value)" class="text-3xl font-mono font-medium bg-transparent border-b border-slate-300 dark:border-slate-600 w-full focus:outline-none focus:border-indigo-500 uppercase" maxlength="7" />
                                 </div>
                                 <div class="flex gap-2 text-xs font-mono">
                                     <div class="flex-1 bg-slate-50 dark:bg-slate-900 rounded px-2 py-1 border border-slate-200 dark:border-slate-700">
@@ -346,6 +453,15 @@ const processPaste = () => {
                             <option value="shades">Deep Shades</option>
                             <option value="interpolate">Range Interpolation</option>
                         </select>
+                        </select>
+                    </div>
+
+                    <div v-if="selectedIndex !== -1 && palette[selectedIndex]" class="p-3 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center gap-3">
+                         <div class="w-10 h-10 rounded shadow-sm" :style="{backgroundColor: palette[selectedIndex].hex}"></div>
+                         <div>
+                             <span class="text-[10px] uppercase font-bold text-slate-400">Base Color</span>
+                             <div class="text-xs font-bold">{{ palette[selectedIndex].name }}</div>
+                         </div>
                     </div>
 
                     <div v-if="genStrategy === 'interpolate'" class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 space-y-4">
@@ -391,9 +507,17 @@ const processPaste = () => {
                     
                     <div class="pt-6 border-t border-slate-200 dark:border-slate-700 space-y-3">
                         <label class="text-[10px] uppercase font-bold text-slate-400">External Tools</label>
-                        <a href="https://coolors.co/" target="_blank" class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 hover:border-indigo-500 transition-colors text-xs font-bold text-slate-600 dark:text-slate-300">
-                             Coolors.co <ExternalLink class="w-3 h-3" />
-                        </a>
+                        <div class="grid grid-cols-1 gap-2">
+                             <a href="https://coolors.co/" target="_blank" class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 hover:border-indigo-500 transition-colors text-xs font-bold text-slate-600 dark:text-slate-300">
+                                  Coolors.co <ExternalLink class="w-3 h-3" />
+                             </a>
+                             <a href="https://color.adobe.com/create/color-wheel" target="_blank" class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 hover:border-indigo-500 transition-colors text-xs font-bold text-slate-600 dark:text-slate-300">
+                                  Adobe Color <ExternalLink class="w-3 h-3" />
+                             </a>
+                             <a href="https://colorhunt.co/" target="_blank" class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 hover:border-indigo-500 transition-colors text-xs font-bold text-slate-600 dark:text-slate-300">
+                                  Color Hunt <ExternalLink class="w-3 h-3" />
+                             </a>
+                        </div>
                     </div>
                 </div>
 

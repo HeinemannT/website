@@ -382,7 +382,7 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
     <div class="w-1 bg-slate-700 hover:bg-indigo-500 cursor-col-resize z-20 transition-colors" @mousedown="startResize"></div>
 
     <!-- Canvas -->
-    <div class="flex-grow relative bg-slate-50 dark:bg-slate-900 overflow-hidden bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:20px_20px]">
+    <div class="flex-grow relative bg-slate-50 dark:bg-slate-900 overflow-hidden bg-grid-pattern">
         <div id="canvas" class="w-full h-full"></div>
 
         <!-- Empty State -->

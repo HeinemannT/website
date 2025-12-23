@@ -36,8 +36,8 @@ const baseViewBox = ref<{x: number, y: number, w: number, h: number} | null>(nul
 
 // Computed
 const bgClass = computed(() => {
-  if (bgMode.value === 'light') return 'bg-slate-50' // simplified grid
-  if (bgMode.value === 'dark') return 'bg-slate-900'
+  if (bgMode.value === 'light') return 'bg-slate-50 bg-grid-pattern'
+  if (bgMode.value === 'dark') return 'bg-slate-900 bg-grid-pattern'
   return 'bg-[url("https://www.transparenttextures.com/patterns/stardust.png")] bg-slate-200'
 })
 

@@ -199,22 +199,22 @@ const copyResult = () => copy(scriptOutput.value, 'Generated Code')
                     <div v-if="method !== 4">
                         <label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Source List</label>
                         <div class="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-indigo-100 dark:focus-within:ring-indigo-900">
-                            <span class="pl-2 text-[10px] font-mono font-bold text-indigo-400">:=</span>
-                            <input v-model="sourceList" class="w-full bg-transparent border-none text-xs font-mono font-bold px-2 py-1.5 focus:outline-none" />
+                            <span class="pl-2 text-[10px] font-mono font-medium text-indigo-400">:=</span>
+                            <input v-model="sourceList" class="w-full bg-transparent border-none text-xs font-mono font-medium px-2 py-1.5 focus:outline-none" />
                         </div>
                     </div>
                     <div>
                         <label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Output Variable</label>
                         <div class="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-indigo-100 dark:focus-within:ring-indigo-900">
-                            <span class="pl-2 text-[10px] font-mono font-bold text-indigo-400">:=</span>
-                            <input v-model="tableVar" class="w-full bg-transparent border-none text-xs font-mono font-bold px-2 py-1.5 focus:outline-none" />
+                            <span class="pl-2 text-[10px] font-mono font-medium text-indigo-400">:=</span>
+                            <input v-model="tableVar" class="w-full bg-transparent border-none text-xs font-mono font-medium px-2 py-1.5 focus:outline-none" />
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Scrollable List -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-6 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:20px_20px]">
+            <div class="flex-1 overflow-y-auto p-4 space-y-6 bg-grid-pattern">
                 
                 <!-- Hierarchy Config -->
                 <div v-if="method === 4" class="space-y-3">
@@ -345,7 +345,8 @@ const copyResult = () => copy(scriptOutput.value, 'Generated Code')
                     <Copy class="w-3 h-3" /> Copy
                 </button>
             </div>
-            <textarea readonly :value="scriptOutput" class="flex-1 w-full bg-[#0d1117] p-4 font-mono text-[10px] text-slate-300 resize-none outline-none leading-relaxed"></textarea>
+        </div>
+            <textarea readonly :value="scriptOutput" class="flex-1 w-full bg-slate-950 p-4 font-mono text-[10px] text-slate-300 resize-none outline-none leading-relaxed"></textarea>
         </div>
     </div>
 </template>

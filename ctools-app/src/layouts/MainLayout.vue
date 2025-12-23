@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import {
   LayoutDashboard,
   Palette,
@@ -10,12 +10,15 @@ import {
   Image as ImageIcon,
   Edit3,
   Sun,
-  Moon
+  Moon,
+  HelpCircle
 } from 'lucide-vue-next'
 import { useThemeStore } from '../stores/theme'
+import AboutModal from '../components/ui/AboutModal.vue'
 
 const route = useRoute()
 const themeStore = useThemeStore()
+const showAbout = ref(false)
 
 const navigation = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard, color: 'text-slate-500' },
@@ -24,7 +27,7 @@ const navigation = [
   { name: 'Process', path: '/process', icon: Activity, color: 'text-emerald-500' },
   { name: 'Table', path: '/table', icon: Table, color: 'text-orange-500' },
   { name: 'Image', path: '/image', icon: ImageIcon, color: 'text-violet-500' },
-  { name: 'Tuner', path: '/tuner', icon: Edit3, color: 'text-teal-500' },
+  { name: 'SVG Tuner', path: '/tuner', icon: Edit3, color: 'text-teal-500' },
 ]
 
 const currentTool = computed(() => navigation.find(n => n.path === route.path))
@@ -36,8 +39,9 @@ const currentTool = computed(() => navigation.find(n => n.path === route.path))
     <!-- Sidebar (Collapsed) -->
     <aside class="w-16 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center py-4 z-20 shrink-0">
       <router-link to="/" class="mb-8 block">
-        <div class="w-10 h-10 bg-gradient-to-br from-cora-500 to-cora-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-cora-500/20 font-bold text-xl hover:scale-105 transition-transform">
-          C
+        <div class="w-10 h-10 bg-gradient-to-br from-slate-900 to-slate-800 dark:from-white dark:to-slate-200 rounded-xl flex flex-col items-center justify-center text-white dark:text-slate-900 shadow-lg shadow-slate-500/20 font-bold hover:scale-105 transition-transform overflow-hidden">
+          <span class="text-xs leading-none mt-1">c</span>
+          <span class="text-[8px] leading-none uppercase tracking-tighter">Tools</span>
         </div>
       </router-link>
 
@@ -59,7 +63,10 @@ const currentTool = computed(() => navigation.find(n => n.path === route.path))
         </router-link>
       </nav>
 
-      <div class="mt-auto">
+      <div class="mt-auto flex flex-col items-center gap-2 mb-4">
+        <button @click="showAbout = true" class="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="About CTools">
+          <HelpCircle class="w-5 h-5" />
+        </button>
         <button @click="themeStore.toggleTheme()" class="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <Sun v-if="themeStore.isDark" class="w-5 h-5" />
           <Moon v-else class="w-5 h-5" />
@@ -97,6 +104,8 @@ const currentTool = computed(() => navigation.find(n => n.path === route.path))
       </main>
     </div>
   </div>
+  </div>
+  <AboutModal :isOpen="showAbout" @close="showAbout = false" />
 </template>
 
 <style scoped>

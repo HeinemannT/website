@@ -194,7 +194,7 @@ const copyResult = () => {
                  </button>
              </div>
              <textarea v-model="generatedScript" readonly placeholder="// Processed script will appear here..." 
-                class="flex-1 w-full bg-slate-50 dark:bg-slate-950 p-4 font-mono text-xs text-slate-700 dark:text-slate-300 resize-none outline-none focus:ring-0"></textarea>
+                class="flex-1 w-full bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-[10px] text-emerald-600 dark:text-emerald-400 resize-none outline-none leading-relaxed"></textarea>
         </div>
 
     </div>

@@ -344,7 +344,13 @@ const updateRoles = () => {
 
 // Resizer logic
 const startResize = () => { isResizing.value = true; document.body.style.cursor = 'col-resize'; }
-const handleResize = (e: MouseEvent) => { if (isResizing.value) sidebarWidth.value = Math.max(200, Math.min(e.clientX, 600)); }
+const handleResize = (e: MouseEvent) => { 
+    if (isResizing.value) {
+        const container = document.body.getBoundingClientRect(); // Using body or main container
+        const newWidth = container.width - e.clientX;
+        sidebarWidth.value = Math.max(200, Math.min(newWidth, 600)); 
+    }
+}
 const stopResize = () => { isResizing.value = false; document.body.style.cursor = ''; }
 
 </script>
@@ -352,8 +358,27 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
 <template>
   <div class="flex h-full w-full overflow-hidden" @mousemove="handleResize" @mouseup="stopResize">
     
-    <!-- Left Panel -->
-    <div class="bg-slate-800 border-r border-slate-700 flex flex-col z-10 shadow-2xl shrink-0"
+    <!-- Canvas -->
+    <div class="flex-grow relative bg-slate-50 dark:bg-slate-900 overflow-hidden bg-grid-pattern">
+        <div id="canvas" class="w-full h-full"></div>
+
+        <!-- Empty State -->
+        <div v-if="!hasDiagram" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <div class="w-16 h-16 mb-4 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                <LayoutTemplate class="w-8 h-8 text-slate-400" />
+            </div>
+            <p class="text-sm font-medium text-slate-500 mb-4">Waiting for BPMN data...</p>
+            <BaseButton @click="createNewDiagram" class="pointer-events-auto">
+                <PlusCircle class="w-4 h-4 mr-2" /> Create New Diagram
+            </BaseButton>
+        </div>
+    </div>
+
+    <!-- Resizer -->
+    <div class="w-1 bg-slate-700 hover:bg-indigo-500 cursor-col-resize z-20 transition-colors" @mousedown="startResize"></div>
+
+    <!-- Right Panel -->
+    <div class="bg-slate-800 border-l border-slate-700 flex flex-col z-10 shadow-2xl shrink-0"
          :style="{ width: sidebarWidth + 'px' }">
         <div class="flex border-b border-slate-700">
             <button @click="activeTab = 'input'" :class="activeTab === 'input' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-slate-200'" class="flex-1 py-3 text-xs font-semibold uppercase border-b-2 transition-colors">Input</button>
@@ -373,27 +398,10 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
         </div>
 
         <div v-show="activeTab === 'xml'" class="flex-grow flex flex-col bg-slate-900 relative">
-             <button @click="copyToClipboard(xmlContent, 'XML')" class="absolute top-2 right-2 p-1.5 bg-slate-800 rounded hover:bg-slate-700 text-slate-400 hover:text-white z-10 border border-slate-700"><Copy class="w-3 h-3" /></button>
-             <textarea v-model="xmlContent" @input="handleXmlEdit" class="w-full h-full p-4 text-xs font-mono bg-slate-900 text-blue-200 outline-none resize-none" spellcheck="false"></textarea>
-        </div>
-    </div>
-
-    <!-- Resizer -->
-    <div class="w-1 bg-slate-700 hover:bg-indigo-500 cursor-col-resize z-20 transition-colors" @mousedown="startResize"></div>
-
-    <!-- Canvas -->
-    <div class="flex-grow relative bg-slate-50 dark:bg-slate-900 overflow-hidden bg-grid-pattern">
-        <div id="canvas" class="w-full h-full"></div>
-
-        <!-- Empty State -->
-        <div v-if="!hasDiagram" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <div class="w-16 h-16 mb-4 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                <LayoutTemplate class="w-8 h-8 text-slate-400" />
-            </div>
-            <p class="text-sm font-medium text-slate-500 mb-4">Waiting for BPMN data...</p>
-            <BaseButton @click="createNewDiagram" class="pointer-events-auto">
-                <PlusCircle class="w-4 h-4 mr-2" /> Create New Diagram
-            </BaseButton>
+             <div class="p-2 border-b border-slate-700 flex justify-end">
+                 <button @click="copyToClipboard(xmlContent, 'XML')" class="text-indigo-400 hover:text-indigo-300 text-xs font-bold flex items-center gap-1"><Copy class="w-3 h-3" /> Copy</button>
+             </div>
+             <textarea v-model="xmlContent" @input="handleXmlEdit" class="w-full h-full p-4 text-xs font-mono bg-[#0d1117] text-blue-200 outline-none resize-none leading-relaxed" spellcheck="false"></textarea>
         </div>
     </div>
 

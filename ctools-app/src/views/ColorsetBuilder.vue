@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { Plus, Trash2, Copy, Palette, Wand2, ArrowRight, ExternalLink } from 'lucide-vue-next'
+import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import { Plus, Trash2, Copy, Palette, Wand2, ArrowRight, ExternalLink, FileCode } from 'lucide-vue-next'
 import {
     hexToHsv, hsvToHex, hexToHsl, hslToHex, interpolateColors, hexToRgb, rgbToHex
 } from '../utils/colors'
@@ -8,8 +8,6 @@ import BaseButton from '../components/ui/BaseButton.vue'
 import BaseInput from '../components/ui/BaseInput.vue'
 import { useToast } from '../composables/useToast'
 import { useClipboard } from '../composables/useClipboard'
-
-import { onMounted } from 'vue'
 
 const { add: toast } = useToast()
 const { copy } = useClipboard()
@@ -52,8 +50,8 @@ const currentRgb = ref({ r: 239, g: 68, b: 68 })
 const matrixCanvasFn = ref<HTMLCanvasElement | null>(null)
 const matrixContainer = ref<HTMLDivElement | null>(null)
 const hueContainer = ref<HTMLDivElement | null>(null)
-let isMatrixDragging = false
-let isHueDragging = false
+const isMatrixDragging = ref(false)
+const isHueDragging = ref(false)
 
 // Generator State
 const genStrategy = ref('scale')
@@ -117,6 +115,8 @@ const drawMatrix = () => {
     
     // Resize to container
     const rect = matrixContainer.value.getBoundingClientRect()
+    if (rect.width === 0 || rect.height === 0) return
+
     canvas.width = rect.width
     canvas.height = rect.height
 
@@ -161,12 +161,12 @@ const updateHueFromMouse = (e: MouseEvent) => {
 // Lifecycle Hooks for Canvas
 onMounted(() => {
     window.addEventListener('mousemove', (e) => {
-        if (isMatrixDragging) updateMatrixFromMouse(e)
-        if (isHueDragging) updateHueFromMouse(e)
+        if (isMatrixDragging.value) updateMatrixFromMouse(e)
+        if (isHueDragging.value) updateHueFromMouse(e)
     })
     window.addEventListener('mouseup', () => {
-        isMatrixDragging = false
-        isHueDragging = false
+        isMatrixDragging.value = false
+        isHueDragging.value = false
     })
 })
 
@@ -176,7 +176,11 @@ watch([currentHue, currentSat, currentVal], () => {
 })
 
 watch(activeTab, () => {
-   if (activeTab.value === 'studio') setTimeout(drawMatrix, 50) 
+   if (activeTab.value === 'studio') {
+       nextTick(() => {
+           setTimeout(drawMatrix, 50)
+       })
+   }
 })
 
 const updateModel = () => {
@@ -304,7 +308,7 @@ const processPaste = () => {
     <div class="h-full flex flex-col lg:flex-row overflow-hidden bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
         
         <!-- Left: Palette Grid -->
-        <div class="lg:w-[55%] flex flex-col border-r border-slate-200 dark:border-slate-800 relative bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:20px_20px]">
+        <div class="lg:w-[55%] flex flex-col border-r border-slate-200 dark:border-slate-800 relative bg-grid-pattern">
             
             <!-- Header Actions -->
             <div class="p-6 bg-white/90 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-10 sticky top-0">
@@ -390,11 +394,15 @@ const processPaste = () => {
                             </div>
                         </div>
 
+                        <!-- Data Inputs & Preview -->
                         <div class="flex gap-4">
+                            <div class="w-20 h-20 rounded-xl shadow-lg border border-slate-200 dark:border-slate-600 shrink-0" 
+                                 :style="{backgroundColor: currentHex}"></div>
+                            
                             <div class="flex-1 space-y-4">
                                 <div class="flex items-center gap-2">
                                     <span class="text-2xl font-mono font-medium text-slate-700 dark:text-slate-200">#</span>
-                                    <input v-model="currentHex" @input="(e: any) => updateColorFromHex(e.target.value)" class="text-3xl font-mono font-medium bg-transparent border-b border-slate-300 dark:border-slate-600 w-full focus:outline-none focus:border-indigo-500 uppercase" maxlength="7" />
+                                    <input v-model="currentHex" @input="(e) => updateColorFromHex((e.target as HTMLInputElement).value)" class="text-3xl font-mono font-medium bg-transparent border-b border-slate-300 dark:border-slate-600 w-full focus:outline-none focus:border-indigo-500 uppercase" maxlength="7" />
                                 </div>
                                 <div class="flex gap-2 text-xs font-mono">
                                     <div class="flex-1 bg-slate-50 dark:bg-slate-900 rounded px-2 py-1 border border-slate-200 dark:border-slate-700">
@@ -410,28 +418,6 @@ const processPaste = () => {
                                         <input v-model.number="currentRgb.b" @input="updateColorFromRgb" class="w-full bg-transparent border-none p-0 focus:ring-0" type="number" min="0" max="255"/>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Sliders -->
-                        <div class="space-y-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
-                            <div>
-                                <div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase mb-1">
-                                    <span>Hue</span> <span>{{ Math.round(currentHue) }}</span>
-                                </div>
-                                <input type="range" v-model.number="currentHue" @input="updateColorFromHsv" min="0" max="360" class="w-full accent-indigo-500" />
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase mb-1">
-                                    <span>Saturation</span> <span>{{ Math.round(currentSat) }}%</span>
-                                </div>
-                                <input type="range" v-model.number="currentSat" @input="updateColorFromHsv" min="0" max="100" class="w-full accent-indigo-500" />
-                            </div>
-                             <div>
-                                <div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase mb-1">
-                                    <span>Value</span> <span>{{ Math.round(currentVal) }}%</span>
-                                </div>
-                                <input type="range" v-model.number="currentVal" @input="updateColorFromHsv" min="0" max="100" class="w-full accent-indigo-500" />
                             </div>
                         </div>
 
@@ -453,14 +439,13 @@ const processPaste = () => {
                             <option value="shades">Deep Shades</option>
                             <option value="interpolate">Range Interpolation</option>
                         </select>
-                        </select>
                     </div>
 
                     <div v-if="selectedIndex !== -1 && palette[selectedIndex]" class="p-3 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center gap-3">
-                         <div class="w-10 h-10 rounded shadow-sm" :style="{backgroundColor: palette[selectedIndex].hex}"></div>
+                         <div class="w-10 h-10 rounded shadow-sm" :style="{backgroundColor: palette[selectedIndex]?.hex}"></div>
                          <div>
                              <span class="text-[10px] uppercase font-bold text-slate-400">Base Color</span>
-                             <div class="text-xs font-bold">{{ palette[selectedIndex].name }}</div>
+                             <div class="text-xs font-bold">{{ palette[selectedIndex]?.name }}</div>
                          </div>
                     </div>
 
@@ -523,11 +508,16 @@ const processPaste = () => {
 
                 <!-- SCRIPT -->
                 <div v-if="activeTab === 'script'" class="h-full flex flex-col">
-                    <div class="flex items-center gap-4 mb-4">
-                        <BaseInput label="Context Folder" v-model="rootParentId" class="flex-1" />
-                        <BaseButton size="sm" @click="copyScript" class="mt-4"><Copy class="w-4 h-4 mr-2" /> Copy</BaseButton>
+                    <div class="px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex flex-col gap-4">
+                        <div class="flex justify-between items-center">
+                             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                                <FileCode class="w-4 h-4" /> Generated Script
+                             </span>
+                             <button @click="copyScript" class="text-indigo-500 hover:text-indigo-400 text-xs font-bold flex items-center gap-1"><Copy class="w-3 h-3" /> Copy</button>
+                        </div>
+                        <BaseInput label="Context Folder" v-model="rootParentId" class="w-full" />
                     </div>
-                    <textarea readonly :value="scriptOutput" class="flex-1 w-full bg-slate-950 text-indigo-300 font-mono text-xs p-4 rounded-xl resize-none outline-none"></textarea>
+                    <textarea readonly :value="scriptOutput" class="flex-1 w-full bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-[10px] text-emerald-600 dark:text-emerald-400 resize-none outline-none leading-relaxed"></textarea>
                 </div>
             </div>
         </div>

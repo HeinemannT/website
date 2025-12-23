@@ -34,14 +34,20 @@ const currentTool = computed(() => navigation.find(n => n.path === route.path))
 </script>
 
 <template>
+  <div>
   <div class="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
     
     <!-- Sidebar (Collapsed) -->
     <aside class="w-16 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center py-4 z-20 shrink-0">
-      <router-link to="/" class="mb-8 block">
-        <div class="w-10 h-10 bg-gradient-to-br from-slate-900 to-slate-800 dark:from-white dark:to-slate-200 rounded-xl flex flex-col items-center justify-center text-white dark:text-slate-900 shadow-lg shadow-slate-500/20 font-bold hover:scale-105 transition-transform overflow-hidden">
-          <span class="text-xs leading-none mt-1">c</span>
-          <span class="text-[8px] leading-none uppercase tracking-tighter">Tools</span>
+      <router-link to="/" class="mb-8 block group relative">
+        <div class="flex flex-col items-center justify-center">
+            <!-- Creative Logo -->
+            <div class="text-2xl font-black tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-br from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-300">
+                c
+            </div>
+            <div class="text-[0.6rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 transition-colors">
+                Tools
+            </div>
         </div>
       </router-link>
 
@@ -104,8 +110,8 @@ const currentTool = computed(() => navigation.find(n => n.path === route.path))
       </main>
     </div>
   </div>
-  </div>
   <AboutModal :isOpen="showAbout" @close="showAbout = false" />
+  </div>
 </template>
 
 <style scoped>

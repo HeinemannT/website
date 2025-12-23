@@ -51,3 +51,7 @@ Romanization follows the Pinyin standard. Historical place names are mapped to t
 *   **Recorder**: Lao Guanfei (33rd Generation)
 *   **Digital Editor**: [Your Name/Org]
 *   **License**: MIT / Creative Commons Non-Commercial
+
+## Contact
+Contact me at tassilodheinemann@gmail.com
+sample text.

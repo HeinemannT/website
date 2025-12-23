@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DocumentMetadata } from '../types';
-import { Menu as MenuIcon, ALargeSmall, Monitor, Moon, Sun, ChevronsDown } from 'lucide-react';
+import { Menu as MenuIcon, Moon, Sun, Type, Book, Search, FileText, Library, Code, Info } from 'lucide-react';
+
+type Tab = 'toc' | 'search' | 'docs' | 'glossary' | 'source';
 
 interface HeaderProps {
   metadata: DocumentMetadata;
@@ -9,24 +11,34 @@ interface HeaderProps {
   fontSize: 'sm' | 'md' | 'lg';
   setFontSize: (size: 'sm' | 'md' | 'lg') => void;
   onMenuToggle: () => void;
+  onOpenTab: (tab: Tab) => void;
+  activeTab: Tab;
 }
 
-const Header: React.FC<HeaderProps> = ({ 
-  metadata, 
-  isDarkMode, 
-  toggleDarkMode, 
+const Header: React.FC<HeaderProps> = ({
+  metadata,
+  isDarkMode,
+  toggleDarkMode,
   fontSize,
   setFontSize,
-  onMenuToggle 
+  onMenuToggle,
+  onOpenTab,
+  activeTab
 }) => {
-  const [isStyleOpen, setIsStyleOpen] = useState(false);
-  const styleMenuRef = useRef<HTMLDivElement>(null);
+  const [isFontMenuOpen, setIsFontMenuOpen] = useState(false);
+  const fontMenuRef = useRef<HTMLDivElement>(null);
+  const mobileFontMenuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (styleMenuRef.current && !styleMenuRef.current.contains(event.target as Node)) {
-        setIsStyleOpen(false);
+      const target = event.target as Node;
+
+      const isOutsideDesktop = fontMenuRef.current && !fontMenuRef.current.contains(target);
+      const isOutsideMobile = mobileFontMenuRef.current && !mobileFontMenuRef.current.contains(target);
+
+      if (isOutsideDesktop && isOutsideMobile) {
+        setIsFontMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -34,132 +46,240 @@ const Header: React.FC<HeaderProps> = ({
   }, []);
 
   return (
-    <header className="bg-white/80 dark:bg-zinc-950/90 backdrop-blur-md border-b border-stone-200 dark:border-zinc-800 px-4 md:px-8 py-3 transition-colors duration-300 z-30 shadow-sm relative">
-      <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
-        
-        {/* Logo / Title Area - Redesigned to honor Xiaolao Village */}
-        <div className="flex items-center gap-4">
-          
-          {/* 
-             Traditional Seal (Stamp) Design 
-             - Rotated slightly for organic feel
-             - Double border effect using box-shadow and border
-          */}
-          <div className="relative group transform -rotate-2 hover:rotate-0 transition-transform duration-300">
-            <div className="
-              flex flex-col items-center justify-center 
-              bg-cinnabar dark:bg-red-800 
-              text-stone-50 
-              w-10 h-10 rounded-[2px]
-              shadow-sm 
-              border-2 border-red-800/30 dark:border-red-900/50
-              leading-none
-            ">
-               {/* Inner Border for Stamp Effect */}
-               <div className="absolute inset-0.5 border border-stone-50/30 rounded-[1px]"></div>
-               
-               <span className="font-serif-tc font-bold text-xs transform translate-y-[1px]">小</span>
-               <span className="font-serif-tc font-bold text-lg transform -translate-y-[1px]">勞</span>
-            </div>
-          </div>
+    <>
+      {/* ==============================================
+          MOBILE / TABLET HEADER (Top Bar)
+          Visible on screens < lg
+      =============================================== */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-zinc-900 border-b border-stone-200 dark:border-zinc-800 flex items-center justify-between px-4 shadow-sm">
 
-          <div className="flex flex-col justify-center border-l border-stone-300 dark:border-zinc-700 pl-4 h-9">
-            <h1 className="text-lg font-serif-tc font-bold text-ink dark:text-zinc-100 tracking-wide leading-none mb-1">
-              小勞村 <span className="text-stone-400 dark:text-zinc-500 font-normal mx-1">|</span> Xiaolao Village
+        {/* Branding - Clean Box Stamp */}
+        <div className="flex items-center gap-3">
+          <div className="
+             flex flex-col items-center justify-center 
+             bg-cinnabar dark:bg-red-800 
+             text-stone-50 
+             w-8 h-8 rounded-[2px]
+             shadow-sm 
+             border-2 border-red-900/10 dark:border-red-900/50
+             leading-none
+           ">
+            <div className="w-[26px] h-[26px] border border-stone-50/30 rounded-[1px] absolute pointer-events-none"></div>
+            <span className="font-serif-tc font-bold text-[9px] transform translate-y-[1px]">小</span>
+            <span className="font-serif-tc font-bold text-sm transform -translate-y-[1px]">勞</span>
+          </div>
+          <div>
+            <h1 className="text-base font-serif-tc font-bold text-stone-800 dark:text-zinc-100 leading-none tracking-tight">
+              Xiaolao Village
             </h1>
-            <h2 className="text-[10px] uppercase tracking-[0.2em] text-cinnabar dark:text-red-400 font-bold">
-              Lao Clan Genealogy
-            </h2>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 md:gap-6">
-           {/* Desktop Metadata */}
-           <div className="hidden md:flex flex-col text-right text-[10px] md:text-xs text-stone-400 dark:text-zinc-600 font-medium uppercase tracking-widest">
-              <span>{metadata.origin_location}</span>
-           </div>
+        {/* Mobile Controls */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => toggleDarkMode(!isDarkMode)}
+            className="p-2 rounded-full text-stone-500 active:bg-stone-100 dark:text-zinc-400 dark:active:bg-zinc-800 transition-all active:scale-95 duration-200"
+          >
+            <div className={`transition-transform duration-500 ${isDarkMode ? 'rotate-180' : 'rotate-0'}`}>
+              {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
+            </div>
+          </button>
 
-           <div className="flex items-center gap-2">
-             
-             {/* STYLE PICKER DROPDOWN */}
-             <div className="relative" ref={styleMenuRef}>
-               <button 
-                 onClick={() => setIsStyleOpen(!isStyleOpen)}
-                 className={`p-2 rounded-full transition-colors ${isStyleOpen ? 'bg-stone-100 dark:bg-zinc-800 text-ink dark:text-white' : 'hover:bg-stone-100 dark:hover:bg-zinc-800 text-stone-600 dark:text-zinc-400'}`}
-                 aria-label="Appearance Settings"
-               >
-                 <ALargeSmall size={20} />
-               </button>
+          {/* Mobile Font Menu Wrapper */}
+          <div className="relative" ref={mobileFontMenuRef}>
+            <button
+              onClick={() => setIsFontMenuOpen(!isFontMenuOpen)}
+              className={`p-2 rounded-full transition-colors ${isFontMenuOpen ? 'bg-stone-100 dark:bg-zinc-800 text-cinnabar dark:text-red-400' : 'text-stone-500 active:bg-stone-100 dark:text-zinc-400 dark:active:bg-zinc-800'}`}
+            >
+              <Type size={20} />
+            </button>
 
-               {isStyleOpen && (
-                 <div className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-stone-200 dark:border-zinc-700 p-4 z-50 animate-in fade-in zoom-in-95 duration-200">
-                    
-                    {/* Theme Section */}
-                    <div className="mb-4">
-                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2 block">Theme</span>
-                      <div className="flex bg-stone-100 dark:bg-zinc-800 rounded-lg p-1">
-                        <button 
-                          onClick={() => toggleDarkMode(false)} 
-                          className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-medium transition-all ${!isDarkMode ? 'bg-white text-ink shadow-sm' : 'text-stone-500 hover:text-stone-700 dark:text-zinc-400'}`}
-                        >
-                          <Sun size={14} /> Light
-                        </button>
-                        <button 
-                          onClick={() => toggleDarkMode(true)} 
-                          className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-md text-xs font-medium transition-all ${isDarkMode ? 'bg-zinc-700 text-white shadow-sm' : 'text-stone-500 hover:text-stone-700 dark:text-zinc-400'}`}
-                        >
-                          <Moon size={14} /> Dark
-                        </button>
-                      </div>
-                    </div>
+            {/* Mobile Font Menu Popover */}
+            {isFontMenuOpen && (
+              <div className="absolute top-12 right-0 mt-2 bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-700 shadow-xl rounded-xl p-3 flex items-baseline gap-4 animate-in fade-in zoom-in-95 duration-200 min-w-[160px] justify-center z-50">
+                <button
+                  onClick={() => setFontSize('sm')}
+                  className={`group flex flex-col items-center p-2 rounded-lg hover:bg-stone-50 dark:hover:bg-zinc-800 ${fontSize === 'sm' ? 'opacity-100' : 'opacity-50'}`}
+                  title="Small Text"
+                >
+                  <span className="text-sm font-sans font-medium text-ink dark:text-zinc-100">Aa</span>
+                  <div className={`mt-1 w-1 h-1 rounded-full ${fontSize === 'sm' ? 'bg-cinnabar' : 'bg-transparent'}`}></div>
+                </button>
 
-                    {/* Font Size Section */}
-                    <div>
-                      <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2 block">Text Size</span>
-                      <div className="flex items-center justify-between gap-2">
-                         <button 
-                           onClick={() => setFontSize('sm')}
-                           className={`h-8 w-8 flex items-center justify-center rounded border transition-all ${fontSize === 'sm' ? 'border-cinnabar text-cinnabar bg-cinnabar/5' : 'border-stone-200 dark:border-zinc-700 text-stone-500 hover:border-stone-300'}`}
-                           aria-label="Small Text"
-                         >
-                           <span className="text-xs font-serif font-bold">A</span>
-                         </button>
-                         <button 
-                           onClick={() => setFontSize('md')}
-                           className={`h-8 w-8 flex items-center justify-center rounded border transition-all ${fontSize === 'md' ? 'border-cinnabar text-cinnabar bg-cinnabar/5' : 'border-stone-200 dark:border-zinc-700 text-stone-500 hover:border-stone-300'}`}
-                           aria-label="Medium Text"
-                         >
-                           <span className="text-base font-serif font-bold">A</span>
-                         </button>
-                         <button 
-                           onClick={() => setFontSize('lg')}
-                           className={`h-8 w-8 flex items-center justify-center rounded border transition-all ${fontSize === 'lg' ? 'border-cinnabar text-cinnabar bg-cinnabar/5' : 'border-stone-200 dark:border-zinc-700 text-stone-500 hover:border-stone-300'}`}
-                           aria-label="Large Text"
-                         >
-                           <span className="text-xl font-serif font-bold">A</span>
-                         </button>
-                      </div>
-                    </div>
+                <button
+                  onClick={() => setFontSize('md')}
+                  className={`group flex flex-col items-center p-2 rounded-lg hover:bg-stone-50 dark:hover:bg-zinc-800 ${fontSize === 'md' ? 'opacity-100' : 'opacity-50'}`}
+                  title="Medium Text"
+                >
+                  <span className="text-lg font-sans font-medium text-ink dark:text-zinc-100">Aa</span>
+                  <div className={`mt-1 w-1.5 h-1.5 rounded-full ${fontSize === 'md' ? 'bg-cinnabar' : 'bg-transparent'}`}></div>
+                </button>
 
-                 </div>
-               )}
-             </div>
-             
-             {/* Divider */}
-             <div className="w-px h-5 bg-stone-300 dark:bg-zinc-700 mx-1"></div>
+                <button
+                  onClick={() => setFontSize('lg')}
+                  className={`group flex flex-col items-center p-2 rounded-lg hover:bg-stone-50 dark:hover:bg-zinc-800 ${fontSize === 'lg' ? 'opacity-100' : 'opacity-50'}`}
+                  title="Large Text"
+                >
+                  <span className="text-2xl font-sans font-medium text-ink dark:text-zinc-100">Aa</span>
+                  <div className={`mt-1 w-2 h-2 rounded-full ${fontSize === 'lg' ? 'bg-cinnabar' : 'bg-transparent'}`}></div>
+                </button>
+              </div>
+            )}
+          </div>
 
-             <button 
-               onClick={onMenuToggle}
-               className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-zinc-800 text-stone-600 dark:text-zinc-300 transition-colors"
-               aria-label="Open Menu"
-             >
-               <MenuIcon size={20} />
-             </button>
-           </div>
+          <div className="w-px h-6 bg-stone-200 dark:bg-zinc-800 mx-1"></div>
+
+          <button
+            onClick={onMenuToggle}
+            className="p-2 text-stone-600 dark:text-zinc-300 active:scale-95 transition-transform"
+          >
+            <MenuIcon size={24} />
+          </button>
         </div>
-      </div>
-    </header>
+      </header>
+
+
+      {/* ==============================================
+          DESKTOP SIDEBAR (Vertical Power Menu)
+          Visible on screens >= lg
+      =============================================== */}
+      <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 z-50 w-16 bg-white dark:bg-zinc-900 border-r border-stone-200 dark:border-zinc-800 flex-col items-center py-6 gap-6 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+
+        {/* Top: Branding Stamp (Clean Box) */}
+        <button
+          onClick={() => onOpenTab('docs')}
+          className="relative group select-none mb-2 cursor-pointer focus:outline-none"
+          title="Xiaolao (Small Lao)"
+        >
+          <div className="
+            flex flex-col items-center justify-center 
+            bg-cinnabar dark:bg-red-800 
+            text-stone-50 
+            w-10 h-10 rounded-[2px]
+            shadow-sm 
+            border-2 border-red-800/30 dark:border-red-900/50
+            leading-none
+          ">
+            <div className="absolute inset-0.5 border border-stone-50/30 rounded-[1px]"></div>
+            <span className="font-serif-tc font-bold text-[10px] transform translate-y-[1px]">小</span>
+            <span className="font-serif-tc font-bold text-base transform -translate-y-[1px]">勞</span>
+          </div>
+        </button>
+
+        {/* Divider */}
+        <div className="w-8 h-px bg-stone-200 dark:bg-zinc-800"></div>
+
+        {/* SETTINGS GROUP (Top Priority) */}
+        <div className="flex flex-col items-center gap-4">
+
+          {/* Theme Toggle */}
+          <button
+            onClick={() => toggleDarkMode(!isDarkMode)}
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-stone-500 hover:text-stone-800 hover:bg-stone-50 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-900 transition-all duration-300"
+            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            <div className={`transition-transform duration-500 ${isDarkMode ? 'rotate-180' : 'rotate-0'}`}>
+              {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
+            </div>
+          </button>
+
+          {/* Font Size Popover */}
+          <div className="relative" ref={fontMenuRef}>
+            <button
+              onClick={() => setIsFontMenuOpen(!isFontMenuOpen)}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${isFontMenuOpen ? 'bg-stone-100 dark:bg-zinc-800 text-cinnabar dark:text-red-400' : 'text-stone-500 hover:text-stone-800 hover:bg-stone-50 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-900'}`}
+              title="Text Size"
+            >
+              <Type size={20} />
+            </button>
+
+            {/* Popover Menu - Professional Baseline Layout */}
+            {isFontMenuOpen && (
+              <div className="absolute left-14 top-0 ml-2 bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-700 shadow-xl rounded-lg p-3 flex items-baseline gap-4 animate-in fade-in zoom-in-95 duration-200 min-w-[160px] justify-center z-50">
+                <button
+                  onClick={() => setFontSize('sm')}
+                  className={`group flex flex-col items-center transition-opacity ${fontSize === 'sm' ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}
+                  title="Small Text"
+                >
+                  <span className="text-sm font-sans font-medium text-ink dark:text-zinc-100">Aa</span>
+                  <div className={`mt-1 w-1 h-1 rounded-full ${fontSize === 'sm' ? 'bg-cinnabar' : 'bg-transparent group-hover:bg-stone-200'}`}></div>
+                </button>
+
+                <button
+                  onClick={() => setFontSize('md')}
+                  className={`group flex flex-col items-center transition-opacity ${fontSize === 'md' ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}
+                  title="Medium Text"
+                >
+                  <span className="text-lg font-sans font-medium text-ink dark:text-zinc-100">Aa</span>
+                  <div className={`mt-1 w-1.5 h-1.5 rounded-full ${fontSize === 'md' ? 'bg-cinnabar' : 'bg-transparent group-hover:bg-stone-200'}`}></div>
+                </button>
+
+                <button
+                  onClick={() => setFontSize('lg')}
+                  className={`group flex flex-col items-center transition-opacity ${fontSize === 'lg' ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}
+                  title="Large Text"
+                >
+                  <span className="text-2xl font-sans font-medium text-ink dark:text-zinc-100">Aa</span>
+                  <div className={`mt-1 w-2 h-2 rounded-full ${fontSize === 'lg' ? 'bg-cinnabar' : 'bg-transparent group-hover:bg-stone-200'}`}></div>
+                </button>
+              </div>
+            )}
+          </div>
+
+        </div>
+
+        {/* Divider */}
+        <div className="w-8 h-px bg-stone-200 dark:bg-zinc-800"></div>
+
+        {/* APP ICONS (Direct Access) */}
+        <div className="flex flex-col gap-4 w-full items-center">
+
+          {[
+            { id: 'docs', icon: Info, label: 'About' },
+            { id: 'toc', icon: Book, label: 'Contents' },
+            { id: 'search', icon: Search, label: 'Search' },
+            { id: 'glossary', icon: Library, label: 'Glossary' },
+          ].map(item => (
+            <button
+              key={item.id}
+              onClick={() => onOpenTab(item.id as Tab)}
+              className={`sidebar-icon-btn group relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
+                      ${activeTab === item.id
+                  ? 'bg-cinnabar text-white shadow-md'
+                  : 'text-stone-500 dark:text-zinc-400 hover:text-stone-800 dark:hover:text-zinc-200 hover:bg-stone-50 dark:hover:bg-zinc-900'}
+                   `}
+              title={item.label}
+            >
+              <item.icon size={20} className={activeTab === item.id ? 'text-white' : ''} />
+            </button>
+          ))}
+
+        </div>
+
+        {/* Flexible Spacer */}
+        <div className="flex-1"></div>
+
+        {/* Bottom: Extras */}
+        <div className="flex flex-col items-center gap-4 mb-2">
+
+          <button
+            onClick={() => onOpenTab('source')}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
+                  ${activeTab === 'source'
+                ? 'bg-stone-800 text-white dark:bg-zinc-200 dark:text-zinc-900 shadow-md'
+                : 'text-stone-400 dark:text-zinc-500 hover:text-stone-800 dark:hover:text-zinc-200 hover:bg-stone-50 dark:hover:bg-zinc-900'}
+               `}
+            title="Source Data"
+          >
+            <Code size={18} />
+          </button>
+
+        </div>
+      </aside>
+    </>
   );
 };
+
 
 export default Header;

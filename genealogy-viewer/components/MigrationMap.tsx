@@ -43,7 +43,7 @@ const getCurvedPathPoints = (
   // We offset the midpoint perpendicularly
   const offsetX = lng2 - lng1;
   const offsetY = lat2 - lat1;
-  
+
   // Midpoint
   const midLat = (lat1 + lat2) / 2;
   const midLng = (lng1 + lng2) / 2;
@@ -70,7 +70,7 @@ const getCurvedPathPoints = (
 
 const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }) => {
   const [currentYear, setCurrentYear] = useState<number>(MIN_YEAR);
-  
+
   // Refs to hold Leaflet instances
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -97,8 +97,8 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
     const map = L.map(mapContainerRef.current, {
       center: [25.4310, 119.0077],
       zoom: 6,
-      zoomControl: false, 
-      attributionControl: false 
+      zoomControl: false,
+      attributionControl: false
     });
 
     // Add Tile Layer
@@ -123,7 +123,7 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
       map.remove();
       mapRef.current = null;
     };
-  }, []); 
+  }, []);
 
   // 2. Render Markers and Lines based on Timeline
   useEffect(() => {
@@ -139,35 +139,35 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
 
     // --- DRAW CURVED LINES ---
     paths.forEach(path => {
-       if (path.year > currentYear) return;
+      if (path.year > currentYear) return;
 
-       const from = points.find(p => p.id === path.fromId);
-       const to = points.find(p => p.id === path.toId);
+      const from = points.find(p => p.id === path.fromId);
+      const to = points.find(p => p.id === path.toId);
 
-       if (from && to) {
-         const curvedPoints = getCurvedPathPoints(from.coordinates, to.coordinates);
-         
-         L.polyline(curvedPoints, {
-             color: isDarkMode ? '#F87171' : '#A63434',
-             weight: 2,
-             opacity: 0.8,
-             className: 'migration-line-anim' // Uses CSS keyframes from index.html
-           }
-         ).addTo(linesLayer);
-       }
+      if (from && to) {
+        const curvedPoints = getCurvedPathPoints(from.coordinates, to.coordinates);
+
+        L.polyline(curvedPoints, {
+          color: isDarkMode ? '#F87171' : '#A63434',
+          weight: 2,
+          opacity: 0.8,
+          className: 'migration-line-anim' // Uses CSS keyframes from index.html
+        }
+        ).addTo(linesLayer);
+      }
     });
 
     // --- DRAW MARKERS ---
     visiblePoints.forEach((point, index) => {
       const isLatest = index === visiblePoints.length - 1;
       const isModern = point.year > 1900;
-      
+
       const bgColor = isModern ? 'bg-blue-600' : 'bg-cinnabar';
       const iconSvg = isModern ? ICON_NAV : ICON_ANCHOR;
-      
+
       // Custom HTML Marker
       const customIcon = L.divIcon({
-        className: 'custom-div-icon', 
+        className: 'custom-div-icon',
         html: `
           <div class="relative group" style="transform: translate(-50%, -50%);">
             <div class="w-8 h-8 ${bgColor} text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-zinc-800 transition-transform hover:scale-110 ${isLatest ? 'animate-bounce' : ''}">
@@ -176,11 +176,11 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
           </div>
         `,
         iconSize: [30, 30],
-        iconAnchor: [15, 15] 
+        iconAnchor: [15, 15]
       });
 
       const marker = L.marker([point.coordinates.lat, point.coordinates.lng], { icon: customIcon });
-      
+
       const popupContent = `
         <div class="p-3 text-center min-w-[150px]">
           <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1">${point.year}</div>
@@ -189,7 +189,7 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
         </div>
       `;
       marker.bindPopup(popupContent, { closeButton: false });
-      
+
       markersLayer.addLayer(marker);
     });
 
@@ -197,8 +197,8 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
     const latestPoint = visiblePoints[visiblePoints.length - 1];
     if (latestPoint) {
       map.flyTo(
-        [latestPoint.coordinates.lat, latestPoint.coordinates.lng], 
-        latestPoint.year > 1900 ? 4 : 7, 
+        [latestPoint.coordinates.lat, latestPoint.coordinates.lng],
+        latestPoint.year > 1900 ? 4 : 7,
         { duration: 1.5 }
       );
     }
@@ -207,52 +207,52 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
 
   return (
     <div className="relative w-full h-full flex flex-col">
-        {/* --- TIMELINE CONTROLS (MOVED TO BOTTOM) --- */}
-        <div className="absolute bottom-8 left-4 right-4 md:left-12 md:right-12 z-40">
-            <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-stone-200 dark:border-zinc-800 rounded-xl p-4 shadow-xl">
-                <div className="flex justify-between items-end mb-2">
-                    <div>
-                        <div className="flex items-center gap-2 text-cinnabar dark:text-red-400 font-bold uppercase tracking-widest text-xs mb-1">
-                            <Clock size={14} />
-                            <span>Timeline</span>
-                        </div>
-                        <div className="text-2xl font-book font-bold text-ink dark:text-zinc-100">
-                            {currentYear} <span className="text-base font-normal text-stone-400 dark:text-zinc-500 italic ml-2">{currentEra}</span>
-                        </div>
-                    </div>
-                    <div className="hidden md:block text-right">
-                        <div className="text-xs text-stone-400 dark:text-zinc-500 uppercase tracking-widest">Latest Migration</div>
-                        <div className="text-sm font-medium text-ink dark:text-zinc-300">
-                            {visiblePoints[visiblePoints.length - 1]?.name || "Origins"}
-                        </div>
-                    </div>
-                </div>
+      {/* --- TIMELINE CONTROLS (MOVED TO BOTTOM) --- */}
+      <div className="absolute bottom-24 md:bottom-8 left-4 right-4 md:left-12 md:right-12 z-40">
+        <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-stone-200 dark:border-zinc-800 rounded-xl p-4 shadow-xl">
+          <div className="flex justify-between items-end mb-2">
+            <div>
+              <div className="flex items-center gap-2 text-cinnabar dark:text-red-400 font-bold uppercase tracking-widest text-xs mb-1">
+                <Clock size={14} />
+                <span>Timeline</span>
+              </div>
+              <div className="text-2xl font-book font-bold text-ink dark:text-zinc-100">
+                {currentYear} <span className="text-base font-normal text-stone-400 dark:text-zinc-500 italic ml-2">{currentEra}</span>
+              </div>
+            </div>
+            <div className="hidden md:block text-right">
+              <div className="text-xs text-stone-400 dark:text-zinc-500 uppercase tracking-widest">Latest Migration</div>
+              <div className="text-sm font-medium text-ink dark:text-zinc-300">
+                {visiblePoints[visiblePoints.length - 1]?.name || "Origins"}
+              </div>
+            </div>
+          </div>
 
-                <div className="relative h-6 flex items-center">
-                    <input 
-                        type="range"
-                        min={MIN_YEAR}
-                        max={MAX_YEAR}
-                        value={currentYear}
-                        onChange={(e) => setCurrentYear(Number(e.target.value))}
-                        className="
+          <div className="relative h-6 flex items-center">
+            <input
+              type="range"
+              min={MIN_YEAR}
+              max={MAX_YEAR}
+              value={currentYear}
+              onChange={(e) => setCurrentYear(Number(e.target.value))}
+              className="
                         w-full h-1 bg-stone-300 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer z-10
                         accent-cinnabar dark:accent-red-500
                         hover:accent-red-700 dark:hover:accent-red-400
                         "
-                    />
-                </div>
-            </div>
+            />
+          </div>
         </div>
+      </div>
 
-        {/* MAP CONTAINER */}
-        <div className="flex-1 w-full relative bg-[#e6dccf] dark:bg-[#e6dccf]"> 
-            {/* Kept explicit background color same as light mode for consistency as requested */}
-            <div ref={mapContainerRef} className="absolute inset-0 z-0 outline-none" />
-            
-            {/* Overlay Gradient for vintage feel - adjusted to be consistent */}
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-stone-100/20 mix-blend-multiply z-20"></div>
-        </div>
+      {/* MAP CONTAINER */}
+      <div className="flex-1 w-full relative bg-[#e6dccf] dark:bg-[#e6dccf]">
+        {/* Kept explicit background color same as light mode for consistency as requested */}
+        <div ref={mapContainerRef} className="absolute inset-0 z-0 outline-none" />
+
+        {/* Overlay Gradient for vintage feel - adjusted to be consistent */}
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-stone-100/20 mix-blend-multiply z-20"></div>
+      </div>
     </div>
   );
 };

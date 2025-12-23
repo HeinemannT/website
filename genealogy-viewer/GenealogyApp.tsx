@@ -8,12 +8,14 @@ import Menu from './components/Menu';
 import { GenealogyData } from './types';
 import { BookOpen, Image as ImageIcon, ScrollText, Map, Loader2, AlertTriangle, RefreshCw, FileX } from 'lucide-react';
 import jsyaml from 'js-yaml';
+import { useDraggableScroll } from './hooks/useDraggableScroll';
 
 type MobileViewMode = 'read' | 'image' | 'script' | 'map';
 
 // --- Helper Component for Robust Image Loading ---
 const ImagePanel: React.FC<{ filename: string; pageIndex: number }> = ({ filename, pageIndex }) => {
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
+  const dragProps = useDraggableScroll();
 
   // Reset status when filename changes
   useEffect(() => {
@@ -26,8 +28,16 @@ const ImagePanel: React.FC<{ filename: string; pageIndex: number }> = ({ filenam
   const imagePath = `images/${filename}`;
 
   return (
-    <div className="w-full h-full p-4 lg:p-12 flex items-center justify-center overflow-auto">
-      <div className="relative shadow-2xl transition-transform duration-300 min-w-[200px] min-h-[300px] flex items-center justify-center bg-white dark:bg-zinc-900">
+    <div
+      ref={dragProps.ref}
+      {...dragProps.events}
+      className={`
+        w-full h-full p-4 lg:p-12 flex items-center justify-center overflow-auto
+        scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']
+        ${dragProps.cursorClass}
+      `}
+    >
+      <div className="relative shadow-2xl transition-transform duration-300 min-w-[200px] min-h-[300px] flex items-center justify-center bg-white dark:bg-zinc-900 pointer-events-none">
 
         {/* Loading State */}
         {status === 'loading' && (
@@ -88,8 +98,16 @@ const GenealogyApp: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md');
 
+  // Menu/Sidebar State
+  type Tab = 'toc' | 'search' | 'docs' | 'glossary' | 'source';
+  const [activeTab, setActiveTab] = useState<Tab>('toc');
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleOpenTab = (tab: Tab) => {
+    setActiveTab(tab);
+    setIsMenuOpen(true);
+  };
 
   // Fetch and Parse YAML Data
   const loadData = () => {
@@ -199,7 +217,7 @@ const GenealogyApp: React.FC = () => {
 
   return (
     <div className={`${isDarkMode ? 'dark' : ''} h-screen flex flex-col transition-colors duration-500 overflow-hidden`}>
-      <div className="flex flex-col h-full bg-paper dark:bg-zinc-950 text-ink dark:text-zinc-200 font-sans">
+      <div className="flex flex-col h-full bg-paper dark:bg-zinc-950 text-ink dark:text-zinc-200 font-sans pt-16 lg:pt-0 lg:pl-16 transition-all duration-300">
 
         <Header
           metadata={data.metadata}
@@ -208,6 +226,8 @@ const GenealogyApp: React.FC = () => {
           fontSize={fontSize}
           setFontSize={setFontSize}
           onMenuToggle={() => setIsMenuOpen(true)}
+          onOpenTab={handleOpenTab}
+          activeTab={activeTab}
         />
 
         <Menu
@@ -217,6 +237,8 @@ const GenealogyApp: React.FC = () => {
           onNavigate={handleNavigate}
           yamlSource={yamlSource}
           onUpdateYaml={handleYamlUpdate}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
         />
 
         {/* Main Content Area */}
@@ -330,10 +352,28 @@ const GenealogyApp: React.FC = () => {
 
           {/* Mobile Floating Pagination */}
           {mobileViewMode !== 'map' && (
-            <div className="lg:hidden absolute bottom-20 right-4 z-40 bg-white/90 dark:bg-zinc-800/90 backdrop-blur border border-stone-200 dark:border-zinc-700 rounded-full shadow-lg px-4 py-2 text-xs font-mono text-stone-500 dark:text-zinc-400 flex gap-4">
-              <button disabled={currentPageIndex === 0} onClick={() => setCurrentPageIndex(p => p - 1)} className="disabled:opacity-30">←</button>
-              <span>{currentPageIndex + 1} / {data.pages.length}</span>
-              <button disabled={currentPageIndex === data.pages.length - 1} onClick={() => setCurrentPageIndex(p => p + 1)} className="disabled:opacity-30">→</button>
+            <div className="lg:hidden absolute bottom-24 right-4 z-40">
+              <div className="flex items-center gap-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur border border-stone-200 dark:border-zinc-700 rounded-full shadow-lg px-4 py-2 transition-all">
+                <button
+                  disabled={currentPageIndex === 0}
+                  onClick={() => setCurrentPageIndex(p => p - 1)}
+                  className="w-10 h-10 flex items-center justify-center text-stone-600 dark:text-zinc-300 hover:text-cinnabar border border-stone-200 dark:border-zinc-700 rounded-full bg-stone-50 dark:bg-zinc-800 disabled:opacity-30 disabled:hover:text-stone-600 transition-colors active:scale-95"
+                >
+                  <span className="text-xl font-bold pb-1">‹</span>
+                </button>
+
+                <span className="text-xs font-bold font-mono text-stone-600 dark:text-zinc-300 min-w-[3.5rem] text-center">
+                  {currentPageIndex + 1} / {data.pages.length}
+                </span>
+
+                <button
+                  disabled={currentPageIndex === data.pages.length - 1}
+                  onClick={() => setCurrentPageIndex(p => p + 1)}
+                  className="w-10 h-10 flex items-center justify-center text-stone-600 dark:text-zinc-300 hover:text-cinnabar border border-stone-200 dark:border-zinc-700 rounded-full bg-stone-50 dark:bg-zinc-800 disabled:opacity-30 disabled:hover:text-stone-600 transition-colors active:scale-95"
+                >
+                  <span className="text-xl font-bold pb-1">›</span>
+                </button>
+              </div>
             </div>
           )}
 

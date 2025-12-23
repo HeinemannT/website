@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { X, Globe, Mail } from 'lucide-vue-next'
+import { X, Mail } from 'lucide-vue-next'
 
 defineProps<{
     isOpen: boolean
@@ -32,7 +32,7 @@ const emit = defineEmits<{
 
             <!-- Content -->
             <div class="flex-1 overflow-y-auto p-8 prose dark:prose-invert prose-sm max-w-none">
-                <p class="lead">
+                <p class="text-base text-slate-600 dark:text-slate-300">
                     CTools is a specialized suite of utilities designed to streamline the workflow for Corporater implementation consultants and developers.
                 </p>
                 
@@ -50,19 +50,19 @@ const emit = defineEmits<{
                     </div>
 
                     <div>
-                         <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2">Resources</h4>
-                         <div class="space-y-3">
-                             <a href="#" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline">
-                                 <Globe class="w-4 h-4" /> Official Documentation
+                        <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2">Changelog</h4>
+                        <div class="space-y-4">
+                            <div class="border-l-2 border-indigo-500 pl-3">
+                                <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">v2.0.0 (Suite Edition)</span>
+                                <p class="text-xs text-slate-500 mt-1">Consolidated individual tools into a single unified application suite.</p>
+                            </div>
+                        </div>
+
+                         <div class="mt-8">
+                             <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2">Contact</h4>
+                             <a href="mailto:tassiloDheinemann@gmail.com" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline">
+                                 <Mail class="w-4 h-4" /> tassiloDheinemann@gmail.com
                              </a>
-                             <a href="#" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline">
-                                 <Mail class="w-4 h-4" /> Support Contact
-                             </a>
-                         </div>
-                         
-                         <div class="mt-6 p-4 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-slate-800 text-xs text-slate-500">
-                             <p><strong>Version:</strong> 2.0.0 (Suite Edition)</p>
-                             <p class="mt-1">Built with Vue 3, Vite, Tailwind CSS, and simple, efficient code.</p>
                          </div>
                     </div>
                 </div>

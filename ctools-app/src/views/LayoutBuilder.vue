@@ -1,17 +1,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { 
-    Folder, Trash2, Plus, Copy, X, Minimize2, Maximize2, 
+    Folder, Trash2, Plus, X, Minimize2, Maximize2, 
     Monitor, Smartphone, Layout, Layers,
     Code, HelpCircle
 } from 'lucide-vue-next'
-// import BaseButton from '../components/ui/BaseButton.vue'
-// import BaseInput from '../components/ui/BaseInput.vue'
-// import { useToast } from '../composables/useToast'
-import { useClipboard } from '../composables/useClipboard'
+import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
 
-// const { add: toast } = useToast()
-const { copy } = useClipboard()
 
 // --- Types ---
 interface Col {
@@ -210,8 +205,6 @@ const scriptOutput = computed(() => {
     return c
 })
 
-const copyResult = () => copy(scriptOutput.value, 'Generated Code')
-
 // Initialize with one tabset if empty
 if (data.value.length === 0) addTabSet()
 
@@ -348,12 +341,13 @@ if (data.value.length === 0) addTabSet()
         </div>
 
         <!-- Right Panel: Output -->
-        <div class="w-80 bg-slate-50 dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 flex flex-col shadow-2xl relative z-40">
-            <div class="p-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                <h3 class="font-bold text-slate-500 flex items-center gap-2 text-xs uppercase tracking-wider"><Code class="w-4 h-4" /> Code Output</h3>
-                <button @click="copyResult" class="text-indigo-500 hover:text-indigo-400 text-xs font-bold flex items-center gap-1"><Copy class="w-3 h-3" /> Copy</button>
-            </div>
-            <textarea readonly :value="scriptOutput" class="flex-1 w-full bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-[10px] text-emerald-600 dark:text-emerald-400 resize-none outline-none leading-relaxed"></textarea>
+        <!-- Right Panel: Output -->
+        <div class="w-80 border-l border-slate-200 dark:border-slate-800 shadow-2xl relative z-40">
+             <CodeOutputPanel title="Code Output" :code="scriptOutput">
+                 <template #icon>
+                     <Code class="w-4 h-4 text-slate-400" />
+                 </template>
+             </CodeOutputPanel>
         </div>
 
     </div>

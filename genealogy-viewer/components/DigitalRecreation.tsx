@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ContentColumn, MarginaliaItem } from '../types';
 import { X, Globe } from 'lucide-react';
 import { useDraggableScroll } from '../hooks/useDraggableScroll';
+import { marked } from 'marked';
 
 interface DigitalRecreationProps {
   columns: ContentColumn[];
@@ -195,9 +196,9 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                   English Translation
                 </span>
               </div>
-              <p className="font-body text-lg leading-relaxed text-ink dark:text-zinc-200">
-                {selectedColumn.translation}
-              </p>
+              <div className="font-body text-lg leading-relaxed text-ink dark:text-zinc-200"
+                dangerouslySetInnerHTML={{ __html: marked.parse(selectedColumn.translation) as string }}
+              />
             </div>
           </div>
         )}

@@ -3,10 +3,11 @@ import { ref, onMounted, shallowRef } from 'vue'
 import BpmnJS from 'bpmn-js/dist/bpmn-modeler.production.min.js'
 import {
     PlusCircle, RotateCcw, Code, Download, FileCode, CheckCircle,
-    Copy, LayoutTemplate, Zap, User, X
+    LayoutTemplate, Zap, User, X
 } from 'lucide-vue-next'
 import InspectorPanel from '../components/ui/InspectorPanel.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
+import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
 import BaseInput from '../components/ui/BaseInput.vue'
 import { useToast } from '../composables/useToast'
 import { useClipboard } from '../composables/useClipboard'
@@ -397,11 +398,17 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
              <div class="mt-2 text-xs h-4" :class="statusType === 'error' ? 'text-pink-400' : 'text-emerald-400'">{{ statusMsg }}</div>
         </div>
 
-        <div v-show="activeTab === 'xml'" class="flex-grow flex flex-col bg-slate-900 relative">
-             <div class="p-2 border-b border-slate-700 flex justify-end">
-                 <button @click="copyToClipboard(xmlContent, 'XML')" class="text-indigo-400 hover:text-indigo-300 text-xs font-bold flex items-center gap-1"><Copy class="w-3 h-3" /> Copy</button>
-             </div>
-             <textarea v-model="xmlContent" @input="handleXmlEdit" class="w-full h-full p-4 text-xs font-mono bg-[#0d1117] text-blue-200 outline-none resize-none leading-relaxed" spellcheck="false"></textarea>
+        <div v-show="activeTab === 'xml'" class="flex-grow flex flex-col relative border-t border-slate-700">
+             <CodeOutputPanel 
+                title="XML Editor" 
+                :code="xmlContent" 
+                :editable="true"
+                @update:code="(val: string) => { xmlContent = val; handleXmlEdit() }"
+             >
+                 <template #icon>
+                     <FileCode class="w-4 h-4 text-indigo-500" />
+                 </template>
+             </CodeOutputPanel>
         </div>
     </div>
 

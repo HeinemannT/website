@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Trash2, Copy, Image as ImageIcon, CheckCircle, AlertCircle, FileCode } from 'lucide-vue-next'
+import { Trash2, Image as ImageIcon, CheckCircle, AlertCircle, FileCode } from 'lucide-vue-next'
 import FileDropZone from '../components/ui/FileDropZone.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
+import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
 import { useToast } from '../composables/useToast'
-import { useClipboard } from '../composables/useClipboard'
 import { gzipAndBase64Async, chunkString } from '../utils/gzip'
 
 const { add: toast } = useToast()
-const { copy } = useClipboard()
 
 interface ImageItem {
     id: string
@@ -113,9 +112,7 @@ const processImages = async () => {
     }
 }
 
-const copyResult = () => {
-    copy(generatedScript.value, 'Generated Script')
-}
+
 
 </script>
 
@@ -186,15 +183,12 @@ const copyResult = () => {
         </div>
 
         <!-- Right Panel: Output -->
-        <div class="md:w-1/3 bg-slate-100 dark:bg-slate-950/50 border-l border-slate-200 dark:border-slate-800 flex flex-col">
-             <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900">
-                 <h3 class="font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2"><FileCode class="w-4 h-4 text-indigo-500" /> Output Script</h3>
-                 <button @click="copyResult" :disabled="!generatedScript" class="text-xs flex items-center gap-1 text-indigo-600 hover:text-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium px-2 py-1 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors">
-                     <Copy class="w-3 h-3" /> Copy
-                 </button>
-             </div>
-             <textarea v-model="generatedScript" readonly placeholder="// Processed script will appear here..." 
-                class="flex-1 w-full bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-[10px] text-emerald-600 dark:text-emerald-400 resize-none outline-none leading-relaxed"></textarea>
+        <div class="md:w-1/3 border-l border-slate-200 dark:border-slate-800">
+             <CodeOutputPanel title="Output Script" :code="generatedScript">
+                 <template #icon>
+                     <FileCode class="w-4 h-4 text-indigo-500" />
+                 </template>
+             </CodeOutputPanel>
         </div>
 
     </div>

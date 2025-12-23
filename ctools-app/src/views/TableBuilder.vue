@@ -2,14 +2,12 @@
 import { ref, computed } from 'vue'
 import draggable from 'vuedraggable'
 import { 
-    Table, Code, Copy, Plus, Trash2, GripVertical, Settings, 
+    Table, Code, Plus, Trash2, GripVertical, Settings, 
     AlignLeft, AlignCenter, AlignRight, EyeOff,
     ListTree, Lock, WrapText
 } from 'lucide-vue-next'
 // import BaseInput from '../components/ui/BaseInput.vue'
-import { useClipboard } from '../composables/useClipboard'
-
-const { copy } = useClipboard()
+import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
 
 // --- Types ---
 interface Column {
@@ -174,7 +172,7 @@ const generateNestedLoop = (levelIdx: number): string => {
     return s
 }
 
-const copyResult = () => copy(scriptOutput.value, 'Generated Code')
+// const copyResult = () => copy(scriptOutput.value, 'Generated Code')
 
 </script>
 
@@ -336,16 +334,13 @@ const copyResult = () => copy(scriptOutput.value, 'Generated Code')
         </div>
 
         <!-- Right Panel: Code -->
-        <div class="w-full md:w-1/2 bg-slate-900 flex flex-col relative border-l border-slate-800 shadow-2xl z-20">
-            <div class="px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                    <Code class="w-4 h-4" /> Generated Code
-                </span>
-                <button @click="copyResult" class="text-indigo-500 hover:text-indigo-400 text-xs font-bold flex items-center gap-1">
-                    <Copy class="w-3 h-3" /> Copy
-                </button>
-            </div>
-            <textarea readonly :value="scriptOutput" class="flex-1 w-full bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-[10px] text-emerald-600 dark:text-emerald-400 resize-none outline-none leading-relaxed"></textarea>
+        <!-- Right Panel: Code -->
+        <div class="w-full md:w-1/2 flex flex-col relative border-l border-slate-200 dark:border-slate-800 shadow-2xl z-20">
+             <CodeOutputPanel title="Generated Code" :code="scriptOutput">
+                 <template #icon>
+                     <Code class="w-4 h-4 text-indigo-500" />
+                 </template>
+             </CodeOutputPanel>
         </div>
     </div>
 </template>

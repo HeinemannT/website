@@ -47,11 +47,7 @@ There are two distinct ways geographical data is used in the app, and they are *
 ## Note on Transliteration
 Romanization follows the Pinyin standard. Historical place names are mapped to their approximate modern coordinates where precise historical locations are unavailable.
 
-## Credits
-*   **Recorder**: Lao Guanfei (33rd Generation)
-*   **Digital Editor**: [Your Name/Org]
-*   **License**: MIT / Creative Commons Non-Commercial
 
 ## Contact
-Contact me at tassilodheinemann@gmail.com
-sample text.
+Made by Tassilo Heinemann
+Write me questions @ tassilodheinemann@gmail.com

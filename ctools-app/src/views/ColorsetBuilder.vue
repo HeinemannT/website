@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
-import { Plus, Trash2, Copy, Palette, Wand2, ArrowRight, ExternalLink, FileCode } from 'lucide-vue-next'
+import { Plus, Trash2, Palette, Wand2, ArrowRight, ExternalLink, FileCode } from 'lucide-vue-next'
 import {
     hexToHsv, hsvToHex, hexToHsl, hslToHex, interpolateColors, hexToRgb, rgbToHex
 } from '../utils/colors'
 import BaseButton from '../components/ui/BaseButton.vue'
 import BaseInput from '../components/ui/BaseInput.vue'
+import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
 import { useToast } from '../composables/useToast'
-import { useClipboard } from '../composables/useClipboard'
-
 const { add: toast } = useToast()
-const { copy } = useClipboard()
 
 // --- Types ---
 interface ColorStart {
@@ -193,11 +191,11 @@ const updateModel = () => {
         col.name = currentHex.value
     }
     
-    // Auto-update ID if it matches pattern
-    const oldHexId = col.hex.replace('#', '').toLowerCase()
-    if (col.id === `color_${oldHexId}`) {
-        col.id = `color_${currentHex.value.replace('#', '').toLowerCase()}`
-    }
+    // Only auto-update ID if it is NOT empty (i.e. user has set it or it was generated)
+    // User requested ID to be empty by default. If they type something, we keep it.
+    // Actually, if it *matches* the old hex pattern, maybe update it? 
+    // But user said "leave ID empty". So we don't auto-generate ID anymore.
+    // We only update hex.
 
     col.hex = currentHex.value
     generatePreview()
@@ -206,8 +204,8 @@ const updateModel = () => {
 const addColor = () => {
     const newHex = '#64748B'
     palette.value.push({
-        id: 'color_' + newHex.replace('#', '').toLowerCase(),
-        name: 'New Color',
+        id: '',
+        name: 'Color Name',
         hex: newHex
     })
     selectedIndex.value = palette.value.length - 1
@@ -271,14 +269,14 @@ const scriptOutput = computed(() => {
     script += `var targetFolder = ${parent}.create(Folder, id:='${setId.value}', name:='${setName.value}');\n\n`
     
     palette.value.forEach(col => {
-        script += `targetFolder.create(Color, id:='${col.id}', name:='${col.name}', color:='${col.hex}');\n`
+        if (col.id && col.id.trim() !== '') {
+            script += `targetFolder.create(Color, id:='${col.id}', name:='${col.name}', color:='${col.hex}');\n`
+        } else {
+             script += `targetFolder.create(Color, name:='${col.name}', color:='${col.hex}');\n`
+        }
     })
     return script
 })
-
-const copyScript = () => {
-    copy(scriptOutput.value, 'Extended Script')
-}
 
 // --- Import ---
 const importContent = ref('')
@@ -314,10 +312,10 @@ const processPaste = () => {
             <div class="p-6 bg-white/90 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-10 sticky top-0">
                 <div class="flex items-start justify-between gap-6">
                     <div class="flex-1 space-y-3">
-                         <input v-model="setName" class="text-3xl font-extrabold bg-transparent border-none outline-none placeholder-slate-400 w-full" placeholder="Palette Name" />
+                         <input v-model="setName" class="text-3xl font-extrabold bg-transparent border-b border-dashed border-slate-300 hover:border-slate-400 focus:border-indigo-500 focus:border-solid outline-none placeholder-slate-400 w-full transition-colors" placeholder="Palette Name" />
                          <div class="flex items-center gap-2">
                              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID</span>
-                             <input v-model="setId" class="text-sm font-mono text-purple-600 dark:text-purple-400 bg-transparent border-none outline-none" />
+                             <input v-model="setId" class="text-sm font-mono text-purple-600 dark:text-purple-400 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-400 focus:border-indigo-500 focus:border-solid outline-none transition-colors" />
                          </div>
                     </div>
                     <button @click="addColor" class="flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-full font-bold text-xs shadow-lg hover:scale-105 transition-transform">
@@ -401,7 +399,7 @@ const processPaste = () => {
                             
                             <div class="flex-1 space-y-4">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-2xl font-mono font-medium text-slate-700 dark:text-slate-200">#</span>
+                                    <!-- Removed # prefix span -->
                                     <input v-model="currentHex" @input="(e) => updateColorFromHex((e.target as HTMLInputElement).value)" class="text-3xl font-mono font-medium bg-transparent border-b border-slate-300 dark:border-slate-600 w-full focus:outline-none focus:border-indigo-500 uppercase" maxlength="7" />
                                 </div>
                                 <div class="flex gap-2 text-xs font-mono">
@@ -507,17 +505,18 @@ const processPaste = () => {
                 </div>
 
                 <!-- SCRIPT -->
+                <!-- SCRIPT -->
                 <div v-if="activeTab === 'script'" class="h-full flex flex-col">
-                    <div class="px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex flex-col gap-4">
-                        <div class="flex justify-between items-center">
-                             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                                <FileCode class="w-4 h-4" /> Generated Script
-                             </span>
-                             <button @click="copyScript" class="text-indigo-500 hover:text-indigo-400 text-xs font-bold flex items-center gap-1"><Copy class="w-3 h-3" /> Copy</button>
-                        </div>
-                        <BaseInput label="Context Folder" v-model="rootParentId" class="w-full" />
-                    </div>
-                    <textarea readonly :value="scriptOutput" class="flex-1 w-full bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-[10px] text-emerald-600 dark:text-emerald-400 resize-none outline-none leading-relaxed"></textarea>
+                     <CodeOutputPanel title="Generated Script" :code="scriptOutput">
+                         <template #icon>
+                             <FileCode class="w-4 h-4 text-indigo-500" />
+                         </template>
+                         <template #actions>
+                             <div class="w-40">
+                                 <input v-model="rootParentId" placeholder="Context Folder" class="w-full text-xs border-b border-slate-200 dark:border-slate-700 bg-transparent focus:border-indigo-500 outline-none pb-1 placeholder-slate-400" />
+                             </div>
+                         </template>
+                     </CodeOutputPanel>
                 </div>
             </div>
         </div>

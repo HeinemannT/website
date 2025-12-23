@@ -29,7 +29,7 @@ function onDragLeave(e: DragEvent) {
     @drop="onDrop" 
     @dragover="onDragOver" 
     @dragleave="onDragLeave"
-    class="border-2 border-dashed rounded-xl flex flex-col items-center justify-center p-8 transition-colors cursor-pointer"
+    class="relative border-2 border-dashed rounded-xl flex flex-col items-center justify-center p-8 transition-colors cursor-pointer"
     :class="[
       isDragging 
         ? 'border-cora-500 bg-cora-50 dark:bg-cora-500/10' 

@@ -3,19 +3,16 @@ import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { 
   Upload, ClipboardPaste, Download, Image as ImageIcon, 
   Minus, Plus, RotateCcw, Sun, Moon, Grid, 
-  Crop, Zap, Check, Palette as PaletteIcon, PaintBucket, 
-  Copy
+  Crop, Zap, Check, Palette as PaletteIcon, PaintBucket
 } from 'lucide-vue-next'
 import InspectorPanel from '../components/ui/InspectorPanel.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
 import BaseInput from '../components/ui/BaseInput.vue'
 import { useToast } from '../composables/useToast'
-import { useClipboard } from '../composables/useClipboard'
 import { useDownload } from '../composables/useDownload'
 
 // Composables
 const { add: toast } = useToast()
-const { copy: copyToClipboard } = useClipboard()
 const { downloadBlob } = useDownload()
 
 // State
@@ -434,11 +431,15 @@ watch(svgCode, () => {
         </div>
 
         <!-- Tab: Code -->
-        <div v-if="activeTab === 'code'" class="flex-1 flex flex-col min-h-0 -mx-4 -mb-4">
-             <div class="px-4 py-2 bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex justify-end">
-                <button @click="copyToClipboard(svgCode, 'SVG Code')" class="text-indigo-600 hover:text-indigo-500 text-xs font-bold flex items-center gap-1 dark:text-indigo-400"><Copy class="w-3 h-3" /> Copy</button>
-             </div>
-             <textarea v-model="svgCode" class="flex-1 w-full bg-slate-50 dark:bg-[#0d1117] text-emerald-600 dark:text-emerald-400 font-mono text-[10px] p-4 resize-none focus:outline-none leading-relaxed" spellcheck="false" @input="analyzeSVG"></textarea>
+        <div v-if="activeTab === 'code'" class="flex-1 flex flex-col min-h-0 -mx-4 -mb-4 border-t border-slate-200 dark:border-slate-800">
+             <CodeOutputPanel title="SVG Code" :code="svgCode">
+                 <template #icon>
+                     <ClipboardPaste class="w-4 h-4 text-indigo-500" />
+                 </template>
+                 <template #actions>
+                     <!-- No extra actions needed -->
+                 </template>
+             </CodeOutputPanel>
         </div>
 
     </InspectorPanel>

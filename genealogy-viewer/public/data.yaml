@@ -66,7 +66,7 @@ pages:
         translator_note: "The main title on the cover page. Xiaolao refers to the village/lineage and is the main title of this genealogical history."
 
       - id: 2
-        elevation: -1
+        elevation: 1
         is_interlinear: false
         text_zh: "第三十二代小勞子冠斐紀錄"
         translation: "Recorded by Guanfei, son of Xiaolao, of the 32nd Generation"
@@ -136,14 +136,14 @@ pages:
         translation: "The Origin and Flow of the Lineage"
 
       - id: 2
-        elevation: 1
+        elevation: -1
         is_interlinear: false
         text_zh: "允彥式其用景和茂卓昇紹光昭偉遇令緒永登成"
         translation: "Yun, Yan, Shi, Qi, Yong, Jing, He, Mao, Zhuo, Sheng, Shao, Guang, Zhao, Wei, Yu, Ling, Xu, Yong, Deng, Cheng."
         translator_note: "This is a generation poem (Zhaomu). Each character is assigned to a specific generation to maintain order in the family hierarchy."
 
       - id: 3
-        elevation: 1
+        elevation: -1
         is_interlinear: false
         text_zh: "建德崇修廣邦家顯遂之英良隆遠業萬世大章維"
         translation: "Jian, De, Chong, Xiu, Guang, Bang, Jia, Xian, Sui, Zhi, Ying, Liang, Long, Yuan, Ye, Wan, Shi, Da, Zhang, Wei."
@@ -166,125 +166,87 @@ pages:
       physical_page_number: "3"
       title: "Biography of Founding Ancestor Yanzhong"
       marginalia:
-        - position: "top_left"
-          text: "2"
-          note: "Physical page index"
+        - position: "center_right"
+          text: "壹"
+          note: "'Yī - One' describing the first beginning of the lineage."
     columns:
       - id: 1
-        elevation: -1
+        elevation: 1
         is_interlinear: false
-        text_zh: "始祖彥忠 字胎夏號嶺仙 又號文巷東山公長子生而孝友仁厚"
-        translation: "The Founding Ancestor Yanzhong (Courtesy name Taixia, Pseudonym Lingxian, also known as Wenxiang Dongshan). He was the eldest son of Gong and was born with a filial, friendly, and benevolent character."
-        translator_note: "The elevation (Tai-tou) of the text signifies the highest level of respect for the Progenitor of the clan branch."
+        text_zh: "始祖彥忠 字胎夏 號嶺仙 又號文菴"
+        translation: "First Generation Ancestor: Yanzhong. Courtesy name: Taixia. Art name: Lingxian. Also known as: Wen'an."
 
       - id: 2
         elevation: 0
         is_interlinear: false
-        text_zh: "寬宏端重慷慨自期少與父避亂匿于玉屏山常云男兒有"
-        translation: "He was magnanimous, upright, and had great expectations for himself. In his youth, he and his father fled from chaos and hid in Yuping Mountain. He often said that a man must have—"
-        translator_note: "The 'chaos' mentioned often refers to the transition between the Yuan and Ming dynasties or Red Turban Rebellion common in Cantonese clan histories."
+        text_zh: "東山公長子生而孝友仁厚寬宏端重慷慨自期少與父避亂匿于玉屏山常云男兒有"
+        translation: "He was the eldest son of Lord Dongshan. By nature, he was filial, friendly, benevolent, and honest. He was broad-minded, dignified, and generous, holding himself to high standards. In his youth, he fled the [civil] turmoil with his father and hid in Yuping Mountain. He often said:"
+        translator_note: "Yuping could refer to the Guifeng Mountain (圭峰山) in Xinhui (新會) or Enping (恩平). The Yuan Dynasty collapsed into civil war and rebellion (like the Red Turban Rebellions) between 1351 and 1368"
 
       - id: 3
         elevation: 0
         is_interlinear: false
-        text_zh: "四方之志山林非吾志也年三十八而遊勞村見其地脈深"
-        translation: "—aspirations for the four corners of the world; the mountains and forests are not where my ambition lies. At the age of thirty-eight, he traveled to Lao Village and saw that the local geography (earth veins) was deep—"
-        translator_note: "Local 'Earth Veins' (地脈) refers to Feng Shui suitability for establishing a permanent settlement."
+        text_zh: "四方之志山林非吾志也年三十八而進勞村見其地脉深"
+        translation: "'_A man should have ambitions to reach the four corners of the world; to stay only in the mountain forests is not my ambition_'. At the age of thirty-eight, he traveled to Lao Village (Laocun) and saw the 'earth veins' there were deep and thick"
+        translator_note: "_Earth Veins_ is a Feng Shui term referring to geomantic energy - a recurring theme in the text"
+        map_data:
+          event_date: "1441-01-01"
+          event_type: "relocation"
+        location_name: "Xiaolao Village"
+        lat: 23.0132
+        lng: 113.1165
+        draw_line_from:
+          lat: 23.1291 # Approximate Dongshan area
+          lng: 113.2644
 
       - id: 4
         elevation: 0
         is_interlinear: false
         text_zh: "厚乃曰興吾後者其在斯乎遂居之又曰吾與父居玉屏山"
-        translation: "—and rich. He then remarked, 'Is it not here that my descendants shall flourish?' Consequently, he settled there. He also said, 'My father and I lived on Yuping Mountain—"
-        map_data:
-          event_date: null
-          event_type: "relocation"
-          location_name: "Lao Village (Xiaolao)"
-          lat: 23.0125
-          lng: 113.3214
+        translation: "He said, 'The place that will allow my descendants to prosper, is it not here?' So he settled there.  He also said, 'When I lived with my father in Yuping Mountain,'"
 
       - id: 5
         elevation: 0
         is_interlinear: false
-        text_zh: "時人人呼予為小勞子今適居其地豈偶然哉積功累德開"
-        translation: "—at a time when everyone called me the 'Son of Little Lao' (Xiaolao Zi). Now, is it not a remarkable coincidence that I have come to reside in this very place?' Through the accumulation of merit and virtue, he opened—"
+        text_zh: "時人人呼予為小勞子今適居其地豈偶然哉哉積功累德開"
+        translation: "at that time, everyone called me _Little Lao_. Now that I happen to live in this place [Xiaolao Village], can it be a mere coincidence? He accumulated merit and built up virtue to open a"
+        translator_note: "Xiao Lao Zi is 'Little Lao'"
 
       - id: 6
         elevation: 0
         is_interlinear: false
-        text_zh: "基裕後倫愿艱難曰來自艱難者可以父其以綿吾世乎公始"
-        translation: "—the foundations to benefit future generations. Regarding the hardships, he said, 'Those who come from hardship can truly act as fathers to the clan; let this be the way to continue our lineage.' The Ancestor first—"
+        text_zh: "基裕後倫厯艱難曰來自艱難者可以久其以綿吾世乎公始"
+        translation: "foundation of abundance for future generations. Having experienced great hardships, he said, 'That which comes from hardship can endure. May this sustain our lineage forever!'"
 
       - id: 7
         elevation: 0
         is_interlinear: false
         text_zh: "居小勞村祀公為大宗配新會宗氏賢淑慈柔生子永安女"
-        translation: "—settled in Xiaolao Village. He is enshrined as the Great Progenitor. His wife, Lady Zong of Xinhui, was virtuous and gentle. They had a son, Yong'an, and a daughter—"
+        translation: "He was the first to reside in Xiaolao Village and is worshipped as the Great Ancestor. His wife was Lady Song from Xinhui, who was virtuous, kind and gentle. They had a son, Yong'an, and a daughter."
 
       - id: 8
         elevation: 0
         is_interlinear: false
-        text_zh: "一適大良羅公本以避亂至勞村及定恩祖父塋基率子累"
-        translation: "—who married Mr. Luo of Daliang. He originally came to Lao Village to escape chaos. Once settled, he tended to the ancestral graves and, leading his son, repeatedly—"
+        text_zh: "一適大良羅公本以避亂至勞村及定思祖父塋基率子累"
+        translation: "The daughter married Lord Luo of Daliang. Having moved to Lao Village to avoid chaos, when things settled, thinking of his grandfather's grave foundation, he led his son to repeatedly go back and search for it."
+        translator_note: "Daliang (大良) is modern-day Shunde"
 
       - id: 9
         elevation: 0
         is_interlinear: false
         text_zh: "覓為世亂改變莫識所在公生元至正元年辛巳正月初二"
-        translation: "—sought the original sites which had been obscured by the changes of the era's turmoil. The Ancestor was born in the 1st year of the Zhizheng era of the Yuan dynasty (1341), on the 2nd day of the 1st lunar month."
+        translation: "However, due to the turmoil of the times, the landscape had changed and the location could not be recognized. The Ancestor was born in the 1st year, a Xinsi year, of the Zhizheng era of the Yuan Dynasty (1341), on the 2nd day of the 1st lunar month."
         map_data:
           event_date: "1341-02-18"
           event_type: "birth"
-          location_name: "Not specified"
+          location_name: "Dongshan"
+          lat: 23.1291
+          lng: 113.2644
 
-  - page_id: "img_03"
+  - page_id: "img_05"
     metadata:
-      image_file: "img_03.webp"
-      physical_page_number: "2"
-      title: "Lineage Naming Traditions"
-      marginalia:
-        - position: "top_left"
-          text: "二"
-          note: "Physical page index"
-    columns:
-      - id: 1
-        elevation: 0
-        is_interlinear: false
-        text_zh: "宗派源流"
-        translation: "Origins of the Clan Branches"
-
-      - id: 2
-        elevation: 0
-        is_interlinear: false
-        text_zh: "允彥式其用景和茂卓昇紹光昭偉遇今緒永登成"
-        translation: "Yun, Yan, Shi, Qi, Yong, Jing, He, Mao, Zhuo, Sheng, Shao, Guang, Zhao, Wei, Yu, Jin, Xu, Yong, Deng, Cheng."
-        translator_note: "This is a generation poem (辈分诗). Each character represents a generation, used in the given names of descendants to indicate their rank in the lineage hierarchy."
-
-      - id: 3
-        elevation: 0
-        is_interlinear: false
-        text_zh: "建德崇修廣邦家顯遂之英良隆遠業萬世大章維"
-        translation: "Jian, De, Chong, Xiu, Guang, Bang, Jia, Xian, Sui, Zhi, Ying, Liang, Long, Yuan, Ye, Wan, Shi, Da, Zhang, Wei."
-        translator_note: "The continuation of the poem, emphasizing virtues like building merit (Jian-de) and magnifying the family state (Guang-bang-jia)."
-
-      - id: 4
-        elevation: 0
-        is_interlinear: false
-        text_zh: "以上四十字允字與建字同派德字與彥字同派餘做此每"
-        translation: "In the forty characters above: the generation 'Yun' is equivalent to 'Jian', and 'De' is equivalent to 'Yan'. The rest follow this pattern."
-        translator_note: "This note explains a synchronization between different sub-branches of the clan who might use different naming poems but are genealogically equivalent."
-
-      - id: 5
-        elevation: 0
-        is_interlinear: false
-        text_zh: "派定兩個字以便避祖父父及外祖舅父之當避者"
-        translation: "Each generation is assigned two possible characters to facilitate the avoidance of naming taboos (Hui) involving ancestors, fathers, or maternal uncles."
-        translator_note: "Naming taboos were strictly observed; a child could not share a name with a senior relative. Providing two options per generation gave the family flexibility."
-
-  - page_id: "img_04"
-    metadata:
-      image_file: "img_04.webp"
-      physical_page_number: "8"
+      image_file: "img_05.webp"
+      physical_page_number: "4"
       title: "Biographies of 2nd and 3rd Generation Ancestors"
       marginalia:
         - position: "top_left"

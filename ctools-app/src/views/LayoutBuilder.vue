@@ -305,7 +305,7 @@ if (data.value.length === 0) addTabSet()
                                                      <button @click="removeCol(row, cIdx)" class="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"><Trash2 class="w-3 h-3" /></button>
                                                  </div>
 
-                                                 <span class="text-2xl font-black text-slate-200 dark:text-slate-700 group-hover/col:text-indigo-200 dark:group-hover/col:text-indigo-800 select-none">{{ col.width }}</span>
+                                                 <span class="text-2xl font-black text-slate-500 dark:text-slate-600 group-hover/col:text-indigo-200 dark:group-hover/col:text-indigo-800 select-none">{{ col.width }}</span>
                                                  <input v-model="col.name" class="w-full text-center bg-transparent text-[10px] font-bold text-slate-500 border-none p-0 focus:ring-0" />
                                             </div>
 

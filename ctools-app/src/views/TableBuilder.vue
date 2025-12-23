@@ -335,7 +335,7 @@ const generateNestedLoop = (levelIdx: number): string => {
 
         <!-- Right Panel: Code -->
         <!-- Right Panel: Code -->
-        <div class="w-full md:w-1/2 flex flex-col relative border-l border-slate-200 dark:border-slate-800 shadow-2xl z-20">
+        <div class="w-full md:w-1/3 flex flex-col relative border-l border-slate-200 dark:border-slate-800 shadow-2xl z-20">
              <CodeOutputPanel title="Generated Code" :code="scriptOutput">
 
              </CodeOutputPanel>

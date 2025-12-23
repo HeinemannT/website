@@ -31,12 +31,12 @@ const emit = defineEmits<{
             </div>
 
             <!-- Content -->
-            <div class="flex-1 overflow-y-auto p-8 prose dark:prose-invert prose-sm max-w-none">
-                <p class="text-base text-slate-600 dark:text-slate-300">
+            <div class="flex-1 overflow-y-auto p-6 prose dark:prose-invert prose-sm max-w-none">
+                <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
                     CTools is a specialized suite of utilities designed to streamline the workflow for Corporater implementation consultants and developers.
                 </p>
                 
-                <div class="mt-8 space-y-8">
+                <div class="mt-4 space-y-4">
                     <div>
                         <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2">Changelog</h4>
                         <div class="space-y-4">

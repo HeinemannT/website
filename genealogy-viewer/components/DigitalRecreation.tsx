@@ -148,9 +148,12 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                         transition-all duration-300 pointer-events-auto cursor-pointer z-10
                         border-l border-stone-300/30 dark:border-zinc-700/50 dashed
                         ${index === 0 ? 'border-r border-stone-300/30 dark:border-zinc-700/50' : ''}
-                        ${isRaised ? 'pt-4 pb-12' : 'pt-24 pb-4'}
+                        pb-4
                         ${isActive ? 'bg-cinnabar/10 dark:bg-red-900/30' : ''}
                     `}
+                    style={{
+                      paddingTop: `${Math.max(0, 6 + (col.elevation * 2))}rem`
+                    }}
                   >
                     <div
                       className={`

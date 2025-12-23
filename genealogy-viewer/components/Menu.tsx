@@ -140,22 +140,19 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
           <div className="absolute inset-0 overflow-y-auto">
 
             {activeTab === 'toc' && data && (
-              <div className="p-4 grid grid-cols-2 md:grid-cols-2 gap-3">
+              <div className="flex flex-col min-h-full divide-y divide-stone-100 dark:divide-zinc-800/50">
                 {data.pages.map((page, idx) => (
                   <button
                     key={idx}
                     onClick={() => { onNavigate(idx); onClose(); }}
-                    className="text-left p-3 bg-white dark:bg-zinc-900 border border-stone-200 dark:border-zinc-800 rounded-md hover:border-cinnabar/50 dark:hover:border-red-900 hover:shadow-sm transition-all group flex flex-col h-full"
+                    className="flex items-center gap-4 px-6 py-3 hover:bg-stone-50 dark:hover:bg-zinc-800/50 transition-colors group text-left"
                   >
-                    <div className="flex justify-between items-center mb-1.5 pb-1.5 border-b border-stone-100 dark:border-zinc-800">
-                      <span className="text-[10px] font-bold text-stone-400 dark:text-zinc-500 uppercase tracking-widest">
-                        Page {page.metadata.physical_page_number || (idx + 1)}
-                      </span>
-                      <ChevronRight size={12} className="text-stone-300 dark:text-zinc-700 group-hover:text-cinnabar dark:group-hover:text-red-400" />
-                    </div>
-                    <div className="text-xs font-medium text-ink dark:text-zinc-300 line-clamp-3 leading-relaxed">
+                    <span className="font-mono text-xs font-bold text-stone-400 dark:text-zinc-500 w-16 group-hover:text-cinnabar dark:group-hover:text-red-400 transition-colors">
+                      {page.page_id}
+                    </span>
+                    <span className="text-sm font-medium text-ink dark:text-zinc-300 line-clamp-1 group-hover:text-stone-900 dark:group-hover:text-white transition-colors">
                       {page.metadata.title}
-                    </div>
+                    </span>
                   </button>
                 ))}
               </div>

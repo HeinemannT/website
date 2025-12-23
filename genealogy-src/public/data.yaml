@@ -35,12 +35,26 @@ migration:
       description: "Feng Shui Expansion. The family secures elite burial plots at 'Hundred Step Rock' on this sacred mountain to secure lineage prosperity."
       era: "Ming Dynasty"
 
+    - id: "dingan_refuge"
+      name: "Ding'an District (Refuge)"
+      year: 1435
+      coordinates: { lat: 22.7900, lng: 113.2900 }
+      description: "Survival. After his father's death, the young 4th Gen Zongxu flees local tyrants and hides with relatives in Ding'an (modern Ronggui/Guizhou area) to preserve the lineage."
+      era: "Ming Dynasty"
+
     - id: "guangzhou"
       name: "Shuangmendi, Guangzhou"
       year: 1450
       coordinates: { lat: 23.1255, lng: 113.2662 }
       description: "Commercial Rise. The 3rd Gen (Zhe) establishes the family as urban merchants, purchasing 15 shop-houses in the provincial capital's commercial hub."
       era: "Ming Dynasty"
+
+    - id: "shiwan"
+      name: "Shiwan (Foshan)"
+      year: 1640
+      coordinates: { lat: 23.0080, lng: 113.0800 }
+      description: "Marriage Expansion. 10th Gen Yingyun receives land at 'Pagoda Hill' (Baota Gang) in the ceramics hub of Shiwan as a gift from his wealthy son-in-law."
+      era: "Ming-Qing Transition"
 
     - id: "guangxi"
       name: "Guangxi Province"
@@ -54,6 +68,13 @@ migration:
       year: 1830
       coordinates: { lat: 29.3562, lng: 113.1290 }
       description: "Military Peak. 17th Gen Shangda serves as Naval Captain (4th Rank), marking the clan's height of imperial service."
+      era: "Qing Dynasty"
+
+    - id: "baiyun"
+      name: "Baiyun Mtn, Guangzhou"
+      year: 1846
+      coordinates: { lat: 23.1650, lng: 113.2950 }
+      description: "Peak Status. 18th Gen Yongzhao secures an elite burial plot at the 'Nine Dragons Gathering Qi' site next to Baiyun Temple, demonstrating high social standing."
       era: "Qing Dynasty"
 
     - id: "shunde_return"
@@ -81,9 +102,13 @@ migration:
     - { fromId: "nanxiong", toId: "yuping", year: 1341 }
     - { fromId: "yuping", toId: "xiaolao", year: 1379 }
     - { fromId: "xiaolao", toId: "xiqiao", year: 1424 }
+    - { fromId: "xiaolao", toId: "dingan_refuge", year: 1435 }
+    - { fromId: "dingan_refuge", toId: "xiaolao", year: 1445 } # He returns when he comes of age
     - { fromId: "xiaolao", toId: "guangzhou", year: 1450 }
+    - { fromId: "xiaolao", toId: "shiwan", year: 1640 }
     - { fromId: "guangzhou", toId: "guangxi", year: 1760 }
     - { fromId: "xiaolao", toId: "yuezhou", year: 1830 }
+    - { fromId: "xiaolao", toId: "baiyun", year: 1846 }
     - { fromId: "yuezhou", toId: "shunde_return", year: 1870 }
     - { fromId: "shunde_return", toId: "port_elizabeth", year: 1920 }
     - { fromId: "port_elizabeth", toId: "queenstown", year: 1955 }

@@ -24,13 +24,13 @@ interface GeneratorOutput {
 
 // --- State ---
 const rootParentId = ref('dashboards_colors_folder')
-const setName = ref('Status Colors')
-const setId = ref('StatusColors')
+const setName = ref('New Palette')
+const setId = ref('')
 
 const palette = ref<ColorStart[]>([
-    { id: 'color_ef4444', name: '#EF4444', hex: '#EF4444' },
-    { id: 'color_eab308', name: '#EAB308', hex: '#EAB308' },
-    { id: 'color_22c55e', name: '#22C55E', hex: '#22C55E' }
+    { id: '', name: 'Color Name', hex: '#EF4444' },
+    { id: '', name: 'Color Name', hex: '#EAB308' },
+    { id: '', name: 'Color Name', hex: '#22C55E' }
 ])
 
 const activeTab = ref<'studio' | 'generate' | 'import' | 'script'>('studio')
@@ -390,6 +390,14 @@ const processPaste = () => {
                                  <div class="absolute left-0 right-0 h-1.5 bg-white border border-slate-400 rounded-sm shadow-sm pointer-events-none -translate-y-1/2"
                                       :style="{ top: `${(currentHue / 360) * 100}%` }"></div>
                             </div>
+                        </div>
+
+                        <!-- Saturation Slider -->
+                        <div class="space-y-2 mb-6">
+                            <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <span>Saturation ({{ Math.round(currentSat) }}%)</span>
+                            </div>
+                            <input type="range" v-model.number="currentSat" min="0" max="100" @input="updateColorFromHsv" class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
                         </div>
 
                         <!-- Brightness Slider -->

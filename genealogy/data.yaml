@@ -62,15 +62,15 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "小勞村宗派源流（族部）"
-        translation: "Lineage Origins of Xiaolao Village (Clan Section)"
+        translation: "Lineage Origins of Xiaolao Village (Family Branch Section)"
         translator_note: "The main title on the cover page. Xiaolao refers to the village/lineage and is the main title of this genealogical history."
 
       - id: 2
         elevation: 1
         is_interlinear: false
         text_zh: "第三十二代小勞子冠斐紀錄"
-        translation: "Recorded by Guanfei, son of Xiaolao, of the 32nd Generation"
-        translator_note: "Guanfei is the compiler who transcribed this specific copy of the family record. Identifying as the 32nd generation provides a temporal anchor for the document's creation, likely in the late 19th or early 20th century."
+        translation: "Recorded by Guanfei, son of Xiaolao, of the 21st Generation"
+        translator_note: "Guanfei is the compiler who transcribed this specific copy of the family record. Identifying as the 21st generation provides a temporal anchor for the document's creation, likely in the late 19th or early 20th century."
   - page_id: "img_02"
     metadata:
       image_file: "img_02.webp"
@@ -92,32 +92,33 @@ pages:
         is_interlinear: false
         text_zh: "三界廟頂椿長聯 勞熈載作"
         translation: "The Long Couplet atop the Sanjie (Three Realms) Temple, composed by Lao Xizai."
-        translator_note: "Lao Xizai is likely a prominent scholar or ancestor of the clan."
+        translator_note: "A Couplet (Duilian 對聯) is a fundamental form of Chinese poetry, balancing length, grammar, tone and meaning."
 
       - id: 3
         elevation: 0
         is_interlinear: false
         text_zh: "在昔西粵黌宮一介為儒耳數十年亦羈養就即登般若之臺"
-        translation: "In the past at the academy of Western Yue (Guangdong), serving as a scholar for decades, enduring hardship only to eventually ascend the Platform of Prajna (wisdom)."
+        translation: "In the past at the academy of Western Yue, he was but a single Confucian scholar. Over decades, he cultivated the composure of a 'Wooden Chicken', only to eventually ascend the Platform of Prajna."
+        translator_note: "Western Yue refers to Guangxi. Since these terms are relative, it might however refer to the Xinhui/Western Pearl River Delta. *Wooden Chicken* (木鷄): A famous idiom from the Daoist text Zhuangzi. A king wanted a fighting cock trained to be invincible. He kept asking the trainer if the bird was ready.  10 days: 'Not yet. He is vain and arrogant.'  20 days: 'Not yet. He reacts to every sound and shadow.'  30 days: 'Not yet. He looks angry and aggressive.'  Final day: 'He is ready. When he stands there, he resembles a Wooden Chicken.'  *The Platform of Prajna* (般若台) is a Buddhist term for enlightenment or wisdom."
 
       - id: 4
         elevation: -1
         is_interlinear: false
         text_zh: "始知學問思辨中自具本來面目"
-        translation: "Only then did I realize that within the process of learning, questioning, and reflecting, one's true original nature is found."
+        translation: "Only then did he realize that within the process of learning, questioning, and reflecting, one's true original nature is found."
 
       - id: 5
         elevation: -1
         is_interlinear: false
         text_zh: "直從仁義禮智内認出上界鬚眉"
-        translation: "By directly recognizing the virtues of benevolence, righteousness, propriety, and wisdom, one reveals the noble character (lit. 'brows and beard') of the upper realms."
+        translation: "By directly recognizing the virtues of *Benevolence*, *Righteousness*, *Propriety*, and *Wisdom*, he recognized the noble character (lit. 'brows and beard') of the upper realms."
 
       - id: 6
         elevation: 0
         is_interlinear: false
         text_zh: "於今高陽廟貌四方稱聖焉百千載玉關長輝共證真如之座"
-        translation: "Now, the appearance of the Gaoyang Temple is revered as sacred by all directions; for thousands of years, the Jade Pass shall shine forever, together witnessing the seat of True Suchness (Tathatā)."
-        translator_note: "'Gaoyang' (高陽) is a common ancestral choronym (hall name) for the Lao surname, tracing their origins back to the legendary Emperor Zhuanxu."
+        translation: "Today, in the Gaoyang Temple, he is proclaimed a Sage by all in the four directions. For hundreds and thousands of years, the Jade Palace shines eternally, witnessing together the seat of Tathata."
+        translator_note: "'Gaoyang' (高陽) is a common ancestral choronym (hall name) for the Lao surname, tracing the origins back to the legendary Emperor Zhuanxu."
   - page_id: "img_03"
     metadata:
       image_file: "img_03.webp"

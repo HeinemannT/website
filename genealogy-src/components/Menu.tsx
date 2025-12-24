@@ -135,7 +135,7 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
                     onClick={() => { onNavigate(idx); onClose(); }}
                     className="flex items-baseline w-full gap-2 py-2 group text-left hover:bg-stone-50 dark:hover:bg-zinc-800/50 rounded-md -mx-2 px-2 transition-colors"
                   >
-                    <span className="text-sm font-medium text-ink dark:text-zinc-200 flex-1 font-serif-tc text-left">
+                    <span className="text-sm font-medium text-ink dark:text-zinc-200 font-serif-tc text-left">
                       {page.metadata.title}
                     </span>
 

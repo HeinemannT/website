@@ -330,16 +330,19 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
         <div
           className={`
             fixed z-[60] bg-white dark:bg-zinc-800 border border-stone-200 dark:border-zinc-700 shadow-xl rounded-md p-3 text-sm animate-in fade-in zoom-in-95 duration-200
-            ${isMobile
-              ? 'bottom-20 left-4 right-4 mx-auto w-auto max-w-sm' // Mobile: Snack bar style above nav
-              : 'w-64 transform -translate-x-1/2 -translate-y-full pointer-events-none' // Desktop: Floating
-            }
+            transform -translate-x-1/2 -translate-y-full
+            ${isMobile ? 'max-w-[90vw] w-auto' : 'w-64 pointer-events-none'}
           `}
-          style={!isMobile ? {
-            left: tooltip.x,
-            top: tooltip.y - 8
-          } : undefined}
-          onClick={(e) => e.stopPropagation()} // Allow clicking inside tooltip without closing on mobile
+          style={{
+            left: isMobile ? '50%' : tooltip.x, // Mobile: Center horizontally
+            top: tooltip.y - 8, // Both: Position above the text
+            // Mobile Specific override if needed, but centering on screen horizontally is safer for long definitions than following exact X
+            ...(isMobile ? { left: '50%', transform: 'translate(-50%, -100%)' } : {})
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            // On mobile, allow clicking inside (e.g. to copy?), but we also have a close button
+          }}
         >
           <div className="flex justify-between items-baseline mb-1 border-b border-stone-100 dark:border-zinc-700 pb-1">
             <span className="font-bold font-serif-tc text-ink dark:text-zinc-100">{tooltip.term.term}</span>
@@ -356,10 +359,8 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
           <p className="text-stone-600 dark:text-zinc-400 text-xs leading-relaxed">
             {tooltip.term.definition}
           </p>
-          {/* Arrow (Desktop Only) */}
-          {!isMobile && (
-            <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-white dark:border-t-zinc-800"></div>
-          )}
+          {/* Arrow */}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-white dark:border-t-zinc-800"></div>
         </div>
       )}
 

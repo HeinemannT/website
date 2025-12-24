@@ -79,3 +79,57 @@ people:
     name_en: "Xianci"
     generation: 7
     page_ref: "img_10"
+    children: ["gen8_gap"]
+
+  - id: "gen8_gap"
+    name_zh: "..."
+    name_en: "Gen 8-16 (Gap)"
+    title: "Records Lost/Fragmented"
+    generation: 8
+    children: ["gen17_shangda", "gen15_wenxian"]
+
+  - id: "gen15_wenxian"
+    name_zh: "文顯"
+    name_en: "Wenxian"
+    title: "The Lost Branch (Guangxi)"
+    generation: 15
+
+  - id: "gen17_shangda"
+    name_zh: "尚達"
+    name_en: "Shangda"
+    title: "Naval Captain (4th Rank)"
+    generation: 17
+    children: ["gen18_yongzhao"]
+
+  - id: "gen18_yongzhao"
+    name_zh: "永照"
+    name_en: "Yongzhao"
+    title: "Lord Xiulin (?) - Burial at Baiyun"
+    generation: 18
+    page_ref: "img_34"
+    children: ["gen19_guozhi"]
+
+  - id: "gen19_guozhi"
+    name_zh: "國治"
+    name_en: "Guozhi"
+    title: "Pingpo / 6th Rank Official"
+    generation: 19
+    page_ref: "img_35"
+    children: ["gen20_zhenbang", "gen20_zhenmeng", "gen20_zhenbei"]
+
+  - id: "gen20_zhenbang"
+    name_zh: "鎮邦"
+    name_en: "Zhenbang"
+    title: "Migrated to South Africa"
+    generation: 20
+    page_ref: "img_36"
+
+  - id: "gen20_zhenmeng"
+    name_zh: "鎮孟"
+    name_en: "Zhenmeng"
+    generation: 20
+
+  - id: "gen20_zhenbei"
+    name_zh: "鎮盃"
+    name_en: "Zhenbei"
+    generation: 20

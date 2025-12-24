@@ -55,6 +55,16 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
     const peopleMap: Map<string, FamilyMember> = new Map(data.people.map((p: FamilyMember) => [p.id, p]));
 
     // Recursive Tree Renderer
+    // Auto-scroll to root on load
+    useEffect(() => {
+        if (!isLoading && data && data.root_id) {
+            const rootElement = document.getElementById(`node-${data.root_id}`);
+            if (rootElement) {
+                rootElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            }
+        }
+    }, [isLoading, data]);
+
     const renderNode = (id: string, depth: number = 0) => {
         const person = peopleMap.get(id);
         if (!person) return null;
@@ -65,6 +75,7 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
             <div key={id} className="flex flex-col items-center">
                 {/* Node Card */}
                 <div
+                    id={`node-${id}`} // ID for scrolling
                     onClick={() => person.page_ref && onNavigate(person.page_ref)}
                     className={`
                         relative p-5 rounded-sm border transition-all duration-300 group
@@ -104,21 +115,7 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
                 {/* Children Container */}
                 {hasChildren && (
                     <div className="flex flex-nowrap gap-8 relative pt-4">
-                        {/* Horizontal Connector Bar */}
-                        {/* We use specific logic: line spans from center of first child to center of last child */}
-                        {person.children!.length > 1 && (
-                            <div className="absolute top-0 left-0 right-0 h-px bg-stone-300 dark:bg-zinc-700 mx-auto w-[calc(100%-160px)]"
-                                style={{
-                                    /* This is an approximation. Ideally, we calculate exact widths.
-                                       However, a simpler consistent 'bracket' look is often achieved by 
-                                       putting top-borders on children containers except single ones.
-                                       Let's try a different CSS approach below instead of this absolute bar. 
-                                    */
-                                    display: 'none' // Disabling this for the CSS-based approach below
-                                }}>
-                            </div>
-                        )}
-
+                        {/* Horizontal Connector Bar moved to CSS logic in renderNode loop */}
                         {person.children!.map((childId, index, arr) => {
                             const isFirst = index === 0;
                             const isLast = index === arr.length - 1;
@@ -164,3 +161,4 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
 };
 
 export default FamilyTree;
+

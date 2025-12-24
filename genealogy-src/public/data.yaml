@@ -1293,7 +1293,7 @@ pages:
         elevation: -3
         is_interlinear: false
         text_zh: "世應運字昌際號紫浮景玉公子邑庠生萬曆二十三年乙未十月"
-        translation: "**10th Generation: Yingyun**, courtesy name Changji, art name Zifu, was the son of Lord Jing-yu. He was a County Student (Xiangsheng). He was born in the 10th lunar month of the 23rd year of Wanli (1595), an Yiwei year."
+        translation: "**10th Generation: Yingyun**, courtesy name Changji, art name Zifu, was the son of Lord Jing-yu. He was a County Student (Xiangsheng). He was born in the 10th lunar month of the 23rd year of Wanli (1595), an Yiwei year..."
         map_data:
           event_date: "1595-11-01"
           event_type: "birth"
@@ -1302,13 +1302,13 @@ pages:
     metadata:
       image_file: "img_17.webp"
       physical_page_number: 17
-      title: "Biography of Yingyun (Continued) and Yingxi (10th Generation)"
+      title: "Biography of Yingyun (Continued) and Land Dispute History"
     columns:
       - id: 1
         elevation: 0
         is_interlinear: false
         text_zh: "初四戌時配馬村黃念聳女生萬曆二十三年乙未四月十八"
-        translation: "...on the 4th day at the Xushi hour. He married the daughter of Huang Niansong of Macun, who was born on the 18th day of the 4th lunar month in the 23rd year of Wanli (1595), an Yiwei year..."
+        translation: "...on the 4th day at the Xushi hour. He married the daughter of Huang Niansong from Ma Village, born on the 18th day of the 4th lunar month in the 23rd year of Wanli (1595), an Yi-wei year"
         map_data:
           event_date: "1595-05-26"
           event_type: "spouse_birth"
@@ -1320,7 +1320,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "日酉時子四聖世禪世持世淑世女二長適南海石頭邑"
-        translation: "...at the Youshi hour. They had four sons: Shengshi, Chanshi, Chishi, and Shushi; and two daughters. The eldest married into Shitou [village] in Nanhai..."
+        translation: "at the Youshi hour. They had four sons: Sheng-shi, Chan-shi, Chi-shi, and Shu-shi; and two daughters. TThe eldest married into the Huo family of Shitou, Nanhai, who was a student"
         map_data:
           event_type: "marriage_location"
           location_name: "Shitou, Nanhai"
@@ -1331,19 +1331,16 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "庠霍應生次適黃麻涌吳昂霄公終康熙七年戊申五月十"
-        translation: "...to Xiangsheng Huo Yingsheng. The second married Lord Wu Angxiao of Huangmachong. The Lord [Yingyun] died on the 12th day of the 5th lunar month in the 7th year of Kangxi (1668), a Wushen year..."
+        translation: "...his name Huo Yingsheng. The second daughter married Wu Angxiao of Huangmachong. The Lord died on the 12th day of the 5th lunar month in the 7th year of Kangxi (1668), a Wu-shen year"
         map_data:
           event_date: "1668-06-20"
           event_type: "death"
-          location_name: "Huangmachong"
-          lat: 22.9806
-          lng: 113.1583
 
       - id: 4
         elevation: 0
         is_interlinear: false
         text_zh: "二戌時壽七十四配終康熙七年戊申正月初九未時壽七"
-        translation: "...at the Xushi hour, aged seventy-four. His wife died on the 9th day of the 1st lunar month in the 7th year of Kangxi (1668), a Wushen year, at the Weishi hour, aged..."
+        translation: "at the Xu-shi hour, aged seventy-four. His wife died on the 9th day of the 1st lunar month in the same 7th year of Kangxi (1668), at the Wei-shi hour"
         map_data:
           event_date: "1668-02-21"
           event_type: "spouse_death"
@@ -1352,7 +1349,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "十四合莖石灣寶塔岡坐坤向艮之原此山地係長女婿霍"
-        translation: "...seventy-four. They were buried together at Baotagang in Shiwan, on the plain sitting in the Kun position and facing Gen. This mountain land was a gift from his eldest son-in-law Huo..."
+        translation: "She lived to be seventy-four. They were buried together at Baotagang in Shiwan, on the plain sitting in the Kun position and facing Gen (Northeast).  This burial land was gifted by his eldest son-in-law, Huo"
         map_data:
           event_type: "burial"
           location_name: "Baotagang, Shiwan"
@@ -1363,31 +1360,31 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "應生所送天啟中土豪張某夥占太祖沙咀公捐貲為費用"
-        translation: "...Yingsheng. During the Tianqi era, a certain local bully named Zhang and his gang occupied the ancestral land at Shazui. The Lord donated funds to cover expenses..."
+        translation: "Yingsheng. During the Tianqi era, a certain local tyrant named Zhang and his gang occupied the ancestral land at Shazui. The Lord donated funds to cover expenses"
 
       - id: 7
         elevation: 0
         is_interlinear: false
         text_zh: "與洪漢公奔走不倦竭力支持卒復前業縣主金貴黃公詳"
-        translation: "...and worked tirelessly with Lord Honghan, providing full support until the ancestral property was finally recovered. The County Magistrate, Lord Huang of Jingui, submitted a report..."
+        translation: "and worked tirelessly with Lord Honghan to support [the lawsuit], eventually recovering the original property The District Magistrate, Huang Jingui, submitted the details"
 
       - id: 8
         elevation: 0
         is_interlinear: false
         text_zh: "至布政使司審斷定案今警業庚流沙是也"
-        translation: "...to the Provincial Administration Commission, which delivered the final judgment. The property currently held, Gengliusha, is that very land."
+        translation: "to the Provincial Administration Commission, which delivered the final judgment. The current ritual property at Gengliu Shayuan is the result of this victory."
 
       - id: 9
         elevation: -2
         is_interlinear: true
         text_zh: "應錫 字昌禧 號瑞廷 肯玉公子生"
-        translation: "**Yingxi**, courtesy name Changxi, art name Ruiting. Son of Lord Ken-yu [Adopted]. Born..."
+        translation: "**Yingxi**, courtesy name Changxi, art name Ruiting. He was the son of Lord Kenyu. He was born on the 6th day of the 12th lunar month in an Yi-you year"
 
       - id: 10
         elevation: 0
         is_interlinear: true
         text_zh: "年已酉十二月初六日申"
-        translation: "...in the year Jiyou (1609), on the 6th day of the 12th lunar month, at the Shen[shi hour]."
+        translation: "at the Shen-shi hour. They had two sons."
         map_data:
           event_date: "1610-01-30"
           event_type: "birth"

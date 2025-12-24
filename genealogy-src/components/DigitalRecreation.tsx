@@ -3,7 +3,7 @@ import { ContentColumn, MarginaliaItem, GlossaryTerm } from '../types';
 import { X, Globe } from 'lucide-react';
 import { useDraggableScroll } from '../hooks/useDraggableScroll';
 import { marked } from 'marked';
-import SmartText from './SmartText';
+// Removed unused SmartText import
 
 interface DigitalRecreationProps {
   columns: ContentColumn[];
@@ -27,6 +27,10 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
 }) => {
   const [mobileSelectedId, setMobileSelectedId] = useState<number | null>(null);
   const dragProps = useDraggableScroll();
+
+  // Extract constants to avoid re-creation
+  const NOISE_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.3'/%3E%3C/svg%3E")`;
+  const GRAIN_GRADIENT = 'linear-gradient(to left, #A63434 1px, transparent 1px)';
 
   const handleColumnClick = (id: number) => {
     // Enable selection on both mobile and desktop
@@ -102,14 +106,14 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
               <div className="absolute inset-0 pointer-events-none opacity-40 dark:hidden mix-blend-multiply"
                 style={{
                   filter: 'contrast(1.1) brightness(0.98)',
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.3'/%3E%3C/svg%3E")`
+                  backgroundImage: NOISE_SVG
                 }}>
               </div>
 
               {/* Paper Grain Lines */}
               <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
                 style={{
-                  backgroundImage: 'linear-gradient(to left, #A63434 1px, transparent 1px)',
+                  backgroundImage: GRAIN_GRADIENT,
                   backgroundSize: '40px 100%'
                 }}>
               </div>
@@ -201,7 +205,7 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                 </span>
               </div>
               <div className="font-body text-lg leading-relaxed text-ink dark:text-zinc-200"
-                dangerouslySetInnerHTML={{ __html: marked.parse(selectedColumn.translation) as string }}
+                dangerouslySetInnerHTML={{ __html: React.useMemo(() => marked.parse(selectedColumn.translation) as string, [selectedColumn.translation]) }}
               />
             </div>
           </div>

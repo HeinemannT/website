@@ -132,12 +132,6 @@ const TranslationParagraph = React.memo<{
                       Historical Record
                     </span>
                   </div>
-                  {/* Note: Map data details would go here if passed, but col.map_data usage requires passing it or extracting needed fields. 
-                      Since I'm memoizing, I should pass map data or just render a placeholder if I don't want to pass deeply. 
-                      Actually, I should pass map data if I want to show details. 
-                      However, the previous code showed event_type etc. 
-                      Let's check if 'col' is available. Yes, 'col' is passed to TranslationParagraph!
-                      So I can access col.map_data directly. */}
                   {col.map_data && (
                     <div className="flex flex-col gap-1.5 font-body">
                       <div className="flex justify-between items-baseline">

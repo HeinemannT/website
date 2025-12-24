@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DocumentMetadata } from '../types';
-import { Menu as MenuIcon, Moon, Sun, Type, Book, Search, FileText, Library, Code, Info } from 'lucide-react';
+import { Menu as MenuIcon, Moon, Sun, Type, Book, Search, FileText, Library, Code, Info, Network } from 'lucide-react';
 
 type Tab = 'toc' | 'search' | 'docs' | 'glossary' | 'source';
 
@@ -13,6 +13,8 @@ interface HeaderProps {
   onMenuToggle: () => void;
   onOpenTab: (tab: Tab) => void;
   activeTab: Tab;
+  viewMode: string;
+  setViewMode: (mode: any) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -23,7 +25,9 @@ const Header: React.FC<HeaderProps> = ({
   setFontSize,
   onMenuToggle,
   onOpenTab,
-  activeTab
+  activeTab,
+  viewMode,
+  setViewMode
 }) => {
   const [isFontMenuOpen, setIsFontMenuOpen] = useState(false);
   const fontMenuRef = useRef<HTMLDivElement>(null);
@@ -255,6 +259,19 @@ const Header: React.FC<HeaderProps> = ({
             </button>
           ))}
 
+          {/* Tree View (View Mode) */}
+          <button
+            onClick={() => setViewMode('tree')}
+            className={`sidebar-icon-btn group relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
+                      ${viewMode === 'tree'
+                ? 'bg-cinnabar text-white shadow-md'
+                : 'text-stone-500 dark:text-zinc-400 hover:text-stone-800 dark:hover:text-zinc-200 hover:bg-stone-50 dark:hover:bg-zinc-900'}
+                   `}
+            title="Family Tree"
+          >
+            <Network size={20} className={viewMode === 'tree' ? 'text-white' : ''} />
+          </button>
+
         </div>
 
         {/* Flexible Spacer */}
@@ -276,7 +293,7 @@ const Header: React.FC<HeaderProps> = ({
           </button>
 
         </div>
-      </aside>
+      </aside >
     </>
   );
 };

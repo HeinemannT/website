@@ -37,10 +37,10 @@ const TranslationParagraph = React.memo<{
   hasAnyNote: boolean;
   hasTranslatorNote: boolean;
   hasRecord: boolean;
-  itemRef: (el: HTMLDivElement | null) => void;
+  registerRef: (id: number, el: HTMLDivElement | null) => void;
 }>(({
   col, isActive, isNoteExpanded, isMobile, fontSize, htmlContent, translatorNoteHtml,
-  onHover, onClick, onToggleNote, hasAnyNote, hasTranslatorNote, hasRecord, itemRef
+  onHover, onClick, onToggleNote, hasAnyNote, hasTranslatorNote, hasRecord, registerRef
 }) => {
 
   const getTextSizeClass = () => {
@@ -53,7 +53,7 @@ const TranslationParagraph = React.memo<{
 
   return (
     <div
-      ref={itemRef}
+      ref={(el) => registerRef(col.id, el)}
       onMouseEnter={() => !isMobile && onHover(col.id)}
       onMouseLeave={() => !isMobile && onHover(null)}
       onClick={(e) => onClick(e, col.id)}
@@ -173,6 +173,12 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
 
   // Tooltip State
   const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, term: null });
+
+  // Stable callback for registering refs
+  const registerRef = React.useCallback((id: number, el: HTMLDivElement | null) => {
+    if (el) itemRefs.current.set(id, el);
+    else itemRefs.current.delete(id);
+  }, []);
 
   useEffect(() => {
     // Only auto-scroll on desktop when hovering the script side
@@ -454,10 +460,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
               hasAnyNote={hasAnyNote}
               hasTranslatorNote={hasTranslatorNote}
               hasRecord={hasRecord}
-              itemRef={(el) => {
-                if (el) itemRefs.current.set(col.id, el);
-                else itemRefs.current.delete(col.id);
-              }}
+              registerRef={registerRef}
             />
           );
         })}

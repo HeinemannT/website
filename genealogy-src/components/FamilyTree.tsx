@@ -151,7 +151,7 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
     };
 
     return (
-        <div className="w-full h-full overflow-auto bg-texture-paper p-12">
+        <div className="w-full h-full overflow-auto bg-texture-paper p-4 pb-32 md:p-12">
             <div className="min-w-max mx-auto flex flex-col items-center">
                 <div className="mb-4 flex items-center gap-2 text-stone-400 dark:text-zinc-500 uppercase tracking-widest text-xs">
                     <Network size={16} />

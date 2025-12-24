@@ -117,7 +117,40 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
     });
   };
 
-  const handleParagraphClick = (id: number) => {
+  const handleParagraphInteraction = (e: React.MouseEvent, id: number) => {
+    // Check if we clicked a glossary term
+    const target = e.target as HTMLElement;
+    const glossaryTerm = target.closest('.glossary-term');
+
+    if (glossaryTerm) {
+      e.stopPropagation();
+      const key = glossaryTerm.getAttribute('data-term-key');
+      if (key && termMap.has(key)) {
+        // Toggle if same, open if diff
+        const term = termMap.get(key)!;
+        if (tooltip.visible && tooltip.term?.term === term.term) {
+          setTooltip({ ...tooltip, visible: false });
+        } else {
+          const rect = glossaryTerm.getBoundingClientRect();
+          setTooltip({
+            visible: true,
+            x: rect.left + (rect.width / 2),
+            y: rect.top,
+            term: term
+          });
+        }
+      }
+      return; // STOP here, do not trigger paragraph selection
+    }
+
+    // Normal Paragraph Click
+    if (tooltip.visible) {
+      setTooltip({ ...tooltip, visible: false }); // Dismiss tooltip if clicking paragraph
+      return; // Optional: Decide if we want to open Original Text immediately or just dismiss tooltip first. User said "close it first", so maybe return?
+      // Let's just dismiss tooltip and NOT open original text if tooltip was open. 
+      // This feels safer for "Close it first".
+    }
+
     if (isMobile) {
       setSelectedMobileId(id);
     }
@@ -140,30 +173,48 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
       {/* Tooltip Portal/Overlay */}
       {tooltip.visible && tooltip.term && (
         <div
-          className="fixed z-50 w-64 bg-white dark:bg-zinc-800 border border-stone-200 dark:border-zinc-700 shadow-xl rounded-md p-3 text-sm pointer-events-none animate-in fade-in zoom-in-95 duration-200"
-          style={{
+          className={`
+            fixed z-[60] bg-white dark:bg-zinc-800 border border-stone-200 dark:border-zinc-700 shadow-xl rounded-md p-3 text-sm animate-in fade-in zoom-in-95 duration-200
+            ${isMobile
+              ? 'bottom-20 left-4 right-4 mx-auto w-auto max-w-sm' // Mobile: Snack bar style above nav
+              : 'w-64 transform -translate-x-1/2 -translate-y-full pointer-events-none' // Desktop: Floating
+            }
+          `}
+          style={!isMobile ? {
             left: tooltip.x,
-            top: tooltip.y - 8,
-            transform: 'translate(-50%, -100%)'
-          }}
+            top: tooltip.y - 8
+          } : undefined}
+          onClick={(e) => e.stopPropagation()} // Allow clicking inside tooltip without closing on mobile
         >
           <div className="flex justify-between items-baseline mb-1 border-b border-stone-100 dark:border-zinc-700 pb-1">
             <span className="font-bold font-serif-tc text-ink dark:text-zinc-100">{tooltip.term.term}</span>
             <span className="text-cinnabar text-xs opacity-80">{tooltip.term.zh}</span>
+            {isMobile && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setTooltip({ ...tooltip, visible: false }); }}
+                className="ml-2 -mr-1 p-1 text-stone-400"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
           <p className="text-stone-600 dark:text-zinc-400 text-xs leading-relaxed">
             {tooltip.term.definition}
           </p>
-          {/* Arrow */}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-white dark:border-t-zinc-800"></div>
+          {/* Arrow (Desktop Only) */}
+          {!isMobile && (
+            <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-white dark:border-t-zinc-800"></div>
+          )}
         </div>
       )}
 
       {/* Scrollable Content */}
       <div
         ref={scrollRef}
-        onMouseOver={handleInteraction}
         className="flex-1 overflow-y-auto px-5 md:px-12 py-10 space-y-6 scroll-smooth"
+        // Desktop Hover Handling
+        onMouseOver={!isMobile ? handleInteraction : undefined}
+      // Mobile Interactions are handled via click delegation in the paragraphs
       >
 
         {/* SUMMARY SECTION - Compact Design */}
@@ -255,7 +306,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
               }}
               onMouseEnter={() => !isMobile && onColumnHover(col.id)}
               onMouseLeave={() => !isMobile && onColumnHover(null)}
-              onClick={() => handleParagraphClick(col.id)}
+              onClick={(e) => handleParagraphInteraction(e, col.id)}
               className="relative cursor-pointer group"
             >
               <div className={`

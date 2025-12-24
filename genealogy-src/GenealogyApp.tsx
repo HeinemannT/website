@@ -254,7 +254,7 @@ const GenealogyApp: React.FC = () => {
   const currentPage = data.pages[currentPageIndex];
 
   return (
-    <div className={`${isDarkMode ? 'dark' : ''} h-screen flex flex-col transition-colors duration-500 overflow-hidden`}>
+    <div className={`${isDarkMode ? 'dark' : ''} h-[100dvh] flex flex-col transition-colors duration-500 overflow-hidden`}>
       <div className="flex flex-col h-full bg-paper dark:bg-zinc-950 text-ink dark:text-zinc-200 font-sans pt-16 lg:pt-0 lg:pl-16 transition-all duration-300">
 
         <Header
@@ -300,7 +300,7 @@ const GenealogyApp: React.FC = () => {
               />
             </div>
 
-            <div className="flex-1 overflow-hidden relative flex items-center justify-center bg-texture-paper">
+            <div className="flex-1 overflow-hidden relative flex items-center justify-center bg-texture-paper pb-20 lg:pb-0">
               {/* VIEW 1: IMAGE */}
               {((!isMobile && desktopViewMode === 'image') || (isMobile && mobileViewMode === 'image')) && (
                 <ImagePanel
@@ -372,52 +372,31 @@ const GenealogyApp: React.FC = () => {
             </div>
           )}
 
-          {/* MOBILE BOTTOM NAVIGATION */}
-          <div className="lg:hidden absolute bottom-0 left-0 right-0 h-16 bg-white dark:bg-zinc-950 border-t border-stone-200 dark:border-zinc-800 flex items-center justify-around z-50 px-6 pb-2">
-            <button
-              onClick={() => setMobileViewMode('read')}
-              className={`flex flex-col items-center gap-1 p-2 transition-colors ${mobileViewMode === 'read' ? 'text-cinnabar dark:text-red-400' : 'text-stone-400 dark:text-zinc-600'}`}
-            >
-              <BookOpen size={20} />
-              <span className="text-[10px] font-medium tracking-wide">READ</span>
-            </button>
-            <button
-              onClick={() => setMobileViewMode('image')}
-              className={`flex flex-col items-center gap-1 p-2 transition-colors ${mobileViewMode === 'image' ? 'text-cinnabar dark:text-red-400' : 'text-stone-400 dark:text-zinc-600'}`}
-            >
-              <ImageIcon size={20} />
-              <span className="text-[10px] font-medium tracking-wide">ORIGINAL</span>
-            </button>
-            <button
-              onClick={() => setMobileViewMode('script')}
-              className={`flex flex-col items-center gap-1 p-2 transition-colors ${mobileViewMode === 'script' ? 'text-cinnabar dark:text-red-400' : 'text-stone-400 dark:text-zinc-600'}`}
-            >
-              <ScrollText size={20} />
-              <span className="text-[10px] font-medium tracking-wide">SCRIPT</span>
-            </button>
-            <button
-              onClick={() => setMobileViewMode('map')}
-              className={`flex flex-col items-center gap-1 p-2 transition-colors ${mobileViewMode === 'map' ? 'text-cinnabar dark:text-red-400' : 'text-stone-400 dark:text-zinc-600'}`}
-            >
-              <Map size={20} />
-              <span className="text-[10px] font-medium tracking-wide">MAP</span>
-            </button>
-
-            {/* NEW ICONS (WIP style) */}
-            <button
-              onClick={() => setMobileViewMode('tree')}
-              className={`flex flex-col items-center gap-1 p-2 transition-colors opacity-60 hover:opacity-100 ${mobileViewMode === 'tree' ? 'text-cinnabar dark:text-red-400' : 'text-stone-400 dark:text-zinc-600'}`}
-            >
-              <Network size={20} />
-              <span className="text-[10px] font-medium tracking-wide">TREE</span>
-            </button>
-            <button
-              onClick={() => setMobileViewMode('glossary')}
-              className={`flex flex-col items-center gap-1 p-2 transition-colors opacity-60 hover:opacity-100 ${mobileViewMode === 'glossary' ? 'text-cinnabar dark:text-red-400' : 'text-stone-400 dark:text-zinc-600'}`}
-            >
-              <BookA size={20} />
-              <span className="text-[10px] font-medium tracking-wide">CTX</span>
-            </button>
+          {/* MOBILE BOTTOM NAVIGATION - FIXED */}
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-zinc-950 border-t border-stone-200 dark:border-zinc-800 flex items-center justify-around z-[100] px-4 pb-1 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+            {[
+              { id: 'read', icon: BookOpen, label: 'READ' },
+              { id: 'image', icon: ImageIcon, label: 'SCAN' },
+              { id: 'script', icon: ScrollText, label: 'SCRIPT' },
+              { id: 'map', icon: Map, label: 'MAP' },
+              { id: 'tree', icon: Network, label: 'TREE' },
+              { id: 'glossary', icon: BookA, label: 'CTX' }
+            ].map((btn) => (
+              <button
+                key={btn.id}
+                onClick={() => setMobileViewMode(btn.id as MobileViewMode)}
+                className={`
+                  flex flex-col items-center gap-1 p-2 rounded-lg min-w-[3.5rem]
+                  active:bg-stone-50 dark:active:bg-zinc-900 transition-all duration-200 active:scale-95
+                  ${mobileViewMode === btn.id
+                    ? 'text-cinnabar dark:text-red-400'
+                    : 'text-stone-400 dark:text-zinc-600'}
+                `}
+              >
+                <btn.icon size={20} strokeWidth={mobileViewMode === btn.id ? 2.5 : 2} />
+                <span className="text-[9px] font-bold tracking-wider">{btn.label}</span>
+              </button>
+            ))}
           </div>
 
           {/* Mobile Floating Pagination */}
@@ -427,7 +406,7 @@ const GenealogyApp: React.FC = () => {
                 <button
                   disabled={currentPageIndex === 0}
                   onClick={() => setCurrentPageIndex(p => p - 1)}
-                  className="w-10 h-10 flex items-center justify-center text-stone-600 dark:text-zinc-300 hover:text-cinnabar border border-stone-200 dark:border-zinc-700 rounded-full bg-stone-50 dark:bg-zinc-800 disabled:opacity-30 disabled:hover:text-stone-600 transition-colors active:scale-95"
+                  className="w-10 h-10 flex items-center justify-center text-stone-600 dark:text-zinc-300 active:text-cinnabar border border-stone-200 dark:border-zinc-700 rounded-full bg-stone-50 dark:bg-zinc-800 disabled:opacity-30 transition-colors active:scale-95"
                 >
                   <span className="text-xl font-bold pb-1">‹</span>
                 </button>
@@ -439,7 +418,7 @@ const GenealogyApp: React.FC = () => {
                 <button
                   disabled={currentPageIndex === data.pages.length - 1}
                   onClick={() => setCurrentPageIndex(p => p + 1)}
-                  className="w-10 h-10 flex items-center justify-center text-stone-600 dark:text-zinc-300 hover:text-cinnabar border border-stone-200 dark:border-zinc-700 rounded-full bg-stone-50 dark:bg-zinc-800 disabled:opacity-30 disabled:hover:text-stone-600 transition-colors active:scale-95"
+                  className="w-10 h-10 flex items-center justify-center text-stone-600 dark:text-zinc-300 active:text-cinnabar border border-stone-200 dark:border-zinc-700 rounded-full bg-stone-50 dark:bg-zinc-800 disabled:opacity-30 transition-colors active:scale-95"
                 >
                   <span className="text-xl font-bold pb-1">›</span>
                 </button>

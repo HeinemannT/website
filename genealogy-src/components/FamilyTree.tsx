@@ -29,7 +29,10 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
 
     useEffect(() => {
         fetch('./family_tree.yaml')
-            .then(res => res.text())
+            .then(res => {
+                if (!res.ok) throw new Error(`Failed to load family_tree.yaml (${res.status})`);
+                return res.text();
+            })
             .then(text => {
                 const parsed = jsyaml.load(text) as TreeData;
                 if (!parsed || !Array.isArray(parsed.people)) {

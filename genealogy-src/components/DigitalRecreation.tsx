@@ -167,7 +167,7 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                           : 'text-2xl font-bold text-ink dark:text-zinc-200'}
                   `}
                     >
-                      <SmartText text={col.text_zh} terms={glossaryTerms} language="zh" />
+                      {col.text_zh}
                     </div>
                   </div>
                 );

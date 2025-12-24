@@ -25,7 +25,7 @@ migration:
       name: "Xiaolao Village (Shunde)"
       year: 1379
       coordinates: { lat: 22.9542, lng: 113.1023 }
-      description: "Founding of the Clan Seat. Yanzhong settles here at age 38, identifying the deep 'earth veins' (Feng Shui). This becomes the ancestral home."
+      description: "Founding of the Clan Seat. Yanzhong settles here at age 38, identifying the deep 'Earth Veins' (Feng Shui). This becomes the ancestral home."
       era: "Early Ming Dynasty"
 
     - id: "xiqiao"
@@ -250,7 +250,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "四方之志山林非吾志也年三十八而進勞村見其地脉深"
-        translation: "'_A man should have ambitions to reach the four corners of the world; to stay only in the mountain forests is not my ambition_'. At the age of thirty-eight, he traveled to Lao Village (Laocun) and saw the 'earth veins' there were deep and thick"
+        translation: "'_A man should have ambitions to reach the four corners of the world; to stay only in the mountain forests is not my ambition_'. At the age of thirty-eight, he traveled to Lao Village (Laocun) and saw the 'Earth Veins' there were deep and thick"
         translator_note: "**Earth Veins** is a Feng Shui term referring to geomantic energy - a recurring theme in the text"
         map_data:
           event_date: "1379-01-01"
@@ -467,7 +467,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "琮郡庠生曾孫紹科登嘉靖壬辰進士任四川提學公終宣德八"
-        translation: "Cong was a student of the district school. His great-grandson, Shaoke, passed the imperial exam in the Ren-chen year of Jiajing (1532) as a Jinshi and served as the Sichuan Commissioner of Education. The Lord died in the 8th year of Xuande (1433),"
+        translation: "Cong was a student of the Xiangsheng. His great-grandson, Shaoke, passed the imperial exam in the Ren-chen year of Jiajing (1532) as a Jinshi and served as the Sichuan Commissioner of Education. The Lord died in the 8th year of Xuande (1433),"
         translator_note: "This likely concludes the biography of the 3rd generation ancestor (Zhe) or his son's line."
         map_data:
           event_date: "1433-01-01"
@@ -518,7 +518,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "外鶴田沙等田共貳頃餘畝山墓正德四年已巳十二月十五壬"
-        translation: "and Waihetian Sha (Outer Crane Field), totaling over two qing of land, totaling over 2 qing of land (approx. 30 acres). The mountain grave [was established/re-interred? on the 15th day of the 12th lunar month in the 4th year of Zhengde (1509), a Ji-si year,"
+        translation: "and Waihetian Sha (Outer Crane Field), totaling over 2 qing of land (approx. 30 acres). The mountain grave [was established/re-interred? on the 15th day of the 12th lunar month in the 4th year of Zhengde (1509), a Ji-si year,"
 
       - id: 9
         elevation: 0
@@ -606,7 +606,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "善屬文年十五補邑庠生十八丁父憂時族勢寡弱公慷慨"
-        translation: "[He was] good at literatuire. At age fifteen, he became a county student (Xiangsheng). At eighteen, he mourned his father. At that time, the clan's influence was small and weak. The Lord was impassioned,"
+        translation: "[He was] good at literature. At age fifteen, he became a county student (Xiangsheng). At eighteen, he mourned his father. At that time, the clan's influence was small and weak. The Lord was impassioned,"
 
       - id: 2
         elevation: 0
@@ -767,7 +767,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "子與男女二長適鷺洲關文明三子次適張槎邑庠呂孺子"
-        translation: "...son and Yunan. Two daughters: the eldest married Guan Wenming, the third son [of his family] in Luzhou; the second married the government student Lyu Ruzi of Zhangcha."
+        translation: "...son and Yunan. Two daughters: the eldest married Guan Wenming, the third son [of his family] in Luzhou; the second married the Xiangsheng Lyu Ruzi of Zhangcha."
         map_data:
           event_type: "marriage_location"
           location_name: "Zhangcha, Foshan"
@@ -857,7 +857,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "長適黃連邑庠何師孔次適羊額何眷沖公終萬曆二十四"
-        translation: "The eldest daughter married He Shikong, a government student of Huanglian; the next married He Juan-chong of Yange. The Lord [Yuzi] died in the 24th year of Wanli (1596)..."
+        translation: "The eldest daughter married He Shikong, a Xiangsheng of Huanglian; the next married He Juan-chong of Yange. The Lord [Yuzi] died in the 24th year of Wanli (1596)..."
         map_data:
           event_type: "marriage_location"
           location_name: "Huanglian, Shunde"
@@ -1002,7 +1002,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "傳孫永兆在西省凱旋斬伐大松樹三十二株爭回原穴即"
-        translation: "...the 18th-generation descendant Yongzhao, upon returning home in victory from a military campaign in the Western Province [Guangxi], cut down thirty-two large pine trees to reclaim the original grave site..."
+        translation: "...the 18th-generation descendant Yongzhao, upon returning home in victory from a military campaign in Guangxi (Western Province), cut down thirty-two large pine trees to reclaim the original grave site..."
         map_data:
           event_date: "1858-01-01"
           event_type: "legal_dispute_resolution"
@@ -1276,7 +1276,7 @@ pages:
         elevation: -3
         is_interlinear: false
         text_zh: "世應運字昌際號紫浮景玉公子邑庠生萬曆二十三年乙未十月"
-        translation: "**10th Generation: Yingyun**, courtesy name Changji, art name Zifu, was the son of Lord Jing-yu. He was a government student. He was born in the 10th lunar month of the 23rd year of Wanli (1595), an Yiwei year."
+        translation: "**10th Generation: Yingyun**, courtesy name Changji, art name Zifu, was the son of Lord Jing-yu. He was a Xiangsheng. He was born in the 10th lunar month of the 23rd year of Wanli (1595), an Yiwei year."
         map_data:
           event_date: "1595-11-01"
           event_type: "birth"
@@ -1314,7 +1314,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "庠霍應生次適黃麻涌吳昂霄公終康熙七年戊申五月十"
-        translation: "...to government student Huo Yingsheng. The second married Lord Wu Angxiao of Huangmachong. The Lord [Yingyun] died on the 12th day of the 5th lunar month in the 7th year of Kangxi (1668), a Wushen year..."
+        translation: "...to Xiangsheng Huo Yingsheng. The second married Lord Wu Angxiao of Huangmachong. The Lord [Yingyun] died on the 12th day of the 5th lunar month in the 7th year of Kangxi (1668), a Wushen year..."
         map_data:
           event_date: "1668-06-20"
           event_type: "death"
@@ -1505,7 +1505,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "長適羊額何次適香山縣舉人李六吉子三適南海縣進士"
-        translation: "...the eldest married He of Yange; the next married the son of Li Liuji, a Juren [provincial graduate] of Xiangshan County; the third married a Jinshi [imperial graduate] of Nanhai County..."
+        translation: "...the eldest married He of Yange; the next married the son of Li Liuji, a Juren [Juren] of Xiangshan County; the third married a Jinshi [imperial graduate] of Nanhai County..."
         map_data:
           event_type: "marriage_location"
           location_name: "Yange, Shunde"
@@ -1707,7 +1707,7 @@ pages:
         elevation: -3
         is_interlinear: false
         text_zh: "十一世 聖世 字賡生 號鳴虞 國學生 察浮公長子生萬曆四十五年丁巳"
-        translation: "**11th Generation: Shengshi**. Courtesy name: Gengsheng. Art name: Mingyu. A student of the National Academy. Eldest son of Lord Chafu. Born in the 45th year of Wanli (1617), a Dingyi year..."
+        translation: "**11th Generation: Shengshi**. Courtesy name: Gengsheng. Art name: Mingyu. A student of the Guozijian. Eldest son of Lord Chafu. Born in the 45th year of Wanli (1617), a Dingyi year..."
         map_data:
           event_date: "1617-12-15"
           event_type: "birth"
@@ -1894,7 +1894,7 @@ pages:
       - id: 5
         elevation: 0
         text_zh: "坐丁向癸兼未丑之原小金塔安放於碑前深七尺餘有山"
-        translation: "Sitting in the Ding position and facing Gui, on the plain of Wei-Chou. The small golden pagoda (urn) was placed in front of the tombstone at a depth of over 7 chi. There is a mountain..."
+        translation: "Sitting in the Ding position and facing Gui, on the plain of Wei-Chou. The small Golden Pagoda (urn) was placed in front of the tombstone at a depth of over 7 chi. There is a mountain..."
 
       - id: 6
         elevation: 0
@@ -2428,7 +2428,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "名坂帝原各真武殿坐乾向巽兼戌辰之原 塔安放在山圈"
-        translation: "Badi Plain, at the Zhenwu Hall, sitting Qian facing Xun combined with Xu-Chen (NW facing SE). The urn tower is placed within the mountain enclosure."
+        translation: "Badi Plain, at the Zhenwu Hall, sitting Qian facing Xun combined with Xu-Chen (NW facing SE). The Golden Pagoda is placed within the mountain enclosure."
 
       - id: 3
         elevation: 0
@@ -2622,7 +2622,7 @@ pages:
     metadata:
       image_file: "img_33.webp"
       physical_page_number: 33
-      title: "Geomantic Details and Wives of Yong-zhao"
+      title: "Feng Shui Details and Wives of Yong-zhao"
     columns:
       - id: 1
         elevation: 0
@@ -2790,16 +2790,15 @@ pages:
       - id: 4
         elevation: 0
         is_interlinear: false
-        text_zh: "緒十三年丁亥六月二十六日戌時子一鎮盛公附在先德三十七年丙午"
+        text_zh: "緒十三年丁亥六月二十六日戌時子一鎮孟 公終於光緒三十二年丙午"
         translation: "specifically the 13th year (1887), a Ding-hai year, on the 26th day of the 6th lunar month, at the Xu-shi hour. They had a son, Zhenmeng. The Lord died on the 28th day of the 9th lunar month in the 32nd year of Guangxu (1906), a Bing-wu year"
         map_data:
           event_date: "1860-07-12"
-          event_type: "spouse_birth"
-
+          event_type: "death"
       - id: 5
         elevation: 0
         is_interlinear: false
-        text_zh: "七月二十日寅時配催於光緒二十六年庚子九月二十八日子時妻畢氏"
+        text_zh: "七月二十日寅時配崔氏生于光緒二十六年庚子九月二十八日子時妻畢氏"
         translation: "on the 20th day of the 7th lunar month, between 3:00 AM and 5:00 AM (Yin hour). Zhenmeng wife, Lady Cui, born in the 26th year of Guangxu (1900), a Gengzi year, on the 28th day of the 9th lunar month, at the hour of the Rat (Zi hour). [Another] wife"
         map_data:
           event_date: "1900-08-15"
@@ -2808,8 +2807,8 @@ pages:
       - id: 6
         elevation: 0
         is_interlinear: false
-        text_zh: "終於光緒二十七年辛丑三月廿首子時公墓在廊下園袁比登寺"
-        translation: "passed away in the 27th year of Guangxu (1901), a Xinchou year, on the 20th day of the 3rd lunar month, at the hour of the Rat (Zi hour). The Lord's tomb is located at Langxiayuan, [near] Yuanbideng Temple"
+        text_zh: "終於光緒二十七年辛丑三月廿八日子時公墓在廊下園袁比登寺"
+        translation: "passed away in the 27th year of Guangxu (1901), a Xinchou year, on the 28th day of the 3rd lunar month, at the hour of the Rat (Zi hour). The Lord's tomb is located at Langxiayuan, [near] Yuanbideng Temple"
         map_data:
           event_date: "1907-03-12"
           event_type: "son_birth"
@@ -2821,7 +2820,7 @@ pages:
         translation: "in the home village by the Gengliu River site."
 
       - id: 8
-        is_interlinear: true
+        is_interlinear: false
         text_zh: "二十世鎮邦 平岐公長子生於光緒十五年己丑十月廿四日午時"
         translation: "20th Generation: Zhenbang. Eldest son of Lord Pingpo. Born on the 24th day of the 10th lunar month in the 15th year of Guangxu (1889), a Ji-chou year, at the Wu-shi hour."
 
@@ -2835,7 +2834,7 @@ pages:
         elevation: -3
         is_interlinear: false
         text_zh: "二十世 鎮孟 平岐公次子生於光緒三十一年乙巳八月二十六日寅時"
-        translation: "20th Generation: Zhenmeng.: The second son of Lord Pingqi, born on the 26th day of the 8th lunar month in the 31st year of Guangxu (1905), an Yi-si year, at the Yin-shi hour."
+        translation: "20th Generation: Zhenmeng: The second son of Lord Pingqi, born on the 26th day of the 8th lunar month in the 31st year of Guangxu (1905), an Yi-si year, at the Yin-shi hour."
         map_data:
           event_date: "1889-11-16"
           event_type: "birth"

@@ -95,7 +95,7 @@ const GenealogyApp: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
-  const [desktopViewMode, setDesktopViewMode] = useState<'read' | 'image' | 'digital' | 'map' | 'tree' | 'glossary'>('digital');
+  const [desktopViewMode, setDesktopViewMode] = useState<'image' | 'digital' | 'map' | 'tree' | 'glossary'>('digital');
   const [mobileViewMode, setMobileViewMode] = useState<MobileViewMode>('read');
   const [hoveredColumnId, setHoveredColumnId] = useState<number | null>(null);
 
@@ -275,6 +275,8 @@ const GenealogyApp: React.FC = () => {
           onMenuToggle={() => setIsMenuOpen(true)}
           onOpenTab={handleOpenTab}
           activeTab={activeTab}
+          viewMode={desktopViewMode}
+          setViewMode={setDesktopViewMode}
         />
 
         <Menu
@@ -295,7 +297,7 @@ const GenealogyApp: React.FC = () => {
           {/* LEFT SIDE (Desktop: Visuals / Mobile: Conditional) */}
           <div className={`
             flex-1 flex flex-col bg-[#F0EFEC] dark:bg-[#121214] relative transition-colors duration-500
-            ${(isMobile && (mobileViewMode === 'read' || mobileViewMode === 'glossary')) || (!isMobile && desktopViewMode === 'read') ? 'hidden' : 'flex'}
+            ${isMobile && (mobileViewMode === 'read' || mobileViewMode === 'glossary') ? 'hidden' : 'flex'}
             ${isMobile ? 'absolute inset-0 z-10' : ''}
           `}>
             {/* Desktop Controls */}
@@ -362,7 +364,6 @@ const GenealogyApp: React.FC = () => {
               shadow-[rgba(0,0,0,0.05)_0px_0px_40px] z-20
               transition-all duration-500
               ${isMobile && (mobileViewMode !== 'read' && mobileViewMode !== 'glossary') ? 'hidden' : 'flex flex-col h-full'}
-              ${!isMobile && desktopViewMode === 'read' ? 'flex-1 max-w-4xl mx-auto border-l-0 shadow-none' : ''}
               ${isMobile ? 'absolute inset-0 pt-0 pb-20' : ''}
             `}>
               {mobileViewMode === 'glossary' ? (

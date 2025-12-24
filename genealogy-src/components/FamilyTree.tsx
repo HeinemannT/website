@@ -48,33 +48,41 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
             });
     }, []);
 
-    if (isLoading) return <div className="p-8 text-center text-stone-500">Loading Tree...</div>;
-    if (error || !data) return <div className="p-8 text-center text-red-500">{error}</div>;
+    // 1. Memoize Map creation to avoid expensive re-computation
+    const peopleMap = React.useMemo(() => {
+        if (!data) return new Map<string, FamilyMember>();
+        return new Map(data.people.map((p) => [p.id, p]));
+    }, [data]);
 
-    // Transform flat list to map for easy lookup
-    const peopleMap: Map<string, FamilyMember> = new Map(data.people.map((p: FamilyMember) => [p.id, p]));
-
-    // Recursive Tree Renderer
-    // Auto-scroll to root on load - Wrapped in timeout for Mobile safety
+    // 2. Safer Scroll Logic using requestAnimationFrame
     useEffect(() => {
         if (!isLoading && data && data.root_id) {
-            const timer = setTimeout(() => {
-                const rootElement = document.getElementById(`node-${data.root_id}`);
-                if (rootElement) {
-                    try {
-                        rootElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
-                    } catch (e) {
-                        // Fallback for older browsers or test envs
-                        console.warn("Scroll failed", e);
+            // Using requestAnimationFrame ensures DOM is ready
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const rootElement = document.getElementById(`node-${data.root_id}`);
+                    if (rootElement) {
+                        try {
+                            rootElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
+                        } catch (e) {
+                            console.warn("Scroll failed", e);
+                        }
                     }
-                }
-            }, 100);
-            return () => clearTimeout(timer);
+                }, 100);
+            });
         }
     }, [isLoading, data]);
 
-    const renderNode = (id: string, depth: number = 0) => {
-        if (depth > 50) return <div className="text-red-500 font-bold p-2">Max Depth Exceeded</div>; // Crash prevention
+    // 3. Recursive Renderer with Circular Dependency Check
+    const renderNode = (id: string, depth: number, visited: Set<string>) => {
+        // Crash Prevention 1: Depth Limit
+        if (depth > 60) return <div key={id} className="text-red-500 font-bold p-2">Max Depth</div>;
+
+        // Crash Prevention 2: Circular Dependency Check
+        if (visited.has(id)) return <div key={id} className="text-orange-500 font-bold text-xs p-1">Loop Detected</div>;
+
+        // Add to visited set for this branch
+        const newVisited = new Set(visited).add(id);
 
         const person = peopleMap.get(id);
         if (!person) return null;
@@ -125,7 +133,7 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
                 {/* Children Container */}
                 {hasChildren && (
                     <div className="flex flex-nowrap gap-8 relative pt-4">
-                        {/* Horizontal Connector Bar moved to CSS logic in renderNode loop */}
+                        {/* Render Children */}
                         {person.children!.map((childId, index, arr) => {
                             const isFirst = index === 0;
                             const isLast = index === arr.length - 1;
@@ -134,7 +142,6 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
                             return (
                                 <div key={childId} className="flex flex-col items-center relative">
                                     {/* Connector Lines Logic */}
-                                    {/* Top horizontal line parts */}
                                     {!isOnly && (
                                         <>
                                             {/* Line to Left (if not first) */}
@@ -147,7 +154,8 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
                                     {/* Vertical line from horizontal bar down to node */}
                                     <div className="h-4 w-px bg-stone-300 dark:bg-zinc-700"></div>
 
-                                    {renderNode(childId, depth + 1)}
+                                    {/* Pass cloned/new set to branches */}
+                                    {renderNode(childId, depth + 1, newVisited)}
                                 </div>
                             );
                         })}
@@ -157,6 +165,9 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
         );
     };
 
+    if (isLoading) return <div className="p-8 text-center text-stone-500">Loading Tree...</div>;
+    if (error || !data) return <div className="p-8 text-center text-red-500">{error}</div>;
+
     return (
         <div className="w-full h-full overflow-auto bg-texture-paper p-4 pb-32 md:p-12">
             <div className="min-w-max mx-auto flex flex-col items-center">
@@ -164,7 +175,8 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
                     <Network size={16} />
                     <span>Lineage Graph (WIP)</span>
                 </div>
-                {renderNode(data.root_id)}
+                {/* Initial Call with empty visited set */}
+                {data.root_id && renderNode(data.root_id, 0, new Set())}
             </div>
         </div>
     );

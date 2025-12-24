@@ -1384,7 +1384,7 @@ pages:
         elevation: 0
         is_interlinear: true
         text_zh: "年已酉十二月初六日申"
-        translation: "at the Shen-shi hour. They had two sons."
+        translation: "at the Shen-shi hour. They had two sons..."
         map_data:
           event_date: "1610-01-30"
           event_type: "birth"
@@ -1403,7 +1403,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "時配黎氏生 年丙子十一月初八日酉時再娶倫氏生"
-        translation: "...at that hour. He married Lady Li, born on the 8th day of the 11th lunar month in the year Bingzi (1576), at the Youshi hour. He remarried Lady Lun, born..."
+        translation: "...at that time. He married Lady Li, born on the 8th day of the 11th lunar month in the year Bingzi (1576), at the Youshi hour. e later married Lady Lun, born..."
         map_data:
           event_date: "1576-11-28"
           event_type: "spouse_birth"
@@ -1412,7 +1412,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "萬曆 年壬子十二月二十六日亥時公終 年丁亥"
-        translation: "...in the year Renzi of Wanli (1612), on the 26th day of the 12th lunar month, at the Haishi hour. The Lord [Yingxi] died in the year Dinghai (1647)..."
+        translation: "in the year Renzi of Wanli (1612), on the 26th day of the 12th lunar month, at the Haishi hour. The Lord [Yingxi] died in the year Dinghai (1647)..."
         map_data:
           event_date: "1613-01-26"
           event_type: "spouse_birth"
@@ -1422,7 +1422,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "三月二十八日已時黎氏終 年庚辰二月初二申時倫"
-        translation: "...on the 28th day of the 3rd lunar month, at the Sishi hour. Lady Li died on the 2nd day of the 2nd lunar month in the year Gengchen (1640), at the Shenshi hour. Lady Lun..."
+        translation: "on the 28th day of the 3rd lunar month, at the Sishi hour. Lady Li died on the 2nd day of the 2nd lunar month in the year Gengchen (1640), at the Shenshi hour. Lady Lun"
         map_data:
           event_date: "1647-05-01"
           event_type: "death"
@@ -1431,7 +1431,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "氏終 年癸酉十月二十六日 時昌初四子鼎鎮入嗣"
-        translation: "...died on the 26th day of the 10th lunar month in the year Guiyou (1633). Dingzhen, the fourth son of Changchu [Yingyun], was adopted as heir."
+        translation: "died on the 26th day of the 10th lunar month in the year Guiyou (1633). Ding-zhen, the fourth son of Chang-chu, was adopted into this line as the heir."
         map_data:
           event_date: "1640-03-24"
           event_type: "spouse_death"
@@ -1440,7 +1440,7 @@ pages:
         elevation: -2
         is_interlinear: false
         text_zh: "仲錫 字昌年 號瑞雲 心吾公長子生萬曆二十九年辛丑七月二"
-        translation: "**Zhongxi**, courtesy name Changnian, art name Ruiyun. Eldest son of Lord Xin-wu. Born on the 25th day of the 7th lunar month in the 29th year of Wanli (1601), an Xinchou year..."
+        translation: "**Zhongxi**, courtesy name Changnian, art name Ruiyun. EHe was the eldest son of Lord Xinwu. He was born on the 25th day of the 7th lunar month in the 29th year of Wanli (1601), a Xin-chou year"
         map_data:
           event_date: "1601-08-18"
           event_type: "birth"
@@ -1450,7 +1450,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "十五日 時配葛岸岑生萬曆三十一年癸卯九月初七日"
-        translation: "...at that hour. He married the daughter of Cen from Ge'an, who was born on the 7th day of the 9th lunar month in the 31st year of Wanli (1603), a Guimao year..."
+        translation: "at the [uncertain] hour. He married the daughter of Cen from Ge'an, who was born on the 7th day of the 9th lunar month in the 31st year of Wanli (1603), a Guimao year"
         map_data:
           event_date: "1603-10-11"
           event_type: "spouse_birth"
@@ -1462,7 +1462,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "時子二起世康世女三長適上僚梁次適馬村黃三適北滘"
-        translation: "...at that hour. They had two sons: Qishi and Kangshi; and three daughters. The eldest married Liang of Shangliao; the next married Huang of Macun; the third married into Beijiao..."
+        translation: "They had two sons: Chaoshi and Kangshi; and three daughters. and three daughters: the eldest married into the Liang family of Shangliao; the next married into the Huang family of Ma-village; the third married into the"
         map_data:
           event_type: "marriage_location"
           location_name: "Shangliao, Shunde"
@@ -1473,7 +1473,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "周公終順治十六年已亥七月初一日 時配終康熙三十"
-        translation: "...under Lord Zhou. He died on the 1st day of the 7th lunar month in the 16th year of Shunzhi (1659), a Jihai year. His wife died in the 30th year of Kangxi (1691)..."
+        translation: "Zhou family of Beijiao. The Lord died on the 1st day of the 7th lunar month in the 16th year of Shunzhi (1659), an Yi-hai year. His wife died in the 30th year of Kangxi (1691)"
         map_data:
           event_date: "1659-08-18"
           event_type: "death"
@@ -1482,7 +1482,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "年辛未二月初三日酉時壽八十有九合墓本鄉黃坦之原"
-        translation: "...specifically on the 3rd day of the 2nd lunar month in the year Xinwei, at the Youshi hour, aged eighty-nine. They were buried together on the plain of Huangtan in this village."
+        translation: "a Xin-wei year, on the 3rd day of the 2nd lunar month, at the You-shi hour, aged eighty-nine. They were buried together at the Huangtan site in their home village."
         map_data:
           event_date: "1691-03-02"
           event_type: "spouse_death"
@@ -1497,7 +1497,7 @@ pages:
         elevation: -2
         is_interlinear: false
         text_zh: "漢章 字昌初 號廷齡 冲一公子生萬曆四十七年已未二月十八"
-        translation: "**Hanzhang**, courtesy name Changchu, art name Yanling. Son of Lord Chong-yi. Born on the 18th day of the 2nd lunar month in the 47th year of Wanli (1619), an Yiwei year..."
+        translation: "**Hanzhang**, courtesy name Changchu, art name Yanling. Son of Lord Chong-yi. He was born on the 18th day of the 2nd lunar month in the 47th year of Wanli (1619), an Yi-wei year"
         map_data:
           event_date: "1619-04-02"
           event_type: "birth"
@@ -1507,7 +1507,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "子時配辛村曾生萬曆四十七年已未二月初十 時女三"
-        translation: "...at the Zishi hour. He married Lady Zeng of Xincun, born on the 10th day of the 2nd lunar month in the 47th year of Wanli (1619), an Yiwei year. They had three daughters..."
+        translation: "at the Zishi hour. He married Lady Zeng of Xincun, born on the 10th day of the 2nd lunar month in the 47th year of Wanli (1619), an Yiwei year. They had three daughters"
         map_data:
           event_date: "1619-03-25"
           event_type: "spouse_birth"
@@ -1519,7 +1519,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "長適羊額何次適香山縣舉人李六吉子三適南海縣進士"
-        translation: "...the eldest married He of Yange; the next married the son of Li Liuji, a Juren [Juren] of Xiangshan County; the third married a Jinshi [imperial graduate] of Nanhai County..."
+        translation: "The eldest daughter married into the He family of Yang'e; the second married Li Liuji, a Provincial Graduate (Juren) from Xiangshan County; the third married into the family of a Jinshi (Imperial Scholar) from Nanhai County"
         map_data:
           event_type: "marriage_location"
           location_name: "Yange, Shunde"
@@ -1530,13 +1530,13 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "陳彩姪妾陳氏生崇禎 年丁丑四月子四鼎銓鼎鼎"
-        translation: "...named Chen Cai's niece. His concubine, Lady Chen, was born in the 4th month of the year Dingchou of Chongzhen (1637). They had four sons: Dingquan, Ding..."
+        translation: "specifically the nephew of Chen Cai. His concubine, Lady Chen, was born in the 4th month of the year Dingchou of Chongzhen (1637). They had four sons: Dingquan, Ding-..., Ding-"
 
       - id: 5
         elevation: 0
         is_interlinear: false
         text_zh: "鍾鼎鎮出嗣昌禧女一適桂洲胡公終康熙三十六年丁丑"
-        translation: "...zhong, and Dingzhen (adopted out as heir to Changxi). One daughter married Lord Hu of Guizhou. He [Hanzhang] died in the 36th year of Kangxi (1697), a Dingchou year..."
+        translation: "zhong. and Dingzhen ( who was adopted out as heir to Changxi). They had one daughter who married Lord Hu of Guizhou. The Lord died in the 36th year of Kangxi (1697), a Ding-chou year"
         map_data:
           event_type: "marriage_location"
           location_name: "Guizhou, Shunde"
@@ -1547,7 +1547,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "七月初四丑時壽七十九配終康熙九年庚戌又二月初八"
-        translation: "...on the 4th day of the 7th lunar month, at the Choushi hour, aged seventy-nine. His wife died on the 8th day of the intercalary 2nd lunar month in the 9th year of Kangxi (1670), a Gengxu year..."
+        translation: "on the 4th day of the 7th lunar month, at the Chou-shi hour, aged seventy-nine. His wife died on the 8th day of the intercalary 2nd lunar month in the 9th year of Kangxi (1670), a Gengxu year,"
         map_data:
           event_date: "1697-08-20"
           event_type: "death"
@@ -1556,7 +1556,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "子時陳氏終康熙十四年乙卯六月二十九丑時合墓"
-        translation: "...at the Zishi hour. Lady Chen died on the 29th day of the 6th lunar month in the 14th year of Kangxi (1675), an Yimao year, at the Choushi hour. They were buried together."
+        translation: "at the Zishi hour. Lady Chen died on the 29th day of the 6th lunar month in the 14th year of Kangxi (1675), an Yimao year, at the Choushi hour. They were buried together."
         map_data:
           event_date: "1675-08-19"
           event_type: "concubine_death"
@@ -1565,7 +1565,7 @@ pages:
         elevation: -2
         is_interlinear: false
         text_zh: "俊錫 字昌恪 號恪芝 泰階公子生萬曆二十八年庚子五月初五"
-        translation: "**Junxi**, courtesy name Changke, art name Kezhi. Son of Lord Taijie. Born on the 5th day of the 5th lunar month in the 28th year of Wanli (1600), a Gengzi year."
+        translation: "**Junxi**, courtesy name Changke, art name Kezhi. He was the son of Lord Taijie. He was born on the 5th day of the 5th lunar month in the 28th year of Wanli (1600), a Geng-zi year."
         map_data:
           event_date: "1600-06-15"
           event_type: "birth"

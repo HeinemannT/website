@@ -483,7 +483,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "年癸丑九月初十日配終成化十九年癸卯十月十一日妾蘇氏"
-        translation: "a Guichou year, on the 10th day of the 9th month. His wife died in the 19th year of Chenghua (1483), a Guimao year, on the 11th day of the 10th month. His concubine, Lady Su,"
+        translation: "a Guichou year, on the 10th day of the 9th month. His concubine died in the 19th year of Chenghua (1483), a Guimao year, on the 11th day of the 10th month. His concubine, Lady Su,"
         map_data:
           event_date: "1483-10-11"
           event_type: "spouse_death"
@@ -498,7 +498,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "公與配及妾于本鄉長塘高地卯乙之原蘇氏葬其旁黃太祖母"
-        translation: "The Lord and his wife were buried together at the Changtang Gaodi site in their home village, facing the Mao-Yi direction (East). Lady Su is buried beside them. Great-Grandmother Lady Huang,"
+        translation: "The Lord and his concubine were buried together at the Changtang Gaodi site in their home village, facing the Mao-Yi direction (East). Lady Su is buried beside them. Great-Grandmother Lady Huang,"
         map_data:
           location_name: "Longtang"
           event_type: "burial"
@@ -782,7 +782,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "子與男女二長適鷺洲關文明三子次適張槎邑庠呂孺子"
-        translation: "...son and Yu-nan, and two daughters: the eldest married the third son of Guan Wenming from Luzhou; the second married Lu Ruzi, a student from Zhangcha"
+        translation: "...son and Yu-nan, and two daughters: the eldest married the third son of Guan Wenming from Luzhou; the second married Lu Ruzi, a student from Zhangcha,"
         map_data:
           event_type: "marriage_location"
           location_name: "Zhangcha, Foshan"
@@ -793,7 +793,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "字品芝再娶桂圃何生正德十五年庚辰四月二十八日寅"
-        translation: ", art name Pinzhi. The Lord, later remarried Lady He of Guipu, born on the 28th day of the 4th lunar month in the 15th year of Zhengde (1520), a Gengchen year, at the Yinshi hour."
+        translation: "art name Pinzhi. The Lord, later remarried Lady He of Guipu, born on the 28th day of the 4th lunar month in the 15th year of Zhengde (1520), a Gengchen year, at the Yinshi hour."
         translator_note: "This is where attribution is unclear from the text."
         map_data:
           event_date: "1520-05-15"
@@ -980,7 +980,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "子應運公終天啟六年丙寅六月十六亥時配終崇禎十二"
-        translation: "Their son was Ying-yun. The Lord died on the 16th day of the 6th lunar month in the 6th year of Tianqi (1626), a Bing-yin year, at the Haishi hour. His wife died in the 12th year of Chongzhen (1639)"
+        translation: "Their son was Ying-yun. The Lord died on the 16th day of the 6th lunar month in the 6th year of Tianqi (1626), a Bing-yin year, at the Haishi hour. His wife died in the 12th year of Chongzhen (1639),"
         map_data:
           event_date: "1626-08-07"
           event_type: "death"
@@ -989,7 +989,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "年已卯十二月二十九且時壽六十有七合莖番禺漁翁撒"
-        translation: ",a Yi-mao year, on the 29th day of the 12th lunar month, aged sixty-seven. They were buried together at the 'Fisherman Casting a Net' place in Panyu"
+        translation: "a Yi-mao year, on the 29th day of the 12th lunar month, aged sixty-seven. They were buried together at the 'Fisherman Casting a Net' place in Panyu"
         map_data:
           event_type: "burial"
           location_name: "Yuweng-sa (Panyu)"
@@ -1061,13 +1061,13 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "丑時配周氏生萬曆...年丁丑二月初二日申時公終崇"
-        translation: "at the Chou-shi hour. He married Lady Zhou, who was born on the 2nd day of the 2nd lunar month in a Ding-chou year in the Wanli era at the Shen hour. The Lord died in the Chongzhen era"
+        translation: "at the Chou-shi hour. He married Lady Zhou, who was born on the 2nd day of the 2nd lunar month in a Ding-chou year in the Wanli era at the Shen hour. The Lord died in the Chongzhen era,"
 
       - id: 3
         elevation: 0
         is_interlinear: false
         text_zh: "禎四年辛未十一月十九巳時配終...年戊寅八月二"
-        translation: ", specifically the 4th year of Chongzhen (1631), an Xinwei year, on the 19th day of the 11th lunar month at the Sishi hour. His wife died in the year Wuyin (1638), on the 20th day"
+        translation: "specifically the 4th year of Chongzhen (1631), an Xinwei year, on the 19th day of the 11th lunar month at the Sishi hour. His wife died in the year Wuyin (1638), on the 20th day"
         map_data:
           event_date: "1631-12-12"
           event_type: "death"

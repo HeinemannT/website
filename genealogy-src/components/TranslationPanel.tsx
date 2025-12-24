@@ -158,12 +158,6 @@ const TranslationParagraph = React.memo<{
       </div>
     </div>
   );
-}, (prev, next) => {
-  return prev.isActive === next.isActive &&
-    prev.isNoteExpanded === next.isNoteExpanded &&
-    prev.fontSize === next.fontSize &&
-    prev.col.id === next.col.id &&
-    prev.isMobile === next.isMobile;
 });
 
 const TranslationPanel: React.FC<TranslationPanelProps> = ({

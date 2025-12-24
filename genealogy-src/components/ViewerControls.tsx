@@ -1,9 +1,9 @@
 import React from 'react';
-import { Image as ImageIcon, FileText, ChevronLeft, ChevronRight, Map } from 'lucide-react';
+import { Image as ImageIcon, FileText, ChevronLeft, ChevronRight, Map, BookOpen, ScrollText } from 'lucide-react';
 
 interface ViewerControlsProps {
-  viewMode: 'image' | 'digital' | 'map' | 'tree' | 'glossary';
-  setViewMode: (mode: 'image' | 'digital' | 'map' | 'tree' | 'glossary') => void;
+  viewMode: 'read' | 'image' | 'digital' | 'map' | 'tree' | 'glossary';
+  setViewMode: (mode: 'read' | 'image' | 'digital' | 'map' | 'tree' | 'glossary') => void;
   pageIndex: number;
   totalPageCount: number;
   onPrevPage: () => void;
@@ -25,6 +25,16 @@ const ViewerControls: React.FC<ViewerControlsProps> = ({
         {/* Toggle */}
         <div className="flex bg-stone-100 dark:bg-slate-800 rounded-full p-1 mr-6">
           <button
+            onClick={() => setViewMode('read')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${viewMode === 'read'
+              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+              : 'text-stone-500 dark:text-slate-500 hover:text-stone-800 dark:hover:text-slate-300'
+              }`}
+          >
+            <BookOpen size={16} />
+            <span className="hidden md:inline">Read</span>
+          </button>
+          <button
             onClick={() => setViewMode('image')}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${viewMode === 'image'
               ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
@@ -32,7 +42,7 @@ const ViewerControls: React.FC<ViewerControlsProps> = ({
               }`}
           >
             <ImageIcon size={16} />
-            <span className="hidden md:inline">Original</span>
+            <span className="hidden md:inline">Scan</span>
           </button>
           <button
             onClick={() => setViewMode('digital')}
@@ -41,8 +51,8 @@ const ViewerControls: React.FC<ViewerControlsProps> = ({
               : 'text-stone-500 dark:text-slate-500 hover:text-stone-800 dark:hover:text-slate-300'
               }`}
           >
-            <FileText size={16} />
-            <span className="hidden md:inline">Digital</span>
+            <ScrollText size={16} />
+            <span className="hidden md:inline">Script</span>
           </button>
           <button
             onClick={() => setViewMode('map')}
@@ -64,6 +74,17 @@ const ViewerControls: React.FC<ViewerControlsProps> = ({
             {/* Using Network icon or similar */}
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="6" height="6" /><rect x="9" y="21" width="6" height="6" /><path d="M12 15v6" /><path d="M12 9V3" /><rect x="9" y="3" width="6" height="6" /><path d="M5 9v6" /><path d="M19 9v6" /></svg>
             <span className="hidden md:inline">Tree</span>
+          </button>
+          <button
+            onClick={() => setViewMode('glossary')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${viewMode === 'glossary'
+              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+              : 'text-stone-500 dark:text-slate-500 hover:text-stone-800 dark:hover:text-slate-300'
+              }`}
+          >
+            {/* Using Book icon for Glossary */}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
+            <span className="hidden md:inline">Glossary</span>
           </button>
         </div>
 

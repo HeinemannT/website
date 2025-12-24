@@ -52,34 +52,33 @@ const ViewerControls: React.FC<ViewerControlsProps> = ({
           <Map size={16} />
           <span className="hidden md:inline">Map</span>
         </button>
-      </div>
+        {/* Divider */}
+        <div className="w-px h-8 bg-stone-300 dark:bg-slate-700 mr-6"></div>
 
-      {/* Divider */}
-      <div className="w-px h-8 bg-stone-300 dark:bg-slate-700 mr-6"></div>
+        {/* Pagination - Increased Sizes */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onPrevPage}
+            disabled={pageIndex === 0}
+            className="p-3 rounded-full hover:bg-stone-100 dark:hover:bg-slate-700 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-200 bg-stone-50 dark:bg-slate-800/50"
+            aria-label="Previous Page"
+          >
+            <ChevronLeft size={28} />
+          </button>
 
-      {/* Pagination - Increased Sizes */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onPrevPage}
-          disabled={pageIndex === 0}
-          className="p-3 rounded-full hover:bg-stone-100 dark:hover:bg-slate-700 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-200 bg-stone-50 dark:bg-slate-800/50"
-          aria-label="Previous Page"
-        >
-          <ChevronLeft size={28} />
-        </button>
+          <span className="font-mono text-xl font-bold text-stone-700 dark:text-slate-200 w-24 text-center select-none">
+            {pageIndex + 1} / {totalPageCount}
+          </span>
 
-        <span className="font-mono text-xl font-bold text-stone-700 dark:text-slate-200 w-24 text-center select-none">
-          {pageIndex + 1} / {totalPageCount}
-        </span>
-
-        <button
-          onClick={onNextPage}
-          disabled={pageIndex === totalPageCount - 1}
-          className="p-3 rounded-full hover:bg-stone-100 dark:hover:bg-slate-700 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-200 bg-stone-50 dark:bg-slate-800/50"
-          aria-label="Next Page"
-        >
-          <ChevronRight size={28} />
-        </button>
+          <button
+            onClick={onNextPage}
+            disabled={pageIndex === totalPageCount - 1}
+            className="p-3 rounded-full hover:bg-stone-100 dark:hover:bg-slate-700 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-200 bg-stone-50 dark:bg-slate-800/50"
+            aria-label="Next Page"
+          >
+            <ChevronRight size={28} />
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -39,6 +39,12 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
 
   const selectedColumn = columns.find(c => c.id === mobileSelectedId);
 
+  // Parse markdown for the overlay at top level to avoid conditional hook call
+  const selectedTranslationHtml = React.useMemo(() => {
+    if (!selectedColumn) return '';
+    return marked.parse(selectedColumn.translation) as string;
+  }, [selectedColumn]);
+
   // Helper to position marginalia
   const getMarginaliaStyle = (pos: string): React.CSSProperties => {
     switch (pos) {
@@ -205,7 +211,7 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                 </span>
               </div>
               <div className="font-body text-lg leading-relaxed text-ink dark:text-zinc-200"
-                dangerouslySetInnerHTML={{ __html: React.useMemo(() => marked.parse(selectedColumn.translation) as string, [selectedColumn.translation]) }}
+                dangerouslySetInnerHTML={{ __html: selectedTranslationHtml }}
               />
             </div>
           </div>

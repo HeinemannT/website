@@ -140,18 +140,22 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
           <div className="absolute inset-0 overflow-y-auto">
 
             {activeTab === 'toc' && data && (
-              <div className="flex flex-col min-h-full divide-y divide-stone-100 dark:divide-zinc-800/50">
+              <div className="flex flex-col min-h-full px-6 py-6 space-y-1">
                 {data.pages.map((page, idx) => (
                   <button
                     key={idx}
                     onClick={() => { onNavigate(idx); onClose(); }}
-                    className="flex items-center gap-4 px-6 py-3 hover:bg-stone-50 dark:hover:bg-zinc-800/50 transition-colors group text-left"
+                    className="flex items-baseline w-full gap-2 py-2 group text-left hover:bg-stone-50 dark:hover:bg-zinc-800/50 rounded-md -mx-2 px-2 transition-colors"
                   >
-                    <span className="font-mono text-xs font-bold text-stone-400 dark:text-zinc-500 w-16 group-hover:text-cinnabar dark:group-hover:text-red-400 transition-colors">
-                      {page.page_id}
-                    </span>
-                    <span className="text-sm font-medium text-ink dark:text-zinc-300 line-clamp-1 group-hover:text-stone-900 dark:group-hover:text-white transition-colors">
+                    <span className="text-sm font-medium text-ink dark:text-zinc-200 line-clamp-1 flex-1 font-serif-tc text-left">
                       {page.metadata.title}
+                    </span>
+
+                    {/* Dotted Leader */}
+                    <span className="flex-1 border-b border-dotted border-stone-300 dark:border-zinc-700 mx-2 mb-1 opacity-30"></span>
+
+                    <span className="font-mono text-xs font-bold text-stone-400 dark:text-zinc-500 group-hover:text-cinnabar dark:group-hover:text-red-400 transition-colors whitespace-nowrap">
+                      p. {page.metadata.physical_page_number}
                     </span>
                   </button>
                 ))}

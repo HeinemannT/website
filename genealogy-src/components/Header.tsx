@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-1">
           <button
             onClick={() => toggleDarkMode(!isDarkMode)}
-            className="p-2 rounded-full text-stone-500 active:bg-stone-100 dark:text-zinc-400 dark:active:bg-zinc-800 transition-all active:scale-95 duration-200"
+            className="w-10 h-10 flex items-center justify-center rounded-full text-stone-500 active:bg-stone-100 dark:text-zinc-400 dark:active:bg-zinc-800 transition-all active:scale-90 duration-150"
           >
             <div className={`transition-transform duration-500 ${isDarkMode ? 'rotate-180' : 'rotate-0'}`}>
               {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
@@ -90,7 +90,7 @@ const Header: React.FC<HeaderProps> = ({
           <div className="relative" ref={mobileFontMenuRef}>
             <button
               onClick={() => setIsFontMenuOpen(!isFontMenuOpen)}
-              className={`p-2 rounded-full transition-colors ${isFontMenuOpen ? 'bg-stone-100 dark:bg-zinc-800 text-cinnabar dark:text-red-400' : 'text-stone-500 active:bg-stone-100 dark:text-zinc-400 dark:active:bg-zinc-800'}`}
+              className={`w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95 duration-150 ${isFontMenuOpen ? 'bg-stone-100 dark:bg-zinc-800 text-cinnabar dark:text-red-400' : 'text-stone-500 active:bg-stone-100 dark:text-zinc-400 dark:active:bg-zinc-800'}`}
             >
               <Type size={20} />
             </button>
@@ -132,7 +132,7 @@ const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onMenuToggle}
-            className="p-2 text-stone-600 dark:text-zinc-300 active:scale-95 transition-transform"
+            className="w-10 h-10 flex items-center justify-center text-stone-600 dark:text-zinc-300 active:bg-stone-100 dark:active:bg-zinc-800 rounded-full active:scale-95 transition-all duration-150"
           >
             <MenuIcon size={24} />
           </button>

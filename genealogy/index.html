@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "leaflet": "https://esm.sh/leaflet@1.9.4",
+    "js-yaml": "https://esm.sh/js-yaml@4.1.0",
+    "marked": "https://esm.sh/marked@12.0.0"
+  }
+}
+</script>
+<script type="module" crossorigin src="/genealogy/assets/index-D2I5UZ8j.js"></script>
+
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Genealogy App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=Noto+Serif+TC:wght@400;700&family=Inter:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --paper-light: #fdfbf7;
+      --ink-light: #2D2D2D;
+      --paper-dark: #18181b;
+      --ink-dark: #E4E4E7;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--paper-light);
+      color: var(--ink-light);
+      -webkit-font-smoothing: antialiased;
+      /* Font size managed by App.tsx on the html element for rem scaling */
+    }
+
+    .dark body {
+      background-color: var(--paper-dark);
+      color: var(--ink-dark);
+    }
+
+    /* Texture Generation Classes */
+    .bg-texture-paper {
+      background-color: #f5f2eb;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    }
+
+    .dark .bg-texture-paper {
+      background-color: #121212;
+      background-image: none;
+    }
+
+    .bg-texture-silk {
+      background-color: #e3e1da;
+      background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3h1v1H1V3zm2-2h1v1H3V1z' fill='%239c9283' fill-opacity='0.1'/%3E%3C/svg%3E");
+    }
+
+    .dark .bg-texture-silk {
+      background-color: #18181b;
+      background-image: none;
+    }
+
+    .font-serif-tc {
+      font-family: 'Noto Serif TC', serif;
+    }
+
+    .font-heading {
+      font-family: 'DM Serif Display', serif;
+    }
+
+    .font-body {
+      font-family: 'Source Serif 4', serif;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #d4d4d8;
+      border-radius: 3px;
+    }
+
+    .dark ::-webkit-scrollbar-thumb {
+      background: #3f3f46;
+    }
+
+    /* Leaflet Custom Overrides */
+    .leaflet-container {
+      background: transparent !important;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .leaflet-popup-content-wrapper {
+      border-radius: 8px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .leaflet-popup-content {
+      margin: 0;
+    }
+
+    .leaflet-popup-tip {
+      background: white;
+    }
+
+    .dark .leaflet-popup-content-wrapper {
+      background: #27272a;
+      color: #e4e4e7;
+    }
+
+    .dark .leaflet-popup-tip {
+      background: #27272a;
+    }
+
+    /* Migration Line Animation */
+    @keyframes dash {
+      to {
+        stroke-dashoffset: -20;
+      }
+    }
+
+    .migration-line-anim {
+      animation: dash 3s linear infinite;
+      stroke-dasharray: 10, 10;
+    }
+
+    /* Markdown Styles */
+    .prose h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .prose h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .prose p {
+      margin-bottom: 1rem;
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+
+    .prose ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .prose code {
+      background: rgba(0, 0, 0, 0.1);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    .dark .prose code {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            paper: '#FAF9F6',
+            ink: '#2D2D2D',
+            cinnabar: '#A63434',
+          }
+        }
+      }
+    }
+  </script>
+
+  <div id="root"></div>
+  </body>
+
+</html>

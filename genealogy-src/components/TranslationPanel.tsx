@@ -22,6 +22,150 @@ interface TooltipState {
   term: GlossaryTerm | null;
 }
 
+// --- Memoized Paragraph Component to prevent re-render on hover ---
+const TranslationParagraph = React.memo<{
+  col: ContentColumn;
+  isActive: boolean;
+  isNoteExpanded: boolean;
+  isMobile: boolean;
+  fontSize: 'sm' | 'md' | 'lg';
+  htmlContent: string;
+  translatorNoteHtml: string | null;
+  onHover: (id: number | null) => void;
+  onClick: (e: React.MouseEvent, id: number) => void;
+  onToggleNote: (e: React.MouseEvent, id: number) => void;
+  hasAnyNote: boolean;
+  hasTranslatorNote: boolean;
+  hasRecord: boolean;
+  itemRef: (el: HTMLDivElement | null) => void;
+}>(({
+  col, isActive, isNoteExpanded, isMobile, fontSize, htmlContent, translatorNoteHtml,
+  onHover, onClick, onToggleNote, hasAnyNote, hasTranslatorNote, hasRecord, itemRef
+}) => {
+
+  const getTextSizeClass = () => {
+    switch (fontSize) {
+      case 'sm': return 'text-base';
+      case 'lg': return 'text-xl';
+      default: return 'text-lg';
+    }
+  };
+
+  return (
+    <div
+      ref={itemRef}
+      onMouseEnter={() => !isMobile && onHover(col.id)}
+      onMouseLeave={() => !isMobile && onHover(null)}
+      onClick={(e) => onClick(e, col.id)}
+      className="relative cursor-pointer group"
+    >
+      <div className={`
+          pl-6 border-l-4 transition-colors duration-300
+          ${isActive ? 'border-cinnabar dark:border-red-500' : 'border-transparent'}
+      `}>
+        <div className="flex items-start gap-4">
+          <div className="flex-1">
+            <div className={`
+                    font-body ${getTextSizeClass()} leading-[1.6]
+                    transition-colors duration-300
+                    ${isActive ? 'text-ink dark:text-zinc-100' : 'text-stone-600 dark:text-zinc-400'}
+                    [&>p]:inline
+                `}
+              dangerouslySetInnerHTML={{ __html: htmlContent }}
+            />
+          </div>
+
+          {/* Context Icons (Restored) */}
+          {hasAnyNote && (
+            <button
+              onClick={(e) => onToggleNote(e, col.id)}
+              className="mt-1 flex flex-col items-center gap-1 group/btn"
+              aria-label="Toggle Note"
+            >
+              {hasTranslatorNote && (
+                <div className={`
+                      w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-200
+                      ${isNoteExpanded
+                    ? 'bg-stone-800 text-white border-stone-800 dark:bg-zinc-200 dark:text-zinc-900'
+                    : 'bg-white dark:bg-zinc-900 border-stone-300 dark:border-zinc-700 text-stone-400 dark:text-zinc-500 group-hover/btn:text-cinnabar group-hover/btn:border-cinnabar'}
+                    `}>
+                  {isNoteExpanded ? <ChevronDown size={14} /> : <span className="font-serif font-bold italic text-sm">i</span>}
+                </div>
+              )}
+              {hasRecord && (
+                <div className={`
+                      w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-200
+                      ${isNoteExpanded && !hasTranslatorNote
+                    ? 'bg-stone-800 text-white border-stone-800'
+                    : 'bg-[#e8e6e1] dark:bg-zinc-800 border-stone-300 dark:border-zinc-700 text-stone-600 dark:text-zinc-400 group-hover/btn:text-cinnabar group-hover/btn:border-cinnabar'}
+                    `} title="Historical Record Available">
+                  <Landmark size={12} className="stroke-[2.5]" />
+                </div>
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Expanded Note/Record Content */}
+        <div className={`
+                grid transition-[grid-template-rows] duration-300 ease-out
+                ${isNoteExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}
+            `}>
+          <div className="overflow-hidden">
+            <div className="mt-4 pt-4 border-t border-stone-200 dark:border-zinc-800/60 pb-2 space-y-4">
+              {translatorNoteHtml && (
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-stone-400 dark:text-zinc-500 tracking-widest mb-1 block font-sans">
+                    Note
+                  </span>
+                  <div className="font-body italic text-base text-stone-700 dark:text-zinc-300 leading-relaxed pl-2 border-l-2 border-stone-300 dark:border-zinc-700"
+                    dangerouslySetInnerHTML={{ __html: translatorNoteHtml }}
+                  />
+                </div>
+              )}
+
+              {hasRecord && (
+                <div className="bg-[#e8e6e1] dark:bg-zinc-800/40 p-4 rounded-sm border border-[#d6d3cb] dark:border-zinc-700 shadow-sm">
+                  <div className="flex items-center gap-2 mb-2 pb-2 border-b border-stone-300 dark:border-zinc-700 border-dashed">
+                    <Landmark size={14} className="text-stone-700 dark:text-zinc-400" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-stone-800 dark:text-zinc-300">
+                      Historical Record
+                    </span>
+                  </div>
+                  {/* Note: Map data details would go here if passed, but col.map_data usage requires passing it or extracting needed fields. 
+                      Since I'm memoizing, I should pass map data or just render a placeholder if I don't want to pass deeply. 
+                      Actually, I should pass map data if I want to show details. 
+                      However, the previous code showed event_type etc. 
+                      Let's check if 'col' is available. Yes, 'col' is passed to TranslationParagraph!
+                      So I can access col.map_data directly. */}
+                  {col.map_data && (
+                    <div className="flex flex-col gap-1.5 font-body">
+                      <div className="flex justify-between items-baseline">
+                        <span className="text-xs font-bold text-stone-900 dark:text-zinc-200 uppercase tracking-wider">{col.map_data.event_type}</span>
+                        <span className="text-sm font-semibold text-stone-800 dark:text-zinc-300">{col.map_data.event_date}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-stone-600 dark:text-zinc-400 text-xs">
+                        <MapPin size={12} />
+                        <span>{col.map_data.location_name}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}, (prev, next) => {
+  return prev.isActive === next.isActive &&
+    prev.isNoteExpanded === next.isNoteExpanded &&
+    prev.fontSize === next.fontSize &&
+    prev.col.id === next.col.id &&
+    prev.isMobile === next.isMobile;
+});
+
 const TranslationPanel: React.FC<TranslationPanelProps> = ({
   columns,
   activeColumnId,
@@ -75,14 +219,25 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
 
   }, [glossaryTerms]);
 
-  const preprocessText = (text: string) => {
-    if (!text || !termRegex) return text;
-    // Replace terms with a span that marked will preserve
-    // We use data-term-key to look it up later (lowercased)
-    return text.replace(termRegex, (match) => {
-      return `<span class="glossary-term text-cinnabar dark:text-red-400 font-medium cursor-help border-b border-dashed border-cinnabar/40" data-term-key="${match.toLowerCase()}">${match}</span>`;
-    });
-  };
+  // Memoize the expensive markdown parsing
+  const processedColumns = useMemo(() => {
+    const process = (text: string) => {
+      if (!text) return '';
+      let processed = text;
+      if (termRegex) {
+        processed = text.replace(termRegex, (match) => {
+          return `<span class="glossary-term text-cinnabar dark:text-red-400 font-medium cursor-help border-b border-dashed border-cinnabar/40" data-term-key="${match.toLowerCase()}">${match}</span>`;
+        });
+      }
+      return marked.parse(processed) as string;
+    };
+
+    return columns.map(col => ({
+      ...col,
+      htmlTranslation: process(col.translation || ''),
+      htmlNote: process(col.translator_note || '')
+    }));
+  }, [columns, termRegex]);
 
   const handleInteraction = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -289,118 +444,39 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
           </div>
         </div>
 
-        {columns.map((col) => {
+        {processedColumns.map((col) => {
           const isActive = activeColumnId === col.id;
           const isNoteExpanded = expandedNoteIds.has(col.id);
-
           const hasTranslatorNote = !!col.translator_note || (col.normalized_entities && col.normalized_entities.length > 0);
           const hasRecord = !!col.map_data;
           const hasAnyNote = hasTranslatorNote || hasRecord || !!col.geography_data;
 
           return (
-            <div
+            <TranslationParagraph
               key={col.id}
-              ref={(el) => {
+              col={col}
+              isActive={isActive}
+              isNoteExpanded={isNoteExpanded}
+              isMobile={isMobile}
+              fontSize={fontSize}
+              htmlContent={col.htmlTranslation}
+              translatorNoteHtml={col.htmlNote}
+              onHover={onColumnHover}
+              onClick={handleParagraphInteraction}
+              onToggleNote={toggleNote}
+              hasAnyNote={hasAnyNote}
+              hasTranslatorNote={hasTranslatorNote}
+              hasRecord={hasRecord}
+              itemRef={(el) => {
                 if (el) itemRefs.current.set(col.id, el);
                 else itemRefs.current.delete(col.id);
               }}
-              onMouseEnter={() => !isMobile && onColumnHover(col.id)}
-              onMouseLeave={() => !isMobile && onColumnHover(null)}
-              onClick={(e) => handleParagraphInteraction(e, col.id)}
-              className="relative cursor-pointer group"
-            >
-              <div className={`
-                    pl-6 border-l-4 transition-colors duration-300
-                    ${isActive ? 'border-cinnabar dark:border-red-500' : 'border-transparent'}
-                `}>
-                <div className="flex items-start gap-4">
-                  <div className="flex-1">
-                    <div className={`
-                                font-body ${getTextSizeClass()} leading-[1.6]
-                                transition-colors duration-300
-                                ${isActive ? 'text-ink dark:text-zinc-100' : 'text-stone-600 dark:text-zinc-400'}
-                                [&>p]:inline
-                            `}
-                      dangerouslySetInnerHTML={{ __html: marked.parse(preprocessText(col.translation || '')) as string }}
-                    />
-                  </div>
-
-                  {hasAnyNote && (
-                    <button
-                      onClick={(e) => toggleNote(e, col.id)}
-                      className="mt-1 flex flex-col items-center gap-1 group/btn"
-                      aria-label="Toggle Note"
-                    >
-                      {hasTranslatorNote && (
-                        <div className={`
-                                  w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-200
-                                  ${isNoteExpanded
-                            ? 'bg-stone-800 text-white border-stone-800 dark:bg-zinc-200 dark:text-zinc-900'
-                            : 'bg-white dark:bg-zinc-900 border-stone-300 dark:border-zinc-700 text-stone-400 dark:text-zinc-500 group-hover/btn:text-cinnabar group-hover/btn:border-cinnabar'}
-                                `}>
-                          {isNoteExpanded ? <ChevronDown size={14} /> : <span className="font-serif font-bold italic text-sm">i</span>}
-                        </div>
-                      )}
-                      {hasRecord && (
-                        <div className={`
-                                  w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-200
-                                  ${isNoteExpanded && !hasTranslatorNote
-                            ? 'bg-stone-800 text-white border-stone-800'
-                            : 'bg-[#e8e6e1] dark:bg-zinc-800 border-stone-300 dark:border-zinc-700 text-stone-600 dark:text-zinc-400 group-hover/btn:text-cinnabar group-hover/btn:border-cinnabar'}
-                                `} title="Historical Record Available">
-                          <Landmark size={12} className="stroke-[2.5]" />
-                        </div>
-                      )}
-                    </button>
-                  )}
-                </div>
-
-                <div className={`
-                        grid transition-[grid-template-rows] duration-300 ease-out
-                        ${isNoteExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}
-                    `}>
-                  <div className="overflow-hidden">
-                    <div className="mt-4 pt-4 border-t border-stone-200 dark:border-zinc-800/60 pb-2 space-y-4">
-                      {col.translator_note && (
-                        <div>
-                          <span className="text-[10px] uppercase font-bold text-stone-400 dark:text-zinc-500 tracking-widest mb-1 block font-sans">
-                            Note
-                          </span>
-                          <div className="font-body italic text-base text-stone-700 dark:text-zinc-300 leading-relaxed pl-2 border-l-2 border-stone-300 dark:border-zinc-700"
-                            dangerouslySetInnerHTML={{ __html: marked.parse(preprocessText(col.translator_note)) as string }}
-                          />
-                        </div>
-                      )}
-
-                      {col.map_data && (
-                        <div className="bg-[#e8e6e1] dark:bg-zinc-800/40 p-4 rounded-sm border border-[#d6d3cb] dark:border-zinc-700 shadow-sm">
-                          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-stone-300 dark:border-zinc-700 border-dashed">
-                            <Landmark size={14} className="text-stone-700 dark:text-zinc-400" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-stone-800 dark:text-zinc-300">
-                              Historical Record
-                            </span>
-                          </div>
-                          <div className="flex flex-col gap-1.5 font-body">
-                            <div className="flex justify-between items-baseline">
-                              <span className="text-xs font-bold text-stone-900 dark:text-zinc-200 uppercase tracking-wider">{col.map_data.event_type}</span>
-                              <span className="text-sm font-semibold text-stone-800 dark:text-zinc-300">{col.map_data.event_date}</span>
-                            </div>
-                            <div className="flex items-center gap-1.5 text-stone-600 dark:text-zinc-400 text-xs">
-                              <MapPin size={12} />
-                              <span>{col.map_data.location_name}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            />
           );
         })}
+
         <div className="h-32"></div>
-      </div>
+      </div >
 
       <div className={`
         lg:hidden fixed bottom-16 left-0 right-0 
@@ -419,7 +495,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 };
 

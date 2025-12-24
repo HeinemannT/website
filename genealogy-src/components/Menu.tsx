@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, FileText, Code, Book, ChevronRight, Library, Save, AlertCircle, Info } from 'lucide-react';
+import { X, Search, FileText, Code, Book, ChevronRight, Save, AlertCircle, Info } from 'lucide-react';
 import { GenealogyData } from '../types';
 import { marked } from 'marked';
 import jsyaml from 'js-yaml';
@@ -11,17 +11,16 @@ interface MenuProps {
   onNavigate: (pageIndex: number, columnId?: number) => void;
   yamlSource: string;
   onUpdateYaml: (newSource: string, newData: GenealogyData) => void;
-  activeTab: 'toc' | 'search' | 'docs' | 'glossary' | 'source';
-  onTabChange: (tab: 'toc' | 'search' | 'docs' | 'glossary' | 'source') => void;
+  activeTab: 'toc' | 'search' | 'docs' | 'source';
+  onTabChange: (tab: 'toc' | 'search' | 'docs' | 'source') => void;
 }
 
-type Tab = 'toc' | 'search' | 'docs' | 'glossary' | 'source';
+type Tab = 'toc' | 'search' | 'docs' | 'source';
 
 const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSource, onUpdateYaml, activeTab, onTabChange }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [docHtml, setDocHtml] = useState('');
-  const [glossaryHtml, setGlossaryHtml] = useState('');
 
   const [localSource, setLocalSource] = useState(yamlSource);
   const [parseError, setParseError] = useState<string | null>(null);
@@ -39,16 +38,6 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
         });
     }
   }, [activeTab, docHtml]);
-
-  useEffect(() => {
-    if (activeTab === 'glossary' && !glossaryHtml) {
-      fetch('./glossary.md')
-        .then(res => res.text())
-        .then(text => {
-          setGlossaryHtml(marked.parse(text) as string);
-        });
-    }
-  }, [activeTab, glossaryHtml]);
 
   const handleSourceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newVal = e.target.value;
@@ -115,7 +104,6 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
             { id: 'docs', icon: Info, label: 'About' },
             { id: 'toc', icon: Book, label: 'Contents' },
             { id: 'search', icon: Search, label: 'Search' },
-            { id: 'glossary', icon: Library, label: 'Glossary' },
             { id: 'source', icon: Code, label: 'Source' }
           ].map(tab => (
             <button
@@ -147,14 +135,14 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
                     onClick={() => { onNavigate(idx); onClose(); }}
                     className="flex items-baseline w-full gap-2 py-2 group text-left hover:bg-stone-50 dark:hover:bg-zinc-800/50 rounded-md -mx-2 px-2 transition-colors"
                   >
-                    <span className="text-sm font-medium text-ink dark:text-zinc-200 line-clamp-1 flex-1 font-serif-tc text-left">
+                    <span className="text-sm font-medium text-ink dark:text-zinc-200 flex-1 font-serif-tc text-left">
                       {page.metadata.title}
                     </span>
 
                     {/* Dotted Leader */}
-                    <span className="flex-1 border-b border-dotted border-stone-300 dark:border-zinc-700 mx-2 mb-1 opacity-30"></span>
+                    <span className="flex-1 border-b border-dotted border-stone-300 dark:border-zinc-700 mx-2 mb-1 opacity-30 min-w-[20px]"></span>
 
-                    <span className="font-mono text-xs font-bold text-stone-400 dark:text-zinc-500 group-hover:text-cinnabar dark:group-hover:text-red-400 transition-colors whitespace-nowrap">
+                    <span className="font-mono text-xs font-bold text-stone-400 dark:text-zinc-500 group-hover:text-cinnabar dark:group-hover:text-red-400 transition-colors">
                       p. {page.metadata.physical_page_number}
                     </span>
                   </button>
@@ -212,11 +200,7 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
               </div>
             )}
 
-            {activeTab === 'glossary' && (
-              <div className="p-6 md:p-8 prose dark:prose-invert max-w-none font-body">
-                <div dangerouslySetInnerHTML={{ __html: glossaryHtml }} />
-              </div>
-            )}
+
 
             {activeTab === 'source' && (
               <div className="flex flex-col h-full">

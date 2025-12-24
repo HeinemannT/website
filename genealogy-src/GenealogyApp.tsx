@@ -10,6 +10,7 @@ import Menu from './components/Menu';
 import { GenealogyData, GlossaryTerm, GlossaryData } from './types';
 import { BookOpen, Image as ImageIcon, ScrollText, Map, Loader2, AlertTriangle, RefreshCw, FileX, Network, BookA } from 'lucide-react';
 import jsyaml from 'js-yaml';
+import { marked } from 'marked';
 import { useDraggableScroll } from './hooks/useDraggableScroll';
 
 type MobileViewMode = 'read' | 'image' | 'script' | 'map' | 'tree' | 'glossary';
@@ -88,6 +89,7 @@ const ImagePanel: React.FC<{ filename: string; pageIndex: number }> = ({ filenam
 const GenealogyApp: React.FC = () => {
   const [data, setData] = useState<GenealogyData | null>(null);
   const [glossaryTerms, setGlossaryTerms] = useState<GlossaryTerm[]>([]);
+  const [glossaryHtml, setGlossaryHtml] = useState<string>('');
   const [yamlSource, setYamlSource] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +104,7 @@ const GenealogyApp: React.FC = () => {
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md');
 
   // Menu/Sidebar State
-  type Tab = 'toc' | 'search' | 'docs' | 'glossary' | 'source';
+  type Tab = 'toc' | 'search' | 'docs' | 'source';
   const [activeTab, setActiveTab] = useState<Tab>('toc');
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -125,9 +127,13 @@ const GenealogyApp: React.FC = () => {
       fetch('./glossary.yaml').then(res => {
         if (!res.ok) console.warn("Glossary fetch failed, skipping.");
         return res.ok ? res.text() : '';
+      }),
+      fetch('./glossary.md').then(res => {
+        if (!res.ok) console.warn("Glossary Markdown fetch failed, skipping.");
+        return res.ok ? res.text() : '';
       })
     ])
-      .then(([dataText, glossaryText]) => {
+      .then(([dataText, glossaryText, glossaryMarkdown]) => {
         // 1. Process Main Data
         setYamlSource(dataText);
         try {
@@ -140,21 +146,24 @@ const GenealogyApp: React.FC = () => {
           throw new Error("YAML Parse Error (data.yaml): " + e.message);
         }
 
-        // 2. Process Glossary
+        // 2. Process Glossary YAML (Terms)
         if (glossaryText) {
           try {
             const parsedGlossary = jsyaml.load(glossaryText) as GlossaryData;
-            // Validate structure
             if (parsedGlossary && Array.isArray(parsedGlossary.terms)) {
               setGlossaryTerms(parsedGlossary.terms);
             } else {
-              console.warn("Invalid Glossary Structure: 'terms' array missing.");
               setGlossaryTerms([]);
             }
           } catch (e) {
             console.warn("Failed to parse glossary", e);
             setGlossaryTerms([]);
           }
+        }
+
+        // 3. Process Glossary Markdown
+        if (glossaryMarkdown) {
+          setGlossaryHtml(marked.parse(glossaryMarkdown) as string);
         }
 
         setIsLoading(false);
@@ -338,7 +347,7 @@ const GenealogyApp: React.FC = () => {
 
               {/* VIEW 5: GLOSSARY (Desktop Only - Mobile puts it in 'read' slot equivalent or own slot) */}
               {(!isMobile && desktopViewMode === 'glossary') && (
-                <ContextGlossary terms={glossaryTerms} />
+                <ContextGlossary terms={glossaryTerms} glossaryHtml={glossaryHtml} />
               )}
             </div>
           </div>
@@ -355,7 +364,7 @@ const GenealogyApp: React.FC = () => {
               ${isMobile ? 'absolute inset-0 pt-0 pb-20' : ''}
             `}>
               {mobileViewMode === 'glossary' ? (
-                <ContextGlossary terms={glossaryTerms} />
+                <ContextGlossary terms={glossaryTerms} glossaryHtml={glossaryHtml} />
               ) : (
                 <TranslationPanel
                   columns={currentPage.columns}

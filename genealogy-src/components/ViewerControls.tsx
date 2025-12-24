@@ -82,7 +82,6 @@ const ViewerControls: React.FC<ViewerControlsProps> = ({
         </button>
       </div>
     </div>
-    </div >
   );
 };
 

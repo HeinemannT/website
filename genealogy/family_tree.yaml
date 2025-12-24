@@ -1,0 +1,135 @@
+root_id: "gen1_yanzhong"
+people:
+  - id: "gen1_yanzhong"
+    name_zh: "彥忠"
+    name_en: "Yanzhong"
+    title: "Founding Ancestor"
+    generation: 1
+    page_ref: "img_04"
+    children: ["gen2_yongan"]
+
+  - id: "gen2_yongan"
+    name_zh: "永安"
+    name_en: "Yong'an"
+    title: "2nd Gen Ancestor"
+    generation: 2
+    page_ref: "img_05"
+    children: ["gen3_zhe", "gen3_jian", "gen3_li"]
+
+  - id: "gen3_zhe"
+    name_zh: "蔗"
+    name_en: "Zhe"
+    generation: 3
+    page_ref: "img_06"
+    children: ["gen4_zongxu", "gen4_zongjing", "gen4_zonghou"]
+
+  - id: "gen3_jian"
+    name_zh: "建"
+    name_en: "Jian"
+    generation: 3
+
+  - id: "gen3_li"
+    name_zh: "立"
+    name_en: "Li"
+    generation: 3
+
+  - id: "gen4_zongxu"
+    name_zh: "宗勗"
+    name_en: "Zongxu"
+    generation: 4
+    page_ref: "img_08"
+    children: ["gen5_shangqian", "gen5_shangzhong", "gen5_shanghe"]
+
+  - id: "gen4_zongjing"
+    name_zh: "宗敬"
+    name_en: "Zongjing"
+    generation: 4
+
+  - id: "gen4_zonghou"
+    name_zh: "宗厚"
+    name_en: "Zonghou"
+    generation: 4
+
+  - id: "gen5_shangqian"
+    name_zh: "尚謙"
+    name_en: "Shangqian"
+    generation: 5
+    page_ref: "img_08"
+    children: ["gen6_xian"]
+
+  - id: "gen5_shangzhong"
+    name_zh: "尚忠"
+    name_en: "Shangzhong"
+    generation: 5
+
+  - id: "gen5_shanghe"
+    name_zh: "尚和"
+    name_en: "Shanghe"
+    generation: 5
+
+  - id: "gen6_xian"
+    name_zh: "賢"
+    name_en: "Xian"
+    generation: 6
+    page_ref: "img_09"
+    children: ["gen7_xianci"]
+
+  - id: "gen7_xianci"
+    name_zh: "獻辭"
+    name_en: "Xianci"
+    generation: 7
+    page_ref: "img_10"
+    children: ["gen8_gap"]
+
+  - id: "gen8_gap"
+    name_zh: "..."
+    name_en: "Gen 8-16 (Gap)"
+    title: "Records Lost/Fragmented"
+    generation: 8
+    children: ["gen17_shangda", "gen15_wenxian"]
+
+  - id: "gen15_wenxian"
+    name_zh: "文顯"
+    name_en: "Wenxian"
+    title: "The Lost Branch (Guangxi)"
+    generation: 15
+
+  - id: "gen17_shangda"
+    name_zh: "尚達"
+    name_en: "Shangda"
+    title: "Naval Captain (4th Rank)"
+    generation: 17
+    children: ["gen18_yongzhao"]
+
+  - id: "gen18_yongzhao"
+    name_zh: "永照"
+    name_en: "Yongzhao"
+    title: "Lord Xiulin (?) - Burial at Baiyun"
+    generation: 18
+    page_ref: "img_34"
+    children: ["gen19_guozhi"]
+
+  - id: "gen19_guozhi"
+    name_zh: "國治"
+    name_en: "Guozhi"
+    title: "Pingpo / 6th Rank Official"
+    generation: 19
+    page_ref: "img_35"
+    children: ["gen20_zhenbang", "gen20_zhenmeng", "gen20_zhenbei"]
+
+  - id: "gen20_zhenbang"
+    name_zh: "鎮邦"
+    name_en: "Zhenbang"
+    title: "Migrated to South Africa"
+    generation: 20
+    page_ref: "img_36"
+
+  - id: "gen20_zhenmeng"
+    name_zh: "鎮孟"
+    name_en: "Zhenmeng"
+    generation: 20
+
+  - id: "gen20_zhenbei"
+    name_zh: "鎮盃"
+    name_en: "Zhenbei"
+    generation: 20

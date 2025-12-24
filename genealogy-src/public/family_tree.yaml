@@ -1,0 +1,81 @@
+root_id: "gen1_yanzhong"
+people:
+  - id: "gen1_yanzhong"
+    name_zh: "彥忠"
+    name_en: "Yanzhong"
+    title: "Founding Ancestor"
+    generation: 1
+    page_ref: "img_04"
+    children: ["gen2_yongan"]
+
+  - id: "gen2_yongan"
+    name_zh: "永安"
+    name_en: "Yong'an"
+    title: "2nd Gen Ancestor"
+    generation: 2
+    page_ref: "img_05"
+    children: ["gen3_zhe", "gen3_jian", "gen3_li"]
+
+  - id: "gen3_zhe"
+    name_zh: "蔗"
+    name_en: "Zhe"
+    generation: 3
+    page_ref: "img_06"
+    children: ["gen4_zongxu", "gen4_zongjing", "gen4_zonghou"]
+
+  - id: "gen3_jian"
+    name_zh: "建"
+    name_en: "Jian"
+    generation: 3
+
+  - id: "gen3_li"
+    name_zh: "立"
+    name_en: "Li"
+    generation: 3
+
+  - id: "gen4_zongxu"
+    name_zh: "宗勗"
+    name_en: "Zongxu"
+    generation: 4
+    page_ref: "img_08"
+    children: ["gen5_shangqian", "gen5_shangzhong", "gen5_shanghe"]
+
+  - id: "gen4_zongjing"
+    name_zh: "宗敬"
+    name_en: "Zongjing"
+    generation: 4
+
+  - id: "gen4_zonghou"
+    name_zh: "宗厚"
+    name_en: "Zonghou"
+    generation: 4
+
+  - id: "gen5_shangqian"
+    name_zh: "尚謙"
+    name_en: "Shangqian"
+    generation: 5
+    page_ref: "img_08"
+    children: ["gen6_xian"]
+
+  - id: "gen5_shangzhong"
+    name_zh: "尚忠"
+    name_en: "Shangzhong"
+    generation: 5
+
+  - id: "gen5_shanghe"
+    name_zh: "尚和"
+    name_en: "Shanghe"
+    generation: 5
+
+  - id: "gen6_xian"
+    name_zh: "賢"
+    name_en: "Xian"
+    generation: 6
+    page_ref: "img_09"
+    children: ["gen7_xianci"]
+
+  - id: "gen7_xianci"
+    name_zh: "獻辭"
+    name_en: "Xianci"
+    generation: 7
+    page_ref: "img_10"

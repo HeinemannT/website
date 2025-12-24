@@ -63,7 +63,7 @@ const getCurvedPathPoints = (
   const controlLng = midLng + (offsetY * curveIntensity);
 
   const points: [number, number][] = [];
-  const steps = 80; // Smoothness increased
+  const steps = 45; // Sweet spot between smoothness and performance
 
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
@@ -82,6 +82,7 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
   // Refs to hold Leaflet instances
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const lastFlyTargetIdRef = useRef<string | null>(null);
 
   // Cache for map objects to avoid re-creating them (performance/glitch fix)
   // Structure: { [id]: { layer: L.Layer, year: number } }
@@ -232,11 +233,16 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
     const latestVisible = points.filter(p => p.year <= currentYear).pop();
 
     if (latestVisible && mapRef.current) {
-      mapRef.current.flyTo(
-        [latestVisible.coordinates.lat, latestVisible.coordinates.lng],
-        latestVisible.year > 1900 ? 5 : 8, // Adjusted zoom levels
-        { duration: 1.5, easeLinearity: 0.25 }
-      );
+      // Only fly if the target has definitely changed
+      if (lastFlyTargetIdRef.current !== latestVisible.id) {
+        lastFlyTargetIdRef.current = latestVisible.id;
+
+        mapRef.current.flyTo(
+          [latestVisible.coordinates.lat, latestVisible.coordinates.lng],
+          latestVisible.year > 1900 ? 5 : 8, // Adjusted zoom levels
+          { duration: 1.5, easeLinearity: 0.25 }
+        );
+      }
     }
 
   }, [currentYear, points]);

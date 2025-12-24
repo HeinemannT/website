@@ -133,16 +133,12 @@ pages:
         is_interlinear: true
         text_zh: "第三十二代小勞子冠斐紀錄"
         translation: "Recorded by Guanfei, son of Xiaolao, of the 21st Generation"
-
   - page_id: "img_02"
     metadata:
       image_file: "img_02.webp"
-      physical_page_number: "2"
+      physical_page_number: 2
       title: "Introduction to the Ancestral Temple"
-      marginalia:
-        - position: "top_left"
-          text: "1"
-          note: "Page index"
+
     columns:
       - id: 1
         elevation: 0
@@ -185,12 +181,8 @@ pages:
   - page_id: "img_03"
     metadata:
       image_file: "img_03.webp"
-      physical_page_number: "3"
+      physical_page_number: 3
       title: "The Generation Poem and Naming Taboos"
-      marginalia:
-        - position: "top_left"
-          text: "2"
-          note: "Page index"
 
     columns:
       - id: 1
@@ -228,7 +220,7 @@ pages:
   - page_id: "img_04"
     metadata:
       image_file: "img_04.webp"
-      physical_page_number: "4"
+      physical_page_number: 4
       title: "Biography of Founding Ancestor Yanzhong"
       marginalia:
         - position: "center_right"
@@ -314,13 +306,9 @@ pages:
           lng: 113.2644
   - page_id: "img_05"
     metadata:
-      image_file: "img_05.jpg"
-      physical_page_number: "5"
+      image_file: "img_05.webp"
+      physical_page_number: 5
       title: "Biography of the Second Generation Ancestor: Yong'an"
-      marginalia:
-        - position: "top_right"
-          text: "4"
-          note: "Page index"
 
     columns:
       - id: 1
@@ -398,12 +386,12 @@ pages:
   - page_id: "img_06"
     metadata:
       image_file: "img_06.webp"
-      physical_page_number: "5"
+      physical_page_number: 6
       title: "Biographies of 2nd and 3rd Generation Ancestors"
       marginalia:
         - position: "center_right"
-          text: "式"
-          note: "Generation 3: Shi"
+          text: "弐"
+          note: "Ni: 2"
     columns:
       - id: 1
         elevation: 0
@@ -466,22 +454,24 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "東坑坊三甲戶長勞同戶內臨終盡囑於謝氏子收骨至孫"
-        translation: "—ancestral site at Huangtan within our home village."
-        translator_note: "under the name of the household head Lao Tong in Dongkengfang, 3rd Jia. On his deathbed, he entrusted to Lady Xie's son to collect his bones [for burial]. It wasn't until the grandson..."
+        translation: "under the name of the household head Lao Tong in Dongkengfang, 3rd Jia. On his deathbed, left a will stating that Lady Xie and her son were to take over and manage [the property] until the grandchildren's generation"
 
   - page_id: "img_07"
     metadata:
-      image_file: "img_07.jpg"
-      physical_page_number: "7"
-      title: "Biography of Zongxu (continued) and Family Estates"
+      image_file: "img_07.webp"
+      physical_page_number: 7
+      title: "3rd Generation"
       marginalia: []
     columns:
       - id: 1
         elevation: 0
         is_interlinear: false
         text_zh: "琮郡庠生曾孫紹科登嘉靖壬辰進士任四川提學公終宣德八"
-        translation: "[His son] Cong was a Prefectural Student. His great-grandson, Shaoke, ascended to become a Jinshi in the Renchen year of the Jiajing era (1532) and served as the Education Intendant of Sichuan. The Lord died in the 8th year of Xuande (1433),"
-        translator_note: "This likely concludes the biography of the 3rd generation ancestor (Zhe) or his son's line. 'Cong' appears to be the son mentioned at the very end of the previous page's context."
+        translation: "Cong was a student of the district school. His great-grandson, Shaoke, passed the imperial exam in the Ren-chen year of Jiajing (1532) as a Jinshi and served as the Sichuan Commissioner of Education. The Lord died in the 8th year of Xuande (1433),"
+        translator_note: "This likely concludes the biography of the 3rd generation ancestor (Zhe) or his son's line."
+        map_data:
+          event_date: "1433-01-01"
+          event_type: "death"
 
       - id: 2
         elevation: 0
@@ -499,47 +489,52 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "公與配及妾于本鄉長塘高地卯乙之原蘇氏葬其旁黃太祖母"
-        translation: "The Lord, his wife, and the concubine are [buried] in the home village at Long Pond (Changtang) High Ground, on the plain facing Mao-Yi (East). Lady Su is buried beside them. Great-Grandmother Lady Huang,"
+        translation: "The Lord and his wife were buried together at the Changtang Gaodi site in their home village, facing the Mao-Yi direction (East). Lady Su is buried beside them. Great-Grandmother Lady Huang,"
+        map_data:
+          location_name: "Longtang"
+          event_type: "burial"
 
       - id: 5
         elevation: 0
         is_interlinear: false
         text_zh: "貞靜賢淑年三十六而公卒時長子方九歲家事頗饒氏撫子有"
-        translation: "was chaste, quiet, and virtuous. She was thirty-six when the Lord died. At that time, the eldest son was only nine years old. The family affairs were quite abundant and complex. She raised her son with"
+        translation: "was chaste, quiet, virtuous, and kind. She was thirty-six when the Lord died. At that time, the eldest son was just nine years old, and family affairs were complex. She raised the son with great"
+        translator_note: "Family affairs could be either plentiful or troublesome - an euphemism."
 
       - id: 6
         elevation: 0
         is_interlinear: false
         text_zh: "方治家有法凡百事務次第就理誠女中丈夫也至孫尚謙尚忠"
-        translation: "proper method and managed the household with rules. All myriad matters were handled in proper order. She was truly a 'man among women'. When it came to grandsons Shangqian and Shangzhong,"
+        translation: "proper methods and managed the household with discipline. All matters were handled in order. She was truly a hero among women. By the time of the grandsons Shangqian, Shangzhong,"
+        translator_note: "Lit: 'man among women'"
 
       - id: 7
         elevation: 0
         is_interlinear: false
         text_zh: "等設立祠地嘗田至曾孫任惠等創建立祠宇嘗田土名庚流沙圍"
-        translation: "they established the ancestral temple land and sacrificial fields. Great-grandson Renhui and others founded the ancestral hall building, with sacrificial fields named Gengliu Sand Enclosure,"
+        translation: "and others designated land for ancestral halls and ritual fields. Great-grandsons Ren and Hui later built the ancestral hall structures. The ritual fields are known as Gengliu Shayuan,"
 
       - id: 8
         elevation: 0
         is_interlinear: false
         text_zh: "外鶴田沙等田共貳頃餘畝山墓正德四年已巳十二月十五壬"
-        translation: "and Outer Crane Field Sands, totaling over 2 qing of land (approx. 30 acres). The mountain grave [was recorded] in the 4th year of Zhengde (1509), a Jisi year, 12th month, 15th day, Ren..."
+        translation: "and Waihetian Sha (Outer Crane Field), totaling over two qing of land, totaling over 2 qing of land (approx. 30 acres). The mountain grave [was established/re-interred? on the 15th day of the 12th lunar month in the 4th year of Zhengde (1509), a Ji-si year,"
 
       - id: 9
         elevation: 0
         is_interlinear: false
         text_zh: "寅日辛亥時"
-        translation: "...yin day, at the Xinhai hour."
+        translation: "on a Yin day, at the Xin-hai hour"
 
   - page_id: "img_08"
     metadata:
-      image_file: "img_08.jpg"
-      physical_page_number: "8"
+      image_file: "img_08.webp"
+      physical_page_number: 8
       title: "Biography of 4th Generation Zongxu and 5th Generation Shangqian"
       marginalia:
-        - position: "top_left"
-          text: "4"
-          note: "Page index, likely erroneously marked or referring to 4th generation."
+        - position: "center_right"
+          text: "參"
+          note: "San: 3 (_daiji_, formal character)"
     columns:
       - id: 1
         elevation: -3
@@ -602,8 +597,8 @@ pages:
 
   - page_id: "img_09"
     metadata:
-      image_file: "img_09.jpg"
-      physical_page_number: "9"
+      image_file: "img_09.webp"
+      physical_page_number: 9
       title: "Biography of 5th Generation Shangqian (cont.) and 6th Generation Xian"
       marginalia: []
     columns:
@@ -671,6 +666,10 @@ pages:
       image_file: "img_10.webp"
       physical_page_number: 10
       title: "Life of Yuanfu and Birth of Xianci"
+    marginalia:
+      - position: "center_right"
+        text: "の"
+        note: "Unsure; might be the Japanese の: Go, acting as a separator. Expected 四: 4 here."
     columns:
       - id: 1
         elevation: 0
@@ -737,7 +736,7 @@ pages:
         translation: "...fen, 6 li, 8 hao, 8 si (measurements of area)."
 
       - id: 8
-        elevation: 1
+        elevation: -3
         is_interlinear: false
         text_zh: "世獻辭字朝聳號訥居寅堂公子生正德十年乙亥九月十二日子"
         translation: "**7th Generation: Xianci**. Courtesy name: Chaosong. Art name: Neju. Son of Yintang. Born on the 12th day of the 9th lunar month in the 10th year of Zhengde (1515), an Yihai year, at the Zishi hour."
@@ -779,7 +778,7 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "字品芝再娶桂圃何生正德十五年庚辰四月二十八日寅"
-        translation: "[Xianci] whose style name was Pinzhi, also married Lady He of Guipu, born on the 28th day of the 4th lunar month in the 15th year of Zhengde (1520), a Gengchen year, at the Yinshi hour."
+        translation: "[Xianci] whose courtesy name was Pinzhi, also married Lady He of Guipu, born on the 28th day of the 4th lunar month in the 15th year of Zhengde (1520), a Gengchen year, at the Yinshi hour."
         map_data:
           event_date: "1520-05-15"
           event_type: "spouse_birth"
@@ -818,7 +817,7 @@ pages:
         translation: "...Gen on the plain."
 
       - id: 7
-        elevation: 1
+        elevation: -3
         is_interlinear: false
         text_zh: "世與子字國楚號玉吾訥居公長子生嘉靖二十六年丁未八月十"
         translation: "**8th Generation: Yuzi**. Courtesy name: Guochu. Art name: **Yu-wu**. Eldest son of Lord Neju. Born on the 10th day of the 8th lunar month in the 26th year of Jiajing (1547), a Dingwei year..."
@@ -849,6 +848,10 @@ pages:
       image_file: "img_12.webp"
       physical_page_number: 12
       title: "Family of the 8th Generation: Yuzi and Yunan"
+    marginalia:
+      - position: "center_right"
+        text: "九"
+        note: "Wǔ: 5"
     columns:
       - id: 1
         elevation: 0
@@ -886,7 +889,7 @@ pages:
         translation: "...8 chi; to the south: 5 zhang, 2 chi; to the north: 5 zhang, 6 chi. The actual mountain land plot is 3 fen, 5 li..."
 
       - id: 5
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "與男字國理號日臺訥居公次子生嘉靖三十年辛亥九月二十"
         translation: "**8th Generation: Yunan**. Courtesy name: Guoli. Art name: Ritai. Second son of Lord Neju. Born on the 20th day of the 9th lunar month in the 30th year of Jiajing (1551), a Xinhai year..."
@@ -939,7 +942,7 @@ pages:
       title: "9th Generation: Wan-ji and the Reclamation of Ancestral Graves"
     columns:
       - id: 1
-        elevation: 1
+        elevation: -3
         is_interlinear: false
         text_zh: "世萬畿字洪順號景玉玉吾公長子生隆慶四年庚午九月二十五"
         translation: "**9th Generation: Wan-ji**. Courtesy name: Hongshun. Art name: Jing-yu. Eldest son of Lord Yu-wu. Born on the 25th day of the 9th lunar month in the 4th year of Longqing (1570), a Geng-wu year..."
@@ -1022,9 +1025,13 @@ pages:
       image_file: "img_14.webp"
       physical_page_number: 14
       title: "Families of Wanbang and Wanfang (9th Generation)"
+    marginalia:
+      - position: "center_right"
+        text: "占"
+        note: "Zhān: To divine or fortune-tell. Unsure why this is not 六 - six."
     columns:
       - id: 1
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "萬邦字洪度號肯玉玉吾公次子生萬曆三年乙亥十一月初六"
         translation: "Wanbang, courtesy name Hongdu, art name Ken-yu, was the second son of Lord Yu-wu. He was born on the 6th day of the 11th lunar month in the 3rd year of Wanli (1575), an Yihai year..."
@@ -1055,7 +1062,7 @@ pages:
         translation: "...of the 8th lunar month at the Zhoushi hour. Yingxi, the second son of Wanfang, was adopted as his heir."
 
       - id: 5
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "萬方字洪烱號心吾玉吾公三子生萬曆五年丁丑十二月二十"
         translation: "Wanfang, courtesy name Hongjiong, art name Xin-wu, was the third son of Lord Yu-wu. He was born on the 25th day of the 12th lunar month in the 5th year of Wanli (1577), a Dingchou year..."
@@ -1118,7 +1125,7 @@ pages:
         translation: "...plain of Huangtan in this village, facing the [specified] direction."
 
       - id: 2
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "萬石字洪諧號冲一玉吾公四子生萬曆十年壬午九月初九子"
         translation: "Wanshi, courtesy name Hongxie, art name Chong-yi, was the fourth son of Lord Yu-wu. He was born on the 9th day of the 9th lunar month in the 10th year of Wanli (1582), a Renwu year, at the Zishi hour."
@@ -1153,7 +1160,7 @@ pages:
         translation: "...an Xinchou year, on the 13th day of the 11th lunar month at the Zhoushi hour. She lived to be seventy-nine."
 
       - id: 6
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "萬化字洪烈號泰階日臺公長子生萬曆元年癸酉正月二十八"
         translation: "Wanhua, courtesy name Honglie, art name Taijie, was the eldest son of Lord Ritai. He was born on the 28th day of the 1st lunar month in the 1st year of Wanli (1573), a Guiyou year."
@@ -1177,7 +1184,7 @@ pages:
           event_type: "spouse_death"
 
       - id: 9
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "萬夫字洪壁號奕我日臺公次子生萬曆八年庚辰正月二十一"
         translation: "Wanfu, courtesy name Hongbi, art name Yi-wo, was the second son of Lord Ritai. He was born on the 21st day of the 1st lunar month in the 8th year of Wanli (1580), a Gengchen year."
@@ -1190,6 +1197,10 @@ pages:
       image_file: "img_16.webp"
       physical_page_number: 16
       title: "Families of Wanfu and Wancun; 10th Generation Start"
+    marginalia:
+      - position: "center_right"
+        text: "七"
+        note: "Qī: 7"
     columns:
       - id: 1
         elevation: 0
@@ -1221,13 +1232,13 @@ pages:
           event_type: "spouse_death"
 
       - id: 4
-        elevation: 3
+        elevation: 0
         is_interlinear: true
         text_zh: "十有壹"
         translation: "one (continuation of age 81)."
 
       - id: 5
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "萬存字洪策號完植日臺公三子生萬曆十一年癸未五月二十"
         translation: "Wancun, courtesy name Hongce, art name Wanzhi, was the third son of Lord Ritai. He was born on the 29th day of the 5th lunar month in the 11th year of Wanli (1583), a Guiwei year."
@@ -1262,7 +1273,7 @@ pages:
           event_type: "spouse_death"
 
       - id: 9
-        elevation: -2
+        elevation: -3
         is_interlinear: false
         text_zh: "世應運字昌際號紫浮景玉公子邑庠生萬曆二十三年乙未十月"
         translation: "**10th Generation: Yingyun**, courtesy name Changji, art name Zifu, was the son of Lord Jing-yu. He was a government student. He was born in the 10th lunar month of the 23rd year of Wanli (1595), an Yiwei year."
@@ -1350,7 +1361,7 @@ pages:
         translation: "...to the Provincial Administration Commission, which delivered the final judgment. The property currently held, Gengliusha, is that very land."
 
       - id: 9
-        elevation: 1
+        elevation: -2
         is_interlinear: true
         text_zh: "應錫 字昌禧 號瑞廷 肯玉公子生"
         translation: "**Yingxi**, courtesy name Changxi, art name Ruiting. Son of Lord Ken-yu [Adopted]. Born..."
@@ -1369,6 +1380,10 @@ pages:
       image_file: "img_18.webp"
       physical_page_number: 18
       title: "Biography of Yingxi (Continued) and Zhongxi (10th Generation)"
+    marginalia:
+      - position: "center_right"
+        text: "八"
+        note: "Bā: 8"
     columns:
       - id: 1
         elevation: 0
@@ -1408,7 +1423,7 @@ pages:
           event_type: "spouse_death"
 
       - id: 5
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "仲錫 字昌年 號瑞雲 心吾公長子生萬曆二十九年辛丑七月二"
         translation: "**Zhongxi**, courtesy name Changnian, art name Ruiyun. Eldest son of Lord Xin-wu. Born on the 25th day of the 7th lunar month in the 29th year of Wanli (1601), an Xinchou year..."
@@ -1465,7 +1480,7 @@ pages:
       title: "Biographies of Hanzhang and Junxi (10th Generation)"
     columns:
       - id: 1
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "漢章 字昌初 號廷齡 冲一公子生萬曆四十七年已未二月十八"
         translation: "**Hanzhang**, courtesy name Changchu, art name Yanling. Son of Lord Chong-yi. Born on the 18th day of the 2nd lunar month in the 47th year of Wanli (1619), an Yiwei year..."
@@ -1533,7 +1548,7 @@ pages:
           event_type: "concubine_death"
 
       - id: 8
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "俊錫 字昌恪 號恪芝 泰階公子生萬曆二十八年庚子五月初五"
         translation: "**Junxi**, courtesy name Changke, art name Kezhi. Son of Lord Taijie. Born on the 5th day of the 5th lunar month in the 28th year of Wanli (1600), a Gengzi year."
@@ -1552,6 +1567,7 @@ pages:
           location_name: "Lunjiao, Shunde"
           lat: 22.8643
           lng: 113.1950
+
   - page_id: "img_20"
     metadata:
       image_file: "img_20.webp"
@@ -1560,7 +1576,7 @@ pages:
       marginalia:
         - position: "center_right"
           text: "九"
-          note: "Page index (9)"
+          note: "Jiǔ: 9"
     columns:
       - id: 1
         elevation: 0
@@ -1582,7 +1598,7 @@ pages:
           event_type: "spouse_death"
 
       - id: 3
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "俊傑 字昌昇 號聯輝 奕我公子生萬曆四十年壬子八月二十八"
         translation: "**10th Generation: Junjie**. Courtesy name: Changsheng. Art name: Lianhui. Son of Lord Yi-wo. Born on the 28th day of the 8th lunar month in the 40th year of Wanli (1612), a Renzi year."
@@ -1633,7 +1649,7 @@ pages:
           location_name: "Gengliusha"
 
       - id: 8
-        elevation: 1
+        elevation: -2
         is_interlinear: false
         text_zh: "俊秀 字昌斌 號秋浪 完植公子生萬曆三十三年乙巳九月初七"
         translation: "**10th Generation: Junxiu**. Courtesy name: Changbin. Art name: Qiulang. Son of Lord Wanzhi. Born on the 7th day of the 9th lunar month in the 33rd year of Wanli (1605), an Yisyi year."
@@ -1682,13 +1698,13 @@ pages:
           event_type: "spouse_death"
 
       - id: 4
-        elevation: 3
+        elevation: 0
         is_interlinear: true
         text_zh: "梁氏壽七十六"
         translation: "Lady Liang lived to be seventy-six."
 
       - id: 5
-        elevation: -2
+        elevation: -3
         is_interlinear: false
         text_zh: "十一世 聖世 字賡生 號鳴虞 國學生 察浮公長子生萬曆四十五年丁巳"
         translation: "**11th Generation: Shengshi**. Courtesy name: Gengsheng. Art name: Mingyu. A student of the National Academy. Eldest son of Lord Chafu. Born in the 45th year of Wanli (1617), a Dingyi year..."
@@ -1743,9 +1759,9 @@ pages:
       physical_page_number: 22
       title: "Biographies of 11th Generation Ancestors: Yanheng and Yanjun"
       marginalia:
-        - position: "top_left"
-          text: "12"
-          note: "Duplicate page number"
+        - position: "center_right"
+          text: "十"
+          note: "Shí: 10"
     columns:
       - id: 1
         elevation: 0
@@ -1846,10 +1862,12 @@ pages:
       title: "Relocation of the 13th Generation Ancestors' Graves"
     columns:
       - id: 1
+        elevation: 0
         text_zh: "林舉林舉女二長適簡岸簡次適藤沖劉配終乾隆四年己"
         translation: "Lin-ju's two daughters: the eldest married into the Jian family of Jian'an; the second married Lord Liu of Tengchong. His wife died in the 4th year of Qianlong (1739), a Ji-"
 
       - id: 2
+        elevation: 0
         text_zh: "未六月二十五卯時壽八十一公終乾隆元年丙辰六月初"
         translation: "-wei year, on the 25th day of the 6th lunar month, at the Maoshi hour, aged eighty-one. The Lord died in the 1st year of Qianlong (1736), a Bingchen year, in the beginning of the 6th lunar month..."
         map_data:
@@ -1858,10 +1876,12 @@ pages:
           location_name: "Xiaolao Village"
 
       - id: 3
+        elevation: 0
         text_zh: "九日酉時壽七十八合墓本鄉黃坦之原於咸豐七年九月"
         translation: "...on the 9th day at the Youshi hour, aged seventy-eight. They were buried together on the plain of Huangtan in this village. In the 9th lunar month of the 7th year of Xianfeng (1857)..."
 
       - id: 4
+        elevation: 0
         text_zh: "二十九日已時合遷於南海黃沙尋岡洲村涌口仙人大座"
         translation: "...on the 29th day at the Sishi hour, they were relocated together to the 'Immortal's Great Seat' at Yongkou, Xungangzhou Village, Huangsha, Nanhai."
         map_data:
@@ -1872,14 +1892,17 @@ pages:
           lng: 113.1534
 
       - id: 5
+        elevation: 0
         text_zh: "坐丁向癸兼未丑之原小金塔安放於碑前深七尺餘有山"
         translation: "Sitting in the Ding position and facing Gui, on the plain of Wei-Chou. The small golden pagoda (urn) was placed in front of the tombstone at a depth of over 7 chi. There is a mountain..."
 
       - id: 6
+        elevation: 0
         text_zh: "券為憑此地深長六丈四尺濶壹丈柒尺係十八世孫永兆"
         translation: "...deed as proof. This plot is 6 zhang 4 chi deep and 1 zhang 7 chi wide. It was the 18th-generation descendant Yongzhao..."
 
       - id: 7
+        elevation: 0
         text_zh: "親尋之地此吉地係與南海沙頭堡崔岱雄買撥有紅契存"
         translation: "...who personally found this site. This auspicious land was purchased and transferred from Cui Daixiong of Shatou Fort, Nanhai. A 'red deed' (official property deed) exists."
         map_data:
@@ -1889,10 +1912,12 @@ pages:
           lng: 113.0145
 
       - id: 8
+        elevation: 0
         text_zh: "據照日後無得更改向與及遷莖等弊如有子孫遷莖別"
         translation: "...as evidence. In the future, no changes to the orientation or relocation of the grave shall be allowed. If any descendants attempt to relocate it..."
 
       - id: 9
+        elevation: 0
         text_zh: "處是為不孝特字至囑以垂不朽也"
         translation: "...elsewhere, it shall be considered unfilial. These words are specially left as a command to endure forever."
 
@@ -1901,8 +1926,13 @@ pages:
       image_file: "img_24.webp"
       physical_page_number: 24
       title: "Biographies of Yan-yuan and Yan-zan (11th Generation)"
+    marginalia:
+      - position: "center_right"
+        text: "十一"
+        note: "Shí: 11"
     columns:
       - id: 1
+        elevation: -2
         text_zh: "廷瑗字處君號恭居鳴虞公三子生康熙五年丙午三月十八日"
         translation: "**Yan-yuan**, courtesy name Chujun, art name Gongju. Third son of Lord Mingyu. Born on the 18th day of the 3rd lunar month in the 5th year of Kangxi (1666), a Bingwu year."
         map_data:
@@ -1911,6 +1941,7 @@ pages:
           location_name: "Xiaolao Village"
 
       - id: 2
+        elevation: 0
         text_zh: "卯時配上僚梁生康熙三年甲辰十月二十八日辰時女四"
         translation: "At the Maoshi hour. He married Lady Liang of Shangliao, born on the 28th day of the 10th lunar month in the 3rd year of Kangxi (1664), a Jiachen year, at the Chenshi hour. They had four daughters."
         map_data:
@@ -1919,6 +1950,7 @@ pages:
           location_name: "Shangliao, Shunde"
 
       - id: 3
+        elevation: 0
         text_zh: "長適北滘周次適鷺洲黎季適桂圃何四適譚村何公終乾"
         translation: "The eldest married into the Zhou family of Beijiao; the next married into the Li family of Luzhou; the third married into the He family of Guipu; the fourth married into the He family of Tancun. The Lord died in the Qian[long era]..."
         map_data:
@@ -1928,6 +1960,7 @@ pages:
           lng: 113.2081
 
       - id: 4
+        elevation: 0
         text_zh: "隆九年甲子十月二十六日丑時配終康熙六十一年壬寅"
         translation: "...specifically the 9th year of Qianlong (1744), a Jiazi year, on the 26th day of the 10th lunar month, at the Choushi hour. His wife died in the 61st year of Kangxi (1722), a Renyin year..."
         map_data:
@@ -1935,10 +1968,12 @@ pages:
           event_type: "death"
 
       - id: 5
+        elevation: 0
         text_zh: "七月二十日酉時可六公次子文曜入嗣"
         translation: "...on the 20th day of the 7th lunar month at the Youshi hour. Wen-yao, the second son of Keliu-gong, was adopted as heir."
 
       - id: 6
+        elevation: -2
         text_zh: "廷瓚字輜君號晷齋鳴虞公四子生康熙十三年甲寅十月初十"
         translation: "**Yan-zan**, courtesy name Zhijun, art name Guizhai. Fourth son of Lord Mingyu. Born on the 10th day of the 10th lunar month in the 13th year of Kangxi (1674), a Jiayin year."
         map_data:
@@ -1946,6 +1981,7 @@ pages:
           event_type: "birth"
 
       - id: 7
+        elevation: 0
         text_zh: "丑時配水藤鄧生康熙四十一年壬子六月初九子時子二輝"
         translation: "At the Choushi hour. He married Lady Deng of Shuiteng, born on the 9th day of the 6th lunar month in the 41st year of Kangxi (1702), a Renwu year, at the Zishi hour. They had two sons: Hui..."
         map_data:
@@ -1954,6 +1990,7 @@ pages:
           location_name: "Shuiteng, Shunde"
 
       - id: 8
+        elevation: 0
         text_zh: "鼎輝晟女二公終康熙四十九年庚寅十月初八未時配終"
         translation: "...ding and Huicheng. They had two daughters. The Lord died on the 8th day of the 10th lunar month in the 49th year of Kangxi (1710), a Gengyin year, at the Weishi hour. His wife died..."
         map_data:
@@ -1961,6 +1998,7 @@ pages:
           event_type: "death"
 
       - id: 9
+        elevation: 0
         text_zh: "乾隆八年癸亥十月十七午時合墓本鄉黃坦南向之原"
         translation: "...in the 8th year of Qianlong (1743), a Guihai year, on the 17th day of the 10th lunar month, at the Wushi hour. Buried together on the plain of Huangtan in this village, facing South."
         map_data:
@@ -1974,6 +2012,7 @@ pages:
       title: "Biographies of Lin-ju (13th Gen) and Dian-qu (14th Gen)"
     columns:
       - id: 1
+        elevation: -3
         text_zh: "十三世林舉字建侯號致中勸菴公長子生康熙二十年辛酉七月二十"
         translation: "**13th Generation: Lin-ju**, courtesy name Jianhou, art name Zhizhong. Eldest son of Lord Quan'an. Born on the 25th day of the 7th lunar month in the 20th year of Kangxi (1681), an Xinyou year."
         map_data:
@@ -1982,6 +2021,7 @@ pages:
           location_name: "Xiaolao Village"
 
       - id: 2
+        elevation: 0
         text_zh: "五日辰時配羊額何生康熙十九年庚申七月初四辰時子"
         translation: "At the Chenshi hour. He married Lady He of Yange, born on the 4th day of the 7th lunar month in the 19th year of Kangxi (1680), a Gengshen year, at the Chenshi hour. They had sons..."
         map_data:
@@ -1990,6 +2030,7 @@ pages:
           location_name: "Yange, Shunde"
 
       - id: 3
+        elevation: 0
         text_zh: "三殿取殿元出嗣玉山公殿貴女三長適荷村劉次適上僚"
         translation: "...specifically three: Dian-qu, Dian-yuan (adopted out as heir to Lord Yushan), and Dian-gui. They had three daughters: the eldest married into the Liu family of Hecun; the next married into Shangliao..."
         map_data:
@@ -1999,6 +2040,7 @@ pages:
           lng: 113.1345
 
       - id: 4
+        elevation: 0
         text_zh: "麥三適水藤鄧公終乾隆十八年癸酉十月十五酉時配終"
         translation: "...to the Mai family; the third married Lord Deng of Shuiteng. The Lord died on the 15th day of the 10th lunar month in the 18th year of Qianlong (1753), a Guiyou year, at the Youshi hour. His wife died..."
         map_data:
@@ -2006,6 +2048,7 @@ pages:
           event_type: "death"
 
       - id: 5
+        elevation: 0
         text_zh: "雍正六年戊申十一月初一亥時合墓于本鄉麥田田心於"
         translation: "...on the 1st day of the 11th lunar month in the 6th year of Yongzheng (1728), a Wushen year, at the Haishi hour. Buried together at Maitian Tianxin in this village. In..."
         map_data:
@@ -2013,10 +2056,12 @@ pages:
           event_type: "burial"
 
       - id: 6
+        elevation: 0
         text_zh: "道光二十八年十八世孫永兆親尋吉地自捐銀兩遷莖岳"
         translation: "...the 28th year of Daoguang (1848), the 18th-generation descendant Yongzhao personally found an auspicious site and donated his own funds to relocate the grave to Yue..."
 
       - id: 7
+        elevation: 0
         text_zh: "步園蓮塘庚甲寅之原"
         translation: "...bu-yuan Liantang, on the plain of Geng-Jia-Yin."
         map_data:
@@ -2027,6 +2072,7 @@ pages:
           lng: 113.2345
 
       - id: 8
+        elevation: -3
         text_zh: "十四世 殿取字簡斯號永英致中公長子生康熙四十二年癸未十月初"
         translation: "**14th Generation: Dian-qu**, courtesy name Jiansi, art name Yongying. Eldest son of Lord Zhizhong. Born in the beginning of the 10th lunar month in the 42nd year of Kangxi (1703), a Guiwei year."
         map_data:
@@ -2034,6 +2080,7 @@ pages:
           event_type: "birth"
 
       - id: 9
+        elevation: 0
         text_zh: "九卯時配龍涌陳生康熙四十二年癸未十一月初六未時"
         translation: "At the Maoshi hour. He married Lady Chen of Longchong, born on the 6th day of the 11th lunar month in the 42nd year of Kangxi (1703), a Guiwei year, at the Weishi hour."
         map_data:
@@ -2048,8 +2095,14 @@ pages:
       image_file: "img_26.webp"
       physical_page_number: 26
       title: "Successors of the 14th Generation (Dian-yuan and Dian-gui)"
+    marginalia:
+      - position: "center_right"
+        text: "十二"
+        note: "Shí èr: 12"
+
     columns:
       - id: 1
+        elevation: 0
         text_zh: "子文龍公終乾隆三十一年丙戌四月初十卯時壽六十五"
         translation: "His son, Lord Wen-long, died on the 10th day of the 4th lunar month in the 31st year of Qianlong (1766), a Bingxu year, at the Maoshi hour, aged sixty-five."
         map_data:
@@ -2057,6 +2110,7 @@ pages:
           event_type: "death"
 
       - id: 2
+        elevation: 0
         text_zh: "配終乾隆四十九年甲辰十一月初八酉時壽八十三合莖"
         translation: "His wife died on the 8th day of the 11th lunar month in the 49th year of Qianlong (1784), a Jiachen year, at the Youshi hour, aged eighty-three. They were buried together..."
         map_data:
@@ -2064,6 +2118,7 @@ pages:
           event_type: "spouse_death"
 
       - id: 3
+        elevation: 0
         text_zh: "本鄉更樓沙丁癸之原"
         translation: "...on the plain of Geng-lou-sha in this village, facing the Ding-Gui direction."
         map_data:
@@ -2071,6 +2126,7 @@ pages:
           location_name: "Geng-lou-sha, Xiaolao"
 
       - id: 4
+        elevation: -2
         text_zh: "殿元 字體斯 玉山公嗣子生康熙四十八年己丑九月二十五日"
         translation: "**Dian-yuan**, courtesy name Ti-si. Adopted son of Lord Yu-shan. Born on the 25th day of the 9th lunar month in the 48th year of Kangxi (1709), a Jichou year..."
         map_data:
@@ -2078,6 +2134,7 @@ pages:
           event_type: "birth"
 
       - id: 5
+        elevation: 0
         text_zh: "亥時配鷺洲周生康熙五十二年癸巳十二月十六日巳時"
         translation: "...at the Haishi hour. He married Lady Zhou of Luzhou, who was born on the 16th day of the 12th lunar month in the 52nd year of Kangxi (1713), a Guisi year, at the Sishi hour."
         map_data:
@@ -2088,10 +2145,12 @@ pages:
           lng: 113.1365
 
       - id: 6
+        elevation: 0
         text_zh: "子四文顯文章文勝文春女一"
         translation: "They had four sons: Wen-xian, Wen-zhang, Wen-sheng, and Wen-chun; and one daughter."
 
       - id: 7
+        elevation: -2
         text_zh: "殿貴 字奕斯 致中公三子生康熙五十二年癸巳十月初十丑時"
         translation: "**Dian-gui**, courtesy name Yi-si. Third son of Lord Zhi-zhong. Born on the 10th day of the 10th lunar month in the 52nd year of Kangxi (1713), a Guisi year, at the Choushi hour."
         map_data:
@@ -2099,6 +2158,7 @@ pages:
           event_type: "birth"
 
       - id: 8
+        elevation: 0
         text_zh: "配登洲區生康熙五十三年甲午六月二十九巳時子文昇"
         translation: "He married Lady Qu of Dengzhou, born on the 29th day of the 6th lunar month in the 53rd year of Kangxi (1714), a Jiawu year, at the Sishi hour. They had a son named Wen-sheng."
         map_data:
@@ -2108,6 +2168,7 @@ pages:
           lng: 113.1531
 
       - id: 9
+        elevation: 0
         text_zh: "女一配終乾隆三十一年丙戌九月二十六亥時文昇後嗣無"
         translation: "They had one daughter. He died on the 26th day of the 9th lunar month in the 31st year of Qianlong (1766), a Bingxu year, at the Haishi hour. Wen-sheng left no descendants."
         map_data:
@@ -2121,6 +2182,7 @@ pages:
       title: "Biography of the 15th Generation: Wen-long"
     columns:
       - id: 1
+        elevation: -3
         text_zh: "十五世 文龍 字允恆 號順賢 永英公子生雍正七年己酉正月二十二寅"
         translation: "**15th Generation: Wen-long**, courtesy name Yun-heng, art name Shun-xian. Son of Lord Yong-ying. Born on the 22nd day of the 1st lunar month in the 7th year of Yongzheng (1729), a Jiyou year, at the Yinshi hour."
         map_data:
@@ -2129,6 +2191,7 @@ pages:
           location_name: "Xiaolao Village"
 
       - id: 2
+        elevation: 0
         text_zh: "時配藤涌劉生雍正七年己酉五月二十七日亥時子三觀"
         translation: "He married Lady Liu of Teng-yong, who was born on the 27th day of the 5th lunar month in the 7th year of Yongzheng (1729), a Jiyou year, at the Haishi hour. They had three sons: Guan-"
         map_data:
@@ -2139,6 +2202,7 @@ pages:
           lng: 113.1566
 
       - id: 3
+        elevation: 0
         text_zh: "信觀位觀智公終乾隆六十年乙卯八月二十二日子時壽"
         translation: "-xin, Guan-wei, and Guan-zhi. The Lord died on the 22nd day of the 8th lunar month in the 60th year of Qianlong (1795), an Yimao year, at the Zishi hour, aged..."
         map_data:
@@ -2146,6 +2210,7 @@ pages:
           event_type: "death"
 
       - id: 4
+        elevation: 0
         text_zh: "六十七配合葬嘉慶元年丙辰十二月初五申時壽六十八合"
         translation: "...sixty-seven. His wife died on the 5th day of the 12th lunar month in the 1st year of Jiaqing (1796), a Bingchen year, at the Shenshi hour, aged sixty-eight."
         map_data:
@@ -2153,10 +2218,12 @@ pages:
           event_type: "spouse_death"
 
       - id: 5
+        elevation: 0
         text_zh: "莖本鄉更樓沙於道光二十八年十八世孫永兆親尋吉地"
         translation: "Originally buried at Geng-lou-sha in this village. In the 28th year of Daoguang (1848), the 18th-generation descendant Yong-zhao personally sought an auspicious site..."
 
       - id: 6
+        elevation: 0
         text_zh: "自捐銀兩遷莖岳步園蓮塘致中公墓左之原"
         translation: "...and donated funds to relocate the grave to the plain on the left of Lord Zhi-zhong’s tomb at Yue-bu-yuan Liantang."
         map_data:
@@ -2167,6 +2234,7 @@ pages:
           lng: 113.2345
 
       - id: 7
+        elevation: -2
         text_zh: "文顯 字允益 生子彥純 往廣西經營未回不知下落其神主護祀"
         translation: "Wen-xian, courtesy name Yun-yi, had a son named Yan-chun. He went to Guangxi for business and has not returned; his whereabouts are unknown. His ancestral tablet is protected and worshipped..."
         map_data:
@@ -2176,10 +2244,12 @@ pages:
           lng: 108.4794
 
       - id: 8
+        elevation: 0
         text_zh: "文武廟右偏間享祀係十八世孫永兆捐資入護"
         translation: "...in the right side chamber of the Wen-wu (Civil and Martial) Temple. This was arranged through funds donated by the 18th-generation descendant Yong-zhao."
 
       - id: 9
+        elevation: -2
         text_zh: "文章 文勝 文春等不知往何處經營未詳"
         translation: "Wen-zhang, Wen-sheng, Wen-chun, and others went abroad for business, but their specific locations are unknown."
 
@@ -2188,8 +2258,13 @@ pages:
       image_file: "img_28.webp"
       physical_page_number: 28
       title: "Biography of the 16th Generation: Guan-xin"
+    marginalia:
+      - position: "center_right"
+        text: "十三"
+        note: "Shí sān: 13"
     columns:
       - id: 1
+        elevation: -3
         text_zh: "十六世 觀信 字彥誠 號璞齋 順賢公長子生乾隆二十一年丙子九月"
         translation: "**16th Generation: Guan-xin**, courtesy name Yan-cheng, art name Pu-zhai. Eldest son of Lord Shun-xian. Born in the 9th lunar month of the 21st year of Qianlong (1756), a Bingzi year."
         map_data:
@@ -2198,10 +2273,12 @@ pages:
           location_name: "Xiaolao Village"
 
       - id: 2
+        elevation: 0
         text_zh: "初十子時由孫永兆貴馳贈昭武都尉配岳步鄉南頭何孔"
         translation: "At the Zishi hour on the 10th day. Due to the high status of his grandson Yong-zhao, he was posthumously granted the title of 'Zhao-wu-du-wei' (Military Official of the 4th Rank). He married the daughter of He Kong-"
 
       - id: 3
+        elevation: 0
         text_zh: "傳之姊生乾隆二十一年丙子九月初四日巳時 馳贈四"
         translation: "-chuan from Nan-tou in Yue-bu Village. She was born at the Sishi hour on the 4th day of the 9th lunar month in the 21st year of Qianlong (1756). She was posthumously granted the title of..."
         map_data:
@@ -2210,6 +2287,7 @@ pages:
           location_name: "Yue-bu Village, Shunde"
 
       - id: 4
+        elevation: 0
         text_zh: "品太恭人生子二長上達次宗榮出嗣公終道光六年丙戌"
         translation: "...'Lady of the 4th Rank'. They had two sons: the eldest named Shang-da; the second named Zong-rong (who was adopted out). The Lord died in the 6th year of Daoguang (1826), a Bingxu year..."
         map_data:
@@ -2217,6 +2295,7 @@ pages:
           event_type: "death"
 
       - id: 5
+        elevation: 0
         text_zh: "五月初八日巳時壽七十一莖省城大北門外土名小仙人"
         translation: "...on the 8th day of the 5th lunar month at the Sishi hour, aged seventy-one. He was buried outside the Great North Gate of the Provincial Capital (Guangzhou) at the site named 'Xiao-xian-ren' (Little Immortal)."
         map_data:
@@ -2226,6 +2305,7 @@ pages:
           lng: 113.2655
 
       - id: 6
+        elevation: 0
         text_zh: "坐丙向壬兼午子之原配終道光四年甲申三月初五日酉"
         translation: "Sitting in the Bing position and facing Ren. His wife died at the Youshi hour on the 5th day of the 3rd lunar month in the 4th year of Daoguang (1824), a Jiashen year."
         map_data:
@@ -2233,10 +2313,12 @@ pages:
           event_type: "spouse_death"
 
       - id: 7
+        elevation: 0
         text_zh: "時壽六十九莖本鄉更樓沙於道光二十八年孫永兆親覓"
         translation: "Aged sixty-nine. Buried at Geng-lou-sha in this village. In the 28th year of Daoguang (1848), his grandson Yong-zhao personally sought..."
 
       - id: 8
+        elevation: 0
         text_zh: "吉地自捐銀兩遷莖于致中公墓右坐向同原"
         translation: "...an auspicious site and donated funds to relocate the grave to the right of Lord Zhi-zhong’s tomb, maintaining the same orientation."
         map_data:
@@ -2245,21 +2327,16 @@ pages:
           location_name: "Yue-bu Village, Shunde"
 
       - id: 9
+        elevation: -2
         text_zh: "觀位 字彥才子式洪 觀智 字彥松乃順賢公次子宗榮入嗣"
         translation: "Guan-wei, courtesy name Yan-cai, had a son named Shi-hong. Guan-zhi, courtesy name Yan-song, was the second son of Lord Shun-xian; Zong-rong was adopted as his heir."
 
   - page_id: "img_29"
     metadata:
-      image_file: "img_29.jpg"
-      physical_page_number: "29"
+      image_file: "img_29.webp"
+      physical_page_number: 29
       title: "Biography of 17th Generation Shangda"
-      marginalia:
-        - position: "top_right"
-          text: "16"
-          note: "Handwritten page number (looks like 16 or 17, likely 17 based on context)"
-        - position: "top_left"
-          text: "十七"
-          note: "Seventeen (Generation Index)"
+
     columns:
       - id: 1
         elevation: -3
@@ -2328,13 +2405,13 @@ pages:
 
   - page_id: "img_30"
     metadata:
-      image_file: "img_30.jpg"
-      physical_page_number: "30"
+      image_file: "img_30.webp"
+      physical_page_number: 30
       title: "Biography of 17th Gen Shangda (cont.) and Zongrong"
       marginalia:
-        - position: "top_left"
-          text: "16"
-          note: "Handwritten page number '16'"
+        - position: "center_right"
+          text: "十四"
+          note: "Shí sì: 14"
     columns:
       - id: 1
         elevation: 0
@@ -2390,7 +2467,7 @@ pages:
         translation: "7 zhang deep and 1 zhang 8 chi wide. Land purchased from the Li family of Damen Village in this locality."
 
       - id: 8
-        elevation: -3
+        elevation: -2
         is_interlinear: false
         text_zh: "宗榮 字式華 觀智公嗣子 公生乾隆五十七年壬子八月二十五"
         translation: "**Zongrong**. Courtesy name: Shihua. Heir/Son of Lord Guanzhi. Born in the 57th year of Qianlong (1792), a Renzi year, 8th month, 25th"
@@ -2403,13 +2480,10 @@ pages:
 
   - page_id: "img_31"
     metadata:
-      image_file: "img_31.jpg"
-      physical_page_number: "31"
+      image_file: "img_31.webp"
+      physical_page_number: 31
       title: "Biography of 17th Gen Zongrong (cont.) and 18th Gen Yongzhao"
-      marginalia:
-        - position: "top_left"
-          text: "17"
-          note: "Handwritten page number '17'"
+
     columns:
       - id: 1
         elevation: 0
@@ -2418,30 +2492,32 @@ pages:
         translation: "Four sons: Eldest [Name missing]; Second Fuling; Third Fugao; Fourth Liang."
 
       - id: 2
-        elevation: -3
+        elevation: -2
         is_interlinear: false
         text_zh: "元泰 字式洪 觀位公子 無嗣 宗榮子入嗣"
         translation: "**Yuantai**. Courtesy name: Shihong. Son of Lord Guanwei. No heir; Zongrong's son adopted as heir."
 
-      - id: 3
+      - id: 3 #Space
+
+      - id: 4
         elevation: -3
         is_interlinear: false
         text_zh: "十八永兆 字其惠 號秀林 淡山公子 由行伍特授水師提標後營把總"
         translation: "**18th Gen: Yongzhao**. Courtesy name: Qihui. Art name: **Xiulin**. Son of Lord Danshan. From the ranks, specially appointed Squad Leader (Bazong) of the Water Force Command Standard Rear Battalion."
 
-      - id: 4
+      - id: 5
         elevation: 0
         is_interlinear: false
         text_zh: "陞授本營千總歷署水師提標後營中軍守備推陞湖南岳"
         translation: "Promoted to Lieutenant (Qianzong) of the same battalion. Served as Acting Central Army Captain (Shoubei) of the Water Force Command Standard Rear Battalion. Promoted to Hunan Yue-"
 
-      - id: 5
+      - id: 6
         elevation: 0
         is_interlinear: false
         text_zh: "州水師營守備奉旨賞戴藍翎奏留廣東順德"
         translation: "zhou Water Force Camp Captain. By Imperial Decree, awarded the Blue Feather. Memorialized to be retained in Guangdong, Shunde"
 
-      - id: 6
+      - id: 7
         elevation: 0
         is_interlinear: false
         text_zh: "協左營儘先都司加三級緣因同治九年本鄉與新填村打"
@@ -2451,7 +2527,7 @@ pages:
           event_type: "conflict"
           event_date: "1870-01-01"
 
-      - id: 7
+      - id: 8
         elevation: 0
         is_interlinear: false
         text_zh: "刼互訟控告不休已致族累罷職原品歸里公生于嘉慶十"
@@ -2466,7 +2542,7 @@ pages:
       marginalia:
         - position: "top_right"
           text: "十五"
-          note: "Index marker for the 15th segment."
+          note: "Shí wǔ: 15"
     columns:
       - id: 1
         elevation: 0
@@ -2625,8 +2701,8 @@ pages:
       title: "Family of Yong-zhao (Continued) and Burial of Lady Ji"
       marginalia:
         - position: "top_right"
-          text: "十五"
-          note: "Index marker."
+          text: "十六"
+          note: "Shí liù: 16"
     columns:
       - id: 1
         elevation: 0
@@ -2682,109 +2758,113 @@ pages:
       image_file: "img_35.webp"
       physical_page_number: 35
       title: "Biography of the 19th Generation: Guozhi"
-      marginalia:
-        - position: "top_right"
-          text: "19"
-          note: "Handwritten notation."
+
     columns:
       - id: 1
-        text_zh: "十九世國治字用平號年波秀林公子六品頂戴記名儘先外委生於咸豐八年戊午六月十一日亥時"
-        translation: "**19th Generation: Guozhi**, courtesy name Yongping, art name Nianbo. Son of Lord Xiulin. He held a 6th-rank official button and title. Born on the 11th day of the 6th lunar month in the 8th year of Xianfeng (1858), a Wuwu year, at the Haishi hour (9–11 PM)."
+        elevation: -2
+        is_interlinear: false
+        text_zh: "十九世 國治字用平號平坡秀林公子六品頂戴記名儘先外委生於咸豐"
+        translation: "19th Generation: Guozhi, courtesy name Yongping, art name Pingpo. He was the son of Lord Xiulin. He held the 6th-rank insignia and was registered for immediate appointment as an unassigned officer. Born in the 8th year of Xianfeng (1858), "
+        translation_zh: "The rank **Liu-pin Ding-dai** (六品頂戴) denotes a senior military officer of the 6th rank. An unassigned officer **Wai-wei** (外委) refers to a common rank for those who had achieved merit but were waiting for a specific vacancy."
         map_data:
           event_date: "1858-07-21"
           event_type: "birth"
           location_name: "Xiaolao Village"
           lat: 22.9542
           lng: 113.1023
-
       - id: 2
-        text_zh: "配袁氏生於咸豐六年丙辰五月二十七日申時"
-        translation: "He married Lady Yuan, who was born on the 27th day of the 5th lunar month in the 6th year of Xianfeng (1856), a Bingchen year, at the Shenshi hour (3–5 PM)."
-        map_data:
-          event_date: "1856-06-30"
-          event_type: "spouse_birth"
+        elevation: 0
+        is_interlinear: false
+        text_zh: "八年戊午六月十一日亥時配袁氏生于咸豐八年戊午四月二十七日申時子"
+        translation: "a Wu-wu year, on the 11th day of the 6th lunar month, at the Hai-shi hour. He married Lady Yuan, who was born on the 27th day of the 4th lunar month in the 8th year of Xianfeng (1858), a Wu-wu year, at the Shen-shi hour. Their sons were"
 
       - id: 3
-        text_zh: "二妻畢氏生於咸豐十年庚申五月二十四日酉時"
-        translation: "His second wife, Lady Bi, was born on the 24th day of the 5th lunar month in the 10th year of Xianfeng (1860), a Gengshen year, at the Youshi hour (5–7 PM)."
+        elevation: 0
+        is_interlinear: false
+        text_zh: "一鎮邦妾梁氏生于咸豐十年庚申五月二十四日酉時三妾羅氏生于光"
+        translation: "first, Zhenbang. His concubine, Lady Liang, was born on the 24th day of the 5th lunar month in the 10th year of Xianfeng (1860), a Geng-shen year, at the You-shi hour. His third concubine, Lady Luo, was born in the Guangxu era"
         map_data:
           event_date: "1860-07-12"
           event_type: "spouse_birth"
 
       - id: 4
-        text_zh: "三妻羅氏生於光緒十三年丁亥六月二十六日戌時"
-        translation: "His third wife, Lady Luo, was born on the 26th day of the 6th lunar month in the 13th year of Guangxu (1887), a Dinghai year, at the Xushi hour (7–9 PM)."
+        elevation: 0
+        is_interlinear: false
+        text_zh: "緒十三年丁亥六月二十六日戌時子一鎮盛公附在先德三十七年丙午"
+        translation: "specifically the 13th year (1887), a Ding-hai year, on the 26th day of the 6th lunar month, at the Xu-shi hour. They had a son, Zhenmeng. The Lord died on the 28th day of the 9th lunar month in the 32nd year of Guangxu (1906), a Bing-wu year"
         map_data:
-          event_date: "1887-08-15"
+          event_date: "1860-07-12"
           event_type: "spouse_birth"
 
       - id: 5
-        text_zh: "子一鎮盃公生於先緒三十三年丁未正月二十八日寅時"
-        translation: "They had a son named Zhenbei. The Lord [Guozhi] was born... [Note: Text shifts to son's birth] Zhenbei was born on the 28th day of the 1st lunar month in the 33rd year of Guangxu (1907), a Dingwei year, at the Yinshi hour (3–5 AM)."
+        elevation: 0
+        is_interlinear: false
+        text_zh: "七月二十日寅時配催於光緒二十六年庚子九月二十八日子時妻畢氏"
+        translation: "on the 20th day of the 7th lunar month, between 3:00 AM and 5:00 AM (Yin hour). Zhenmeng wife, Lady Cui, born in the 26th year of Guangxu (1900), a Gengzi year, on the 28th day of the 9th lunar month, at the hour of the Rat (Zi hour). [Another] wife"
+        map_data:
+          event_date: "1900-08-15"
+          event_type: "spouse_birth"
+
+      - id: 6
+        elevation: 0
+        is_interlinear: false
+        text_zh: "終於光緒二十七年辛丑三月廿首子時公墓在廊下園袁比登寺"
+        translation: "passed away in the 27th year of Guangxu (1901), a Xinchou year, on the 20th day of the 3rd lunar month, at the hour of the Rat (Zi hour). The Lord's tomb is located at Langxiayuan, [near] Yuanbideng Temple"
         map_data:
           event_date: "1907-03-12"
           event_type: "son_birth"
 
-      - id: 6
-        text_zh: "配陸氏先緒二十六身庚子九月二十八日子時"
-        translation: "Married Lady Lu, born on the 28th day of the 9th lunar month in the 26th year of Guangxu (1900), a Gengzi year, at the Zishi hour."
-        map_data:
-          event_date: "1900-11-19"
-          event_type: "spouse_birth"
-
       - id: 7
-        text_zh: "妾畢氏終於光緒二十七年辛丑三月廿首子時"
-        translation: "Concubine Lady Bi died on the 20th day of the 3rd lunar month in the 27th year of Guangxu (1901), an Xinchou year, at the Zishi hour."
-        map_data:
-          event_date: "1901-05-08"
-          event_type: "concubine_death"
+        elevation: 0
+        is_interlinear: false
+        text_zh: "鄉庚流河"
+        translation: "in the home village by the Gengliu River site."
 
       - id: 8
-        text_zh: "公莖本鄉三園里袁氏莖本鄉庚流沙"
-        translation: "The Lord was buried at Siyuanli in this village. Lady Yuan was buried at Gengliusha in this village."
-
-      - id: 9
-        text_zh: "二十世鎮邦平波公長子生於先緒十五年己丑十月廿四日午時"
-        translation: "**20th Generation: Zhenbang**, eldest son of Lord Pingbo. Born on the 24th day of the 10th lunar month in the 15th year of Guangxu (1889), a Jichou year, at the Wushi hour (11 AM–1 PM)."
-        map_data:
-          event_date: "1889-11-16"
-          event_type: "birth"
+        is_interlinear: true
+        text_zh: "二十世鎮邦 平岐公長子生於光緒十五年己丑十月廿四日午時"
+        translation: "20th Generation: Zhenbang. Eldest son of Lord Pingpo. Born on the 24th day of the 10th lunar month in the 15th year of Guangxu (1889), a Ji-chou year, at the Wu-shi hour."
 
   - page_id: "img_36"
     metadata:
       image_file: "img_36.webp"
       physical_page_number: 36
-      title: "Biography of the 20th Generation: Zhenbei and South African Migration"
-      marginalia:
-        - position: "top_left"
-          text: "19"
-          note: "Index marker."
+      title: "Biography of the 20th Generation and South African Migration"
     columns:
       - id: 1
-        text_zh: "二十世鎮盃 平波公次子 生於先緒三十三年丁未正月二十八日寅時"
-        translation: "**20th Generation: Zhenbei**, second son of Lord Pingbo. Born on the 28th day of the 1st lunar month in the 33rd year of Guangxu (1907), a Dingwei year, at the Yinshi hour (3–5 AM)."
+        elevation: -3
+        is_interlinear: false
+        text_zh: "二十世 鎮孟 平岐公次子生於光緒三十一年乙巳八月二十六日寅時"
+        translation: "20th Generation: Zhenmeng.: The second son of Lord Pingqi, born on the 26th day of the 8th lunar month in the 31st year of Guangxu (1905), an Yi-si year, at the Yin-shi hour."
         map_data:
-          event_date: "1907-03-12"
+          event_date: "1889-11-16"
           event_type: "birth"
-          location_name: "Xiaolao Village"
 
       - id: 2
+
+      - id: 3
+        elevation: -2
+        is_interlinear: false
         text_zh: "二十世鎮邦字景慶別佐民生於光緒十五年己丑十月廿四日午時"
         translation: "**20th Generation: Zhenbang**, courtesy name Jingqing, also known as Zuomin. Born on the 24th day of the 10th lunar month in the 15th year of Guangxu (1889), a Jichou year, at the Wushi hour."
         map_data:
           event_date: "1889-11-16"
           event_type: "birth"
 
-      - id: 3
+      - id: 4
+        elevation: 0
+        is_interlinear: false
         text_zh: "配金氏生於西歷一九○三年九月廿一日子一澤家"
         translation: "He married Lady Jin, who was born according to the Western calendar on September 21, 1903. They had one son, Zejia."
         map_data:
           event_date: "1903-09-21"
           event_type: "spouse_birth"
 
-      - id: 4
+      - id: 5
+        elevation: 0
+        is_interlinear: false
         text_zh: "公終於乙未年二月廿三日即一九五五年民國四十四年三月十六日"
-        translation: "The Lord died on the 23rd day of the 2nd lunar month in the year Yiwei, which is March 16, 1955 (the 44th year of the Republic)."
+        translation: "The Lord died in the Yiwei year [lunar] on the 23rd day of the 2nd month, which is March 16th, 1955, the 44th year of the Republic of China."
         map_data:
           event_date: "1955-03-16"
           event_type: "death"
@@ -2792,12 +2872,15 @@ pages:
           lat: -31.8984
           lng: 26.8905
 
-      - id: 5
-        text_zh: "在南斐洲波尼時碧半無病而終莖於南斐皇后鎮西人墳場"
-        translation: "He died peacefully in Port Elizabeth, South Africa. He was buried in the 'Westerner's Cemetery' in Queenstown, South Africa."
+      - id: 6
+        elevation: 0
+        is_interlinear: false
+        text_zh: "在南斐洲波尼时碧埠無病而終葬於南斐皇后鎮西人墳場"
+        translation: "He died of natural causes (without illness) at Port Elizabeth, or a local name] Port in South Africa. He was buried in the Westerners' Cemetery in Queenstown, South Africa."
+        translator_note: "**Port Elizabeth** is written as 'Bonishibi' in the original text, which is the phonetic transcription of the town name. 'Huang-hou-zhen' (皇后鎮) translates to Queenstown. "
         map_data:
           event_type: "burial"
           location_name: "Queenstown Cemetery, South Africa"
           lat: -31.8984
           lng: 26.8905
-          note: "Marks the final recorded location of the lineage members."
+          note: "Marks the final recorded location of the lineage."

@@ -79,3 +79,13 @@ export interface GenealogyData {
     paths: MigrationPath[];
   };
 }
+
+export interface GlossaryTerm {
+  term: string; // English
+  zh: string;   // Chinese
+  definition: string;
+}
+
+export interface GlossaryData {
+  terms: GlossaryTerm[];
+}

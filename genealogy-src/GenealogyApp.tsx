@@ -4,13 +4,15 @@ import ViewerControls from './components/ViewerControls';
 import DigitalRecreation from './components/DigitalRecreation';
 import TranslationPanel from './components/TranslationPanel';
 import MigrationMap from './components/MigrationMap';
+import FamilyTree from './components/FamilyTree';
+import ContextGlossary from './components/ContextGlossary';
 import Menu from './components/Menu';
-import { GenealogyData } from './types';
-import { BookOpen, Image as ImageIcon, ScrollText, Map, Loader2, AlertTriangle, RefreshCw, FileX } from 'lucide-react';
+import { GenealogyData, GlossaryTerm, GlossaryData } from './types';
+import { BookOpen, Image as ImageIcon, ScrollText, Map, Loader2, AlertTriangle, RefreshCw, FileX, Network, BookA } from 'lucide-react';
 import jsyaml from 'js-yaml';
 import { useDraggableScroll } from './hooks/useDraggableScroll';
 
-type MobileViewMode = 'read' | 'image' | 'script' | 'map';
+type MobileViewMode = 'read' | 'image' | 'script' | 'map' | 'tree' | 'glossary';
 
 // --- Helper Component for Robust Image Loading ---
 const ImagePanel: React.FC<{ filename: string; pageIndex: number }> = ({ filename, pageIndex }) => {
@@ -85,12 +87,13 @@ const ImagePanel: React.FC<{ filename: string; pageIndex: number }> = ({ filenam
 
 const GenealogyApp: React.FC = () => {
   const [data, setData] = useState<GenealogyData | null>(null);
+  const [glossaryTerms, setGlossaryTerms] = useState<GlossaryTerm[]>([]);
   const [yamlSource, setYamlSource] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
-  const [desktopViewMode, setDesktopViewMode] = useState<'image' | 'digital' | 'map'>('digital');
+  const [desktopViewMode, setDesktopViewMode] = useState<'image' | 'digital' | 'map' | 'tree' | 'glossary'>('digital');
   const [mobileViewMode, setMobileViewMode] = useState<MobileViewMode>('read');
   const [hoveredColumnId, setHoveredColumnId] = useState<number | null>(null);
 
@@ -113,28 +116,51 @@ const GenealogyApp: React.FC = () => {
   const loadData = () => {
     setIsLoading(true);
     setError(null);
-    // Relative path ./data.yaml allows for better compatibility with sub-folder hosting
-    fetch('./data.yaml')
-      .then(response => {
-        if (!response.ok) throw new Error(`Failed to fetch data file (Status: ${response.status})`);
-        return response.text();
+
+    Promise.all([
+      fetch('./data.yaml').then(res => {
+        if (!res.ok) throw new Error(`Failed to fetch data.yaml (${res.status})`);
+        return res.text();
+      }),
+      fetch('./glossary.yaml').then(res => {
+        if (!res.ok) console.warn("Glossary fetch failed, skipping.");
+        return res.ok ? res.text() : '';
       })
-      .then(text => {
-        setYamlSource(text);
+    ])
+      .then(([dataText, glossaryText]) => {
+        // 1. Process Main Data
+        setYamlSource(dataText);
         try {
-          const parsed = jsyaml.load(text) as GenealogyData;
-          if (!parsed || !parsed.pages) {
+          const parsedData = jsyaml.load(dataText) as GenealogyData;
+          if (!parsedData || !parsedData.pages) {
             throw new Error("Invalid Data Structure: Missing 'pages' array.");
           }
-          setData(parsed);
+          setData(parsedData);
         } catch (e: any) {
-          console.error("YAML Parse Error", e);
-          setError(e.message || "Failed to parse genealogy data.");
+          throw new Error("YAML Parse Error (data.yaml): " + e.message);
         }
+
+        // 2. Process Glossary
+        if (glossaryText) {
+          try {
+            const parsedGlossary = jsyaml.load(glossaryText) as GlossaryData;
+            // Validate structure
+            if (parsedGlossary && Array.isArray(parsedGlossary.terms)) {
+              setGlossaryTerms(parsedGlossary.terms);
+            } else {
+              console.warn("Invalid Glossary Structure: 'terms' array missing.");
+              setGlossaryTerms([]);
+            }
+          } catch (e) {
+            console.warn("Failed to parse glossary", e);
+            setGlossaryTerms([]);
+          }
+        }
+
         setIsLoading(false);
       })
       .catch(err => {
-        console.error("Network Error", err);
+        console.error("Load Error", err);
         setError(err.message || "Failed to load application data.");
         setIsLoading(false);
       });
@@ -177,6 +203,18 @@ const GenealogyApp: React.FC = () => {
       if (!isMobile && desktopViewMode === 'map') {
         setDesktopViewMode('digital');
       }
+    }
+  };
+
+  // Helper for navigation from tree
+  const handlePageIdNavigate = (pageId: string) => {
+    if (!data) return;
+    const index = data.pages.findIndex(p => p.page_id === pageId);
+    if (index !== -1) {
+      setCurrentPageIndex(index);
+      // Auto switch to digital view to read
+      if (isMobile) setMobileViewMode('read');
+      else setDesktopViewMode('digital');
     }
   };
 
@@ -247,7 +285,7 @@ const GenealogyApp: React.FC = () => {
           {/* LEFT SIDE (Desktop: Visuals / Mobile: Conditional) */}
           <div className={`
             flex-1 flex flex-col bg-[#F0EFEC] dark:bg-[#121214] relative transition-colors duration-500
-            ${isMobile && mobileViewMode === 'read' ? 'hidden' : 'flex'}
+            ${isMobile && (mobileViewMode === 'read' || mobileViewMode === 'glossary') ? 'hidden' : 'flex'}
             ${isMobile ? 'absolute inset-0 z-10' : ''}
           `}>
             {/* Desktop Controls */}
@@ -280,6 +318,7 @@ const GenealogyApp: React.FC = () => {
                   isMobile={isMobile}
                   marginalia={currentPage.metadata.marginalia}
                   fontSize={fontSize}
+                  glossaryTerms={glossaryTerms}
                 />
               )}
 
@@ -291,30 +330,45 @@ const GenealogyApp: React.FC = () => {
                   isDarkMode={isDarkMode}
                 />
               )}
+
+              {/* VIEW 4: FAMILY TREE */}
+              {((!isMobile && desktopViewMode === 'tree') || (isMobile && mobileViewMode === 'tree')) && (
+                <FamilyTree onNavigate={handlePageIdNavigate} isDarkMode={isDarkMode} />
+              )}
+
+              {/* VIEW 5: GLOSSARY (Desktop Only - Mobile puts it in 'read' slot equivalent or own slot) */}
+              {(!isMobile && desktopViewMode === 'glossary') && (
+                <ContextGlossary terms={glossaryTerms} />
+              )}
             </div>
           </div>
 
           {/* RIGHT SIDE (Desktop: Translation / Mobile: Conditional) */}
-          {(isMobile || desktopViewMode !== 'map') && (
+          {(isMobile || (desktopViewMode !== 'map' && desktopViewMode !== 'tree' && desktopViewMode !== 'glossary')) && (
             <div className={`
               w-full lg:w-[480px] xl:w-[600px] flex-none 
               border-l border-stone-200 dark:border-zinc-800 
               bg-paper dark:bg-zinc-900 
               shadow-[rgba(0,0,0,0.05)_0px_0px_40px] z-20
               transition-all duration-500
-              ${isMobile && mobileViewMode !== 'read' ? 'hidden' : 'flex flex-col h-full'}
+              ${isMobile && (mobileViewMode !== 'read' && mobileViewMode !== 'glossary') ? 'hidden' : 'flex flex-col h-full'}
               ${isMobile ? 'absolute inset-0 pt-0 pb-20' : ''}
             `}>
-              <TranslationPanel
-                columns={currentPage.columns}
-                activeColumnId={hoveredColumnId}
-                onColumnHover={setHoveredColumnId}
-                summary={currentPage.metadata.title}
-                pageMetadata={currentPage.metadata}
-                isMobile={isMobile}
-                marginalia={currentPage.metadata.marginalia}
-                fontSize={fontSize}
-              />
+              {mobileViewMode === 'glossary' ? (
+                <ContextGlossary terms={glossaryTerms} />
+              ) : (
+                <TranslationPanel
+                  columns={currentPage.columns}
+                  activeColumnId={hoveredColumnId}
+                  onColumnHover={setHoveredColumnId}
+                  summary={currentPage.metadata.title}
+                  pageMetadata={currentPage.metadata}
+                  isMobile={isMobile}
+                  marginalia={currentPage.metadata.marginalia}
+                  fontSize={fontSize}
+                  glossaryTerms={glossaryTerms}
+                />
+              )}
             </div>
           )}
 
@@ -348,10 +402,26 @@ const GenealogyApp: React.FC = () => {
               <Map size={20} />
               <span className="text-[10px] font-medium tracking-wide">MAP</span>
             </button>
+
+            {/* NEW ICONS (WIP style) */}
+            <button
+              onClick={() => setMobileViewMode('tree')}
+              className={`flex flex-col items-center gap-1 p-2 transition-colors opacity-60 hover:opacity-100 ${mobileViewMode === 'tree' ? 'text-cinnabar dark:text-red-400' : 'text-stone-400 dark:text-zinc-600'}`}
+            >
+              <Network size={20} />
+              <span className="text-[10px] font-medium tracking-wide">TREE</span>
+            </button>
+            <button
+              onClick={() => setMobileViewMode('glossary')}
+              className={`flex flex-col items-center gap-1 p-2 transition-colors opacity-60 hover:opacity-100 ${mobileViewMode === 'glossary' ? 'text-cinnabar dark:text-red-400' : 'text-stone-400 dark:text-zinc-600'}`}
+            >
+              <BookA size={20} />
+              <span className="text-[10px] font-medium tracking-wide">CTX</span>
+            </button>
           </div>
 
           {/* Mobile Floating Pagination */}
-          {mobileViewMode !== 'map' && (
+          {(mobileViewMode !== 'map' && mobileViewMode !== 'tree' && mobileViewMode !== 'glossary') && (
             <div className="lg:hidden absolute bottom-24 right-4 z-40">
               <div className="flex items-center gap-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur border border-stone-200 dark:border-zinc-700 rounded-full shadow-lg px-4 py-2 transition-all">
                 <button

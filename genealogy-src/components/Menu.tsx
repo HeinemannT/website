@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, FileText, Code, Book, ChevronRight, Save, AlertCircle, Info } from 'lucide-react';
-import { GenealogyData } from '../types';
+import { X, Search, FileText, Code, Book, ChevronRight, Save, AlertCircle, Info, BookA } from 'lucide-react';
+import { GenealogyData, GlossaryTerm } from '../types';
 import { marked } from 'marked';
 import jsyaml from 'js-yaml';
 
@@ -11,13 +11,14 @@ interface MenuProps {
   onNavigate: (pageIndex: number, columnId?: number) => void;
   yamlSource: string;
   onUpdateYaml: (newSource: string, newData: GenealogyData) => void;
-  activeTab: 'toc' | 'search' | 'docs' | 'source';
-  onTabChange: (tab: 'toc' | 'search' | 'docs' | 'source') => void;
+  activeTab: 'toc' | 'search' | 'docs' | 'source' | 'glossary';
+  onTabChange: (tab: 'toc' | 'search' | 'docs' | 'source' | 'glossary') => void;
+  glossaryTerms?: GlossaryTerm[];
 }
 
-type Tab = 'toc' | 'search' | 'docs' | 'source';
+type Tab = 'toc' | 'search' | 'docs' | 'source' | 'glossary';
 
-const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSource, onUpdateYaml, activeTab, onTabChange }) => {
+const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSource, onUpdateYaml, activeTab, onTabChange, glossaryTerms = [] }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [docHtml, setDocHtml] = useState('');
@@ -104,6 +105,7 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
             { id: 'docs', icon: Info, label: 'About' },
             { id: 'toc', icon: Book, label: 'Contents' },
             { id: 'search', icon: Search, label: 'Search' },
+            { id: 'glossary', icon: BookA, label: 'Glossary' },
             { id: 'source', icon: Code, label: 'Source' }
           ].map(tab => (
             <button
@@ -135,18 +137,37 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
                     onClick={() => { onNavigate(idx); onClose(); }}
                     className="flex items-baseline w-full gap-2 py-2 group text-left hover:bg-stone-50 dark:hover:bg-zinc-800/50 rounded-md -mx-2 px-2 transition-colors"
                   >
-                    <span className="text-sm font-medium text-ink dark:text-zinc-200 font-serif-tc text-left">
+                    <div className="flex-1 font-serif-tc text-left text-sm font-medium text-ink dark:text-zinc-200 pr-2">
                       {page.metadata.title}
-                    </span>
+                    </div>
 
-                    {/* Dotted Leader */}
-                    <span className="flex-1 border-b border-dotted border-stone-300 dark:border-zinc-700 mx-2 mb-1 opacity-30 min-w-[20px]"></span>
-
-                    <span className="font-mono text-xs font-bold text-stone-400 dark:text-zinc-500 group-hover:text-cinnabar dark:group-hover:text-red-400 transition-colors">
-                      p. {page.metadata.physical_page_number}
-                    </span>
+                    <div className="shrink-0 font-mono text-xs font-bold text-stone-400 dark:text-zinc-500 group-hover:text-cinnabar dark:group-hover:text-red-400 transition-colors pl-2 border-l border-stone-200 dark:border-zinc-800 border-dashed">
+                      p.{page.metadata.physical_page_number}
+                    </div>
                   </button>
                 ))}
+              </div>
+            )}
+
+            {activeTab === 'glossary' && (
+              <div className="flex flex-col min-h-full px-6 py-6 space-y-4">
+                <div className="pb-4 border-b border-stone-200 dark:border-zinc-800">
+                  <h3 className="text-sm font-bold text-stone-500 dark:text-zinc-500 uppercase tracking-widest">Glossary Terms</h3>
+                </div>
+                {glossaryTerms.map((term, idx) => (
+                  <div key={idx} className="group">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="font-serif-tc text-lg font-bold text-ink dark:text-zinc-200">{term.term}</span>
+                      <span className="text-xs text-cinnabar dark:text-red-400 font-medium opacity-80">{term.zh}</span>
+                    </div>
+                    <p className="text-sm text-stone-600 dark:text-zinc-400 leading-relaxed group-hover:text-stone-900 dark:group-hover:text-zinc-300 transition-colors">
+                      {term.definition}
+                    </p>
+                  </div>
+                ))}
+                {glossaryTerms.length === 0 && (
+                  <div className="text-stone-400 dark:text-zinc-600 text-center py-8 italic">No glossary terms found.</div>
+                )}
               </div>
             )}
 

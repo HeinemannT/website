@@ -55,17 +55,27 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
     const peopleMap: Map<string, FamilyMember> = new Map(data.people.map((p: FamilyMember) => [p.id, p]));
 
     // Recursive Tree Renderer
-    // Auto-scroll to root on load
+    // Auto-scroll to root on load - Wrapped in timeout for Mobile safety
     useEffect(() => {
         if (!isLoading && data && data.root_id) {
-            const rootElement = document.getElementById(`node-${data.root_id}`);
-            if (rootElement) {
-                rootElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-            }
+            const timer = setTimeout(() => {
+                const rootElement = document.getElementById(`node-${data.root_id}`);
+                if (rootElement) {
+                    try {
+                        rootElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
+                    } catch (e) {
+                        // Fallback for older browsers or test envs
+                        console.warn("Scroll failed", e);
+                    }
+                }
+            }, 100);
+            return () => clearTimeout(timer);
         }
     }, [isLoading, data]);
 
     const renderNode = (id: string, depth: number = 0) => {
+        if (depth > 50) return <div className="text-red-500 font-bold p-2">Max Depth Exceeded</div>; // Crash prevention
+
         const person = peopleMap.get(id);
         if (!person) return null;
 

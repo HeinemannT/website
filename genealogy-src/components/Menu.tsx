@@ -3,6 +3,7 @@ import { X, Search, FileText, Code, Book, ChevronRight, Save, AlertCircle, Info,
 import { GenealogyData, GlossaryTerm } from '../types';
 import { marked } from 'marked';
 import jsyaml from 'js-yaml';
+import ContextGlossary from './ContextGlossary';
 
 interface MenuProps {
   isOpen: boolean;
@@ -14,11 +15,12 @@ interface MenuProps {
   activeTab: 'toc' | 'search' | 'docs' | 'source' | 'glossary';
   onTabChange: (tab: 'toc' | 'search' | 'docs' | 'source' | 'glossary') => void;
   glossaryTerms?: GlossaryTerm[];
+  glossaryHtml?: string;
 }
 
 type Tab = 'toc' | 'search' | 'docs' | 'source' | 'glossary';
 
-const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSource, onUpdateYaml, activeTab, onTabChange, glossaryTerms = [] }) => {
+const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSource, onUpdateYaml, activeTab, onTabChange, glossaryTerms = [], glossaryHtml = '' }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [docHtml, setDocHtml] = useState('');
@@ -150,24 +152,8 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
             )}
 
             {activeTab === 'glossary' && (
-              <div className="flex flex-col min-h-full px-6 py-6 space-y-4">
-                <div className="pb-4 border-b border-stone-200 dark:border-zinc-800">
-                  <h3 className="text-sm font-bold text-stone-500 dark:text-zinc-500 uppercase tracking-widest">Glossary Terms</h3>
-                </div>
-                {glossaryTerms.map((term, idx) => (
-                  <div key={idx} className="group">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <span className="font-serif-tc text-lg font-bold text-ink dark:text-zinc-200">{term.term}</span>
-                      <span className="text-xs text-cinnabar dark:text-red-400 font-medium opacity-80">{term.zh}</span>
-                    </div>
-                    <p className="text-sm text-stone-600 dark:text-zinc-400 leading-relaxed group-hover:text-stone-900 dark:group-hover:text-zinc-300 transition-colors">
-                      {term.definition}
-                    </p>
-                  </div>
-                ))}
-                {glossaryTerms.length === 0 && (
-                  <div className="text-stone-400 dark:text-zinc-600 text-center py-8 italic">No glossary terms found.</div>
-                )}
+              <div className="h-full overflow-hidden">
+                <ContextGlossary terms={glossaryTerms} glossaryHtml={glossaryHtml} />
               </div>
             )}
 

@@ -89,7 +89,7 @@ terms:
 
   - term: "Hao"
     zh: "號"
-    definition: "Art Name. A pseudonym chosen by the educated person themselves, often reflecting their interests or philosophy."
+    definition: "Art Name / Unit. Can refer to a pseudonym chosen by an educated person OR a unit of area (1/1000 of a Mu) or length."
 
   - term: "Juren"
     zh: "舉人"
@@ -154,3 +154,39 @@ terms:
   - term: "Tongzhi"
     zh: "同治"
     definition: "Regnal era of the Qing Dynasty (1861–1875)."
+
+  - term: "Zhang"
+    zh: "丈"
+    definition: "Unit of length ~3.3 meters. Traditionally used for measuring land or distance."
+
+  - term: "Chi"
+    zh: "尺"
+    definition: "Chinese Foot ~1/3 meter (~33cm). Used for measuring height, depth, or smaller distances."
+
+  - term: "Cun"
+    zh: "寸"
+    definition: "Chinese Inch ~3.3 cm. 1/10th of a Chi."
+
+  - term: "Fen"
+    zh: "分"
+    definition: "Unit of measure. Can be 1/10th of a Cun (length) or 1/10th of a Mu (area)."
+
+  - term: "Li"
+    zh: "厘"
+    definition: "Unit of measure. Can be 1/100th of a Cun (length) or 1/100th of a Mu (area)."
+
+  - term: "Si"
+    zh: "絲"
+    definition: "Tiny unit. 1/1000th of a Cun (length) or 1/1000th of a Mu (area). Often implies 'thread-like' precision."
+
+  - term: "Gong"
+    zh: "公"
+    definition: "Lord / Honorable. A respectful suffix for ancestors (e.g., Yanzhong-gong)."
+
+  - term: "Lady"
+    zh: "氏"
+    definition: "Madam / Chi. Suffix for a married woman's maiden surname (e.g., Zhou-shi = Lady Zhou)."
+
+  - term: "Concubine"
+    zh: "妾"
+    definition: "Secondary wife. A recognized union in historical Chinese society, often taken to ensure male heirs."

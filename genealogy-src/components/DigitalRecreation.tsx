@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { ContentColumn, MarginaliaItem } from '../types';
+import { ContentColumn, MarginaliaItem, GlossaryTerm } from '../types';
 import { X, Globe } from 'lucide-react';
 import { useDraggableScroll } from '../hooks/useDraggableScroll';
 import { marked } from 'marked';
+import SmartText from './SmartText';
 
 interface DigitalRecreationProps {
   columns: ContentColumn[];
@@ -11,6 +12,7 @@ interface DigitalRecreationProps {
   isMobile: boolean;
   marginalia?: MarginaliaItem[];
   fontSize: 'sm' | 'md' | 'lg';
+  glossaryTerms?: GlossaryTerm[];
 }
 
 const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
@@ -19,6 +21,8 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
   onColumnHover,
   isMobile,
   marginalia,
+  fontSize,
+  glossaryTerms = []
   // fontSize is purposely ignored for the Chinese script to maintain layout integrity
 }) => {
   const [mobileSelectedId, setMobileSelectedId] = useState<number | null>(null);
@@ -157,18 +161,13 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                   >
                     <div
                       className={`
-                        font-serif-tc text-xl leading-[1.5] tracking-widest
-                        transition-all duration-300 select-none whitespace-nowrap
-                        ${isRaised ? 'font-bold' : 'font-normal'}
-                        ${isInterlinear 
-                          ? 'text-sm !tracking-normal opacity-75 font-body' 
-                          : 'text-xl tracking-widest'}
-                        ${isActive
-                          ? 'text-cinnabar dark:text-red-400 drop-shadow-sm font-semibold'
-                          : 'text-stone-800 dark:text-zinc-400 opacity-90'}
-                        `}
+                    font-serif-tc writing-vertical-rl text-justify tracking-[0.2em] leading-loose
+                    ${col.is_interlinear
+                          ? 'text-sm text-stone-500 dark:text-zinc-500 font-normal pl-1'
+                          : 'text-2xl font-bold text-ink dark:text-zinc-200'}
+                  `}
                     >
-                      {col.text_zh}
+                      <SmartText text={col.text_zh} terms={glossaryTerms} language="zh" />
                     </div>
                   </div>
                 );

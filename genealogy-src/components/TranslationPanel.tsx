@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ContentColumn, PageMetadata, MarginaliaItem } from '../types';
-import { Info, Compass, Calendar, Book, ChevronDown, MapPin, Landmark, BookOpen, X } from 'lucide-react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { ContentColumn, PageMetadata, MarginaliaItem, GlossaryTerm } from '../types';
+import { Info, ChevronDown, MapPin, Landmark, Book, X } from 'lucide-react';
 import { marked } from 'marked';
 
 interface TranslationPanelProps {
@@ -12,6 +12,14 @@ interface TranslationPanelProps {
   pageMetadata?: PageMetadata;
   marginalia?: MarginaliaItem[];
   fontSize: 'sm' | 'md' | 'lg';
+  glossaryTerms?: GlossaryTerm[];
+}
+
+interface TooltipState {
+  visible: boolean;
+  x: number;
+  y: number;
+  term: GlossaryTerm | null;
 }
 
 const TranslationPanel: React.FC<TranslationPanelProps> = ({
@@ -22,15 +30,17 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
   isMobile,
   pageMetadata,
   marginalia,
-  fontSize
+  fontSize,
+  glossaryTerms = []
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<number, HTMLDivElement>>(new Map());
-
-  // State for tracking which notes are expanded.
   const [expandedNoteIds, setExpandedNoteIds] = useState<Set<number>>(new Set());
   const [selectedMobileId, setSelectedMobileId] = useState<number | null>(null);
   const [selectedMarginaliaIndex, setSelectedMarginaliaIndex] = useState<number | null>(null);
+
+  // Tooltip State
+  const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, x: 0, y: 0, term: null });
 
   useEffect(() => {
     // Only auto-scroll on desktop when hovering the script side
@@ -45,6 +55,54 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
       }
     }
   }, [activeColumnId, isMobile]);
+
+  // --- Glossary Pre-processing ---
+  const { termRegex, termMap } = useMemo(() => {
+    if (!glossaryTerms.length) return { termRegex: null, termMap: new Map() };
+
+    const map = new Map<string, GlossaryTerm>();
+    // Filter English terms and sort by length desc
+    const sorted = glossaryTerms
+      .filter(t => t.term && t.term.length > 1)
+      .sort((a, b) => b.term.length - a.term.length);
+
+    sorted.forEach(t => map.set(t.term.toLowerCase(), t));
+
+    const patterns = sorted.map(t => t.term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    // Match word boundaries to prevent partial matches
+    const regex = new RegExp(`\\b(${patterns.join('|')})\\b`, 'gi');
+    return { termRegex: regex, termMap: map };
+
+  }, [glossaryTerms]);
+
+  const preprocessText = (text: string) => {
+    if (!text || !termRegex) return text;
+    // Replace terms with a span that marked will preserve
+    // We use data-term-key to look it up later (lowercased)
+    return text.replace(termRegex, (match) => {
+      return `<span class="glossary-term text-cinnabar dark:text-red-400 font-medium cursor-help border-b border-dashed border-cinnabar/40" data-term-key="${match.toLowerCase()}">${match}</span>`;
+    });
+  };
+
+  const handleInteraction = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('glossary-term')) {
+      const key = target.getAttribute('data-term-key');
+      if (key && termMap.has(key)) {
+        const rect = target.getBoundingClientRect();
+        setTooltip({
+          visible: true,
+          x: rect.left + (rect.width / 2),
+          y: rect.top,
+          term: termMap.get(key)!
+        });
+        return;
+      }
+    }
+    if (tooltip.visible) {
+      setTooltip({ ...tooltip, visible: false });
+    }
+  };
 
   const toggleNote = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
@@ -79,8 +137,34 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
   return (
     <div className="flex flex-col h-full relative">
 
+      {/* Tooltip Portal/Overlay */}
+      {tooltip.visible && tooltip.term && (
+        <div
+          className="fixed z-50 w-64 bg-white dark:bg-zinc-800 border border-stone-200 dark:border-zinc-700 shadow-xl rounded-md p-3 text-sm pointer-events-none animate-in fade-in zoom-in-95 duration-200"
+          style={{
+            left: tooltip.x,
+            top: tooltip.y - 8,
+            transform: 'translate(-50%, -100%)'
+          }}
+        >
+          <div className="flex justify-between items-baseline mb-1 border-b border-stone-100 dark:border-zinc-700 pb-1">
+            <span className="font-bold font-serif-tc text-ink dark:text-zinc-100">{tooltip.term.term}</span>
+            <span className="text-cinnabar text-xs opacity-80">{tooltip.term.zh}</span>
+          </div>
+          <p className="text-stone-600 dark:text-zinc-400 text-xs leading-relaxed">
+            {tooltip.term.definition}
+          </p>
+          {/* Arrow */}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-white dark:border-t-zinc-800"></div>
+        </div>
+      )}
+
       {/* Scrollable Content */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 md:px-12 py-10 space-y-6">
+      <div
+        ref={scrollRef}
+        onMouseOver={handleInteraction}
+        className="flex-1 overflow-y-auto px-5 md:px-12 py-10 space-y-6 scroll-smooth"
+      >
 
         {/* SUMMARY SECTION - Compact Design */}
         <div className="bg-stone-50 dark:bg-zinc-800/40 rounded-sm p-6 border border-stone-200 dark:border-zinc-800 shadow-sm mb-8 relative z-20">
@@ -186,7 +270,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
                                 ${isActive ? 'text-ink dark:text-zinc-100' : 'text-stone-600 dark:text-zinc-400'}
                                 [&>p]:inline
                             `}
-                      dangerouslySetInnerHTML={{ __html: marked.parse(col.translation || '') as string }}
+                      dangerouslySetInnerHTML={{ __html: marked.parse(preprocessText(col.translation || '')) as string }}
                     />
                   </div>
 
@@ -232,7 +316,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
                             Note
                           </span>
                           <div className="font-body italic text-base text-stone-700 dark:text-zinc-300 leading-relaxed pl-2 border-l-2 border-stone-300 dark:border-zinc-700"
-                            dangerouslySetInnerHTML={{ __html: marked.parse(col.translator_note) as string }}
+                            dangerouslySetInnerHTML={{ __html: marked.parse(preprocessText(col.translator_note)) as string }}
                           />
                         </div>
                       )}

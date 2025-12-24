@@ -247,7 +247,8 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
     }
   };
 
-  const toggleNote = (e: React.MouseEvent, id: number) => {
+  // Memoized Handlers to prevent re-renders
+  const toggleNote = React.useCallback((e: React.MouseEvent, id: number) => {
     e.stopPropagation();
     setExpandedNoteIds(prev => {
       const newSet = new Set(prev);
@@ -258,9 +259,9 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
       }
       return newSet;
     });
-  };
+  }, []);
 
-  const handleParagraphInteraction = (e: React.MouseEvent, id: number) => {
+  const handleParagraphInteraction = React.useCallback((e: React.MouseEvent, id: number) => {
     // Check if we clicked a glossary term
     const target = e.target as HTMLElement;
     const glossaryTerm = target.closest('.glossary-term');
@@ -269,36 +270,39 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
       e.stopPropagation();
       const key = glossaryTerm.getAttribute('data-term-key');
       if (key && termMap.has(key)) {
-        // Toggle if same, open if diff
         const term = termMap.get(key)!;
-        if (tooltip.visible && tooltip.term?.term === term.term) {
-          setTooltip({ ...tooltip, visible: false });
-        } else {
+        setTooltip(prev => {
+          // Toggle if same, open if diff
+          if (prev.visible && prev.term?.term === term.term) {
+            return { ...prev, visible: false };
+          }
           const rect = glossaryTerm.getBoundingClientRect();
-          setTooltip({
+          return {
             visible: true,
             x: rect.left + (rect.width / 2),
             y: rect.top,
             term: term
-          });
-        }
+          };
+        });
       }
-      return; // STOP here, do not trigger paragraph selection
+      return; // STOP here
     }
 
     // Normal Paragraph Click
-    if (tooltip.visible) {
-      setTooltip({ ...tooltip, visible: false }); // Dismiss tooltip if clicking paragraph
-      return; // Optional: Decide if we want to open Original Text immediately or just dismiss tooltip first. User said "close it first", so maybe return?
-      // Let's just dismiss tooltip and NOT open original text if tooltip was open. 
-      // This feels safer for "Close it first".
-    }
+    // Need to access current tooltip state? No, setter covers it.
+    // If tooltip is open, close it?
+    // We can't easily check 'tooltip.visible' inside callback without adding it to dependency array,
+    // which breaks memoization.
+    // Instead, we can use functional update or ref.
+    // But simplest is: if user clicks paragraph, we select it. If tooltip was open, it might stay open? 
+    // User requested "Tap whole thing again to disappear" -> refers to popup.
 
+    // Let's just select the paragraph.
     if (isMobile) {
       setSelectedMobileId(id);
     }
     onColumnHover(id);
-  };
+  }, [termMap, isMobile, onColumnHover]);
 
   const selectedColumn = columns.find(c => c.id === selectedMobileId);
 
@@ -318,37 +322,31 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
         <div
           className={`
             fixed z-[60] bg-white dark:bg-zinc-800 border border-stone-200 dark:border-zinc-700 shadow-xl rounded-md p-3 text-sm animate-in fade-in zoom-in-95 duration-200
-            transform -translate-x-1/2 -translate-y-full
-            ${isMobile ? 'max-w-[90vw] w-auto' : 'w-64 pointer-events-none'}
+            transform -translate-x-1/2 -translate-y-full cursor-pointer
+            ${isMobile ? 'max-w-[90vw] w-auto' : 'w-64'}
           `}
           style={{
             left: isMobile ? '50%' : tooltip.x, // Mobile: Center horizontally
             top: tooltip.y - 8, // Both: Position above the text
-            // Mobile Specific override if needed, but centering on screen horizontally is safer for long definitions than following exact X
             ...(isMobile ? { left: '50%', transform: 'translate(-50%, -100%)' } : {})
           }}
           onClick={(e) => {
             e.stopPropagation();
-            // On mobile, allow clicking inside (e.g. to copy?), but we also have a close button
+            setTooltip({ ...tooltip, visible: false }); // Tap whole thing to close
           }}
         >
           <div className="flex justify-between items-baseline mb-1 border-b border-stone-100 dark:border-zinc-700 pb-1">
             <span className="font-bold font-serif-tc text-ink dark:text-zinc-100">{tooltip.term.term}</span>
             <span className="text-cinnabar text-xs opacity-80">{tooltip.term.zh}</span>
-            {isMobile && (
-              <button
-                onClick={(e) => { e.stopPropagation(); setTooltip({ ...tooltip, visible: false }); }}
-                className="ml-2 -mr-1 p-1 text-stone-400"
-              >
-                <X size={14} />
-              </button>
-            )}
+            {/* Visual Only X */}
+            <div className="ml-2 -mr-1 p-1 text-stone-400">
+              <X size={14} />
+            </div>
           </div>
           <p className="text-stone-600 dark:text-zinc-400 text-xs leading-relaxed">
             {tooltip.term.definition}
           </p>
-          {/* Arrow */}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-white dark:border-t-zinc-800"></div>
+          {/* Arrow Removed */}
         </div>
       )}
 

@@ -289,6 +289,7 @@ const GenealogyApp: React.FC = () => {
           activeTab={activeTab}
           onTabChange={setActiveTab}
           glossaryTerms={glossaryTerms}
+          glossaryHtml={glossaryHtml}
         />
 
         {/* Main Content Area */}

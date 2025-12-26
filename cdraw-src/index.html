@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Corporater Visual Architect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <!-- React Flow CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reactflow@11.11.4/dist/style.css" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    html,
+    body,
+    #root {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* --- IBM Style Scrollbars (Global) --- */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #8d8d8d #f4f4f4;
+    }
+
+    /* Webkit (Chrome, Edge, Safari) */
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f4f4f4;
+      border-left: 1px solid #e0e0e0;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #8d8d8d;
+      border: 3px solid #f4f4f4;
+      /* Creates padding effect */
+      border-radius: 0;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #525252;
+    }
+
+    ::-webkit-scrollbar-corner {
+      background: #f4f4f4;
+    }
+
+    /* --- Custom Dark/Thin Scrollbar for Templates (Adjusted for Contrast Harmony) --- */
+    .scrollbar-thin-dark {
+      scrollbar-width: thin;
+      scrollbar-color: #8d8d8d #e5e5e5;
+      /* Matched thumb to global, darker track */
+    }
+
+    .scrollbar-thin-dark::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    .scrollbar-thin-dark::-webkit-scrollbar-track {
+      background: #e5e5e5;
+      border-left: none;
+    }
+
+    .scrollbar-thin-dark::-webkit-scrollbar-thumb {
+      background: #8d8d8d;
+      /* Consistent gray */
+      border: none;
+      border-radius: 2px;
+    }
+
+    .scrollbar-thin-dark::-webkit-scrollbar-thumb:hover {
+      background: #525252;
+    }
+
+    /* --- Industrial Edge Styling --- */
+    .react-flow__edge-path {
+      stroke: #64748b;
+      /* Slate-500 */
+      stroke-width: 1.5px;
+    }
+
+    .react-flow__edge.selected .react-flow__edge-path {
+      stroke: #0f62fe;
+      /* IBM Blue */
+      stroke-width: 2px;
+    }
+
+    /* --- Industrial Square Handles with Larger Hit Area --- */
+    .react-flow__handle {
+      width: 6px;
+      /* Visual Size */
+      height: 6px;
+      background: #0f62fe;
+      /* IBM Blue */
+      border: none;
+      border-radius: 0 !important;
+      /* Force Square */
+      transition: all 0.2s ease-in-out;
+      z-index: 10;
+    }
+
+    /* Invisible Hit Area Expansion */
+    .react-flow__handle::after {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      right: -6px;
+      bottom: -6px;
+      background: transparent;
+      border-radius: 0;
+    }
+
+    .react-flow__handle:hover {
+      background: #0043ce;
+      transform: scale(1.2);
+    }
+
+    /* --- Connection Snapping Feedback --- */
+    /* When dragging a connection line... */
+    .react-flow__handle-connecting {
+      background: #ff0072 !important;
+      /* High contrast magenta when acting as a potential source/target */
+      cursor: crosshair;
+    }
+
+    /* When hovering over a VALID target handle */
+    .react-flow__handle-valid {
+      background: #39ff14 !important;
+      /* Bright neon green */
+      box-shadow: 0 0 0 4px rgba(57, 255, 20, 0.4);
+      /* Glow ring */
+      transform: scale(1.5);
+      /* Magnetize / Grow effect */
+    }
+
+    /* Sharp Selection Ring */
+    .react-flow__node.selected {
+      outline: 2px solid #0f62fe;
+      z-index: 10;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-5px);
+      }
+
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+  </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom": "https://esm.sh/react-dom@18.2.0?deps=react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client?deps=react@18.2.0",
+    "react/jsx-runtime": "https://esm.sh/react@18.2.0/jsx-runtime?deps=react@18.2.0",
+    "react/jsx-dev-runtime": "https://esm.sh/react@18.2.0/jsx-dev-runtime?deps=react@18.2.0",
+    "zustand": "https://esm.sh/zustand@4.5.2?deps=react@18.2.0",
+    "zustand/middleware": "https://esm.sh/zustand@4.5.2/middleware?deps=react@18.2.0",
+    "zustand/middleware/immer": "https://esm.sh/zustand@4.5.2/middleware/immer?deps=react@18.2.0",
+    "immer": "https://esm.sh/immer@10.0.3",
+    "zundo": "https://esm.sh/zundo@2.1.0?deps=zustand@4.5.2,react@18.2.0",
+    "reactflow": "https://esm.sh/reactflow@11.11.4?deps=react@18.2.0,react-dom@18.2.0",
+    "clsx": "https://esm.sh/clsx@2.1.0",
+    "tailwind-merge": "https://esm.sh/tailwind-merge@2.2.1",
+    "react-hot-toast": "https://esm.sh/react-hot-toast@2.4.1?deps=react@18.2.0,react-dom@18.2.0",
+    "colord": "https://esm.sh/colord@2.9.3",
+    "lucide-react": "https://esm.sh/lucide-react@0.344.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "zustand/": "https://esm.sh/zustand@^5.0.9/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "html-to-image": "https://esm.sh/html-to-image@^1.11.13"
+  }
+}
+</script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+
+<body class="bg-[#f4f4f4] text-slate-900">
+  <div id="root"></div>
+  <script type="module" src="/src/index.tsx"></script>
+</body>
+
+</html>

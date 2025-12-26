@@ -52,6 +52,12 @@ jobs:
           npm ci
           npm run build
 
+      - name: Build Cdraw App
+        run: |
+          cd cdraw-src
+          npm install --legacy-peer-deps
+          npm run build
+
       - name: Build CTools App
         run: |
           cd ctools-app

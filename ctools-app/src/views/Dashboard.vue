@@ -71,6 +71,16 @@ const tools = [
         color: 'text-teal-500',
         bg: 'bg-teal-50 dark:bg-teal-900/20',
         border: 'hover:border-teal-300 dark:hover:border-teal-700'
+    },
+    { 
+        id: 'cdraw',
+        name: 'Visual IDE', 
+        description: 'Local-first Visual IDE for GRC. Diagramming and modeling with smart connectors.',
+        path: '/cdraw', 
+        icon: Edit3, 
+        color: 'text-sky-500',
+        bg: 'bg-sky-50 dark:bg-sky-900/20',
+        border: 'hover:border-sky-300 dark:hover:border-sky-700'
     }
 ]
 

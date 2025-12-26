@@ -28,6 +28,7 @@ const navigation = [
   { name: 'Table', path: '/table', icon: Table, color: 'text-orange-500' },
   { name: 'Image', path: '/image', icon: ImageIcon, color: 'text-violet-500' },
   { name: 'SVG Tuner', path: '/tuner', icon: Edit3, color: 'text-teal-500' },
+  { name: 'Visual IDE', path: '/cdraw', icon: Edit3, color: 'text-sky-500' },
 ]
 
 const currentTool = computed(() => navigation.find(n => n.path === route.path))

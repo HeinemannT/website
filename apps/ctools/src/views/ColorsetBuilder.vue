@@ -234,7 +234,7 @@ const processPaste = () => {
     let count = 0
     lines.forEach(line => {
         const match = line.match(/#[a-fA-F0-9]{6}/)
-        if (match) {
+        if (match && match[0]) {
             const hex = match[0].toUpperCase()
             palette.value.push({
                 id: 'color_' + hex.replace('#', '').toLowerCase(),

@@ -96,7 +96,7 @@ const initModeler = () => {
     modeler.value.on('selection.changed', (e: any) => {
         const selection = e.newSelection;
         if (selection.length === 1) {
-            loadInspector(selection[0]);
+            loadInspector(selection?.[0]);
         } else {
             selectedElement.value = null;
             inspectorVisible.value = false;

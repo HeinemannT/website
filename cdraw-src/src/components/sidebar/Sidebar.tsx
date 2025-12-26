@@ -360,11 +360,11 @@ export const Sidebar = () => {
                                     {listSets.map(list => (
                                         <div
                                             key={list.id}
-                                            className="bg-white border border-gray-200 p-3 hover:border-[#0f62fe] cursor-move group shadow-sm"
+                                            className="bg-gray-50 border border-gray-200 p-3 hover:border-[#0f62fe] cursor-move group shadow-sm"
                                             draggable
                                             onDragStart={(e) => onDragStart(e, 'property', { type: 'list_set', listSetId: list.id, label: list.name })}
                                         >
-                                            <div className="flex justify-between items-center mb-2 border-b border-gray-100 pb-1">
+                                            <div className="flex justify-between items-center mb-2 border-b border-gray-200 pb-1">
                                                 <div className="flex items-center gap-2 overflow-hidden">
                                                     <ListIcon className="w-3 h-3 text-amber-600 shrink-0" />
                                                     <span className="text-xs font-bold text-gray-800 truncate" title={list.name}>{list.name}</span>
@@ -387,7 +387,7 @@ export const Sidebar = () => {
                                             </div>
                                             <div className="flex flex-wrap gap-1">
                                                 {list.items.slice(0, 3).map(i => (
-                                                    <span key={i.id} className="text-[10px] text-gray-600 bg-gray-100 px-2 py-0.5 border border-gray-200">
+                                                    <span key={i.id} className="text-[10px] text-gray-600 bg-white px-2 py-0.5 border border-gray-200 shadow-sm">
                                                         {i.name}
                                                     </span>
                                                 ))}

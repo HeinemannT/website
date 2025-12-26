@@ -300,7 +300,7 @@ export const FlowArea = () => {
                         color: '#64748b'
                     }
                 }}
-                deleteKeyCode={['Backspace', 'Delete']}
+                deleteKeyCode={null}
                 multiSelectionKeyCode="Shift"
             >
                 <Background

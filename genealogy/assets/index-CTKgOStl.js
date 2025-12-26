@@ -291,7 +291,7 @@ Please report this to https://github.com/markedjs/marked.`,f){const m="<p>An err
                 shadow-[inset_0_0_20px_rgba(0,0,0,0.05)]
                 py-16 px-10 md:px-16
                 transition-colors duration-500
-                flex flex-col flex-wrap content-start items-start
+                flex flex-col flex-nowrap content-start items-start
                 `,style:{writingMode:"vertical-rl",textOrientation:"upright",boxShadow:"0 0 10px rgba(0,0,0,0.05)"},children:[w.jsx("div",{className:"absolute inset-0 pointer-events-none opacity-40 dark:hidden mix-blend-multiply",style:{filter:"contrast(1.1) brightness(0.98)",backgroundImage:C}}),w.jsx("div",{className:"absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]",style:{backgroundImage:k,backgroundSize:"40px 100%"}}),m==null?void 0:m.map((V,nt)=>w.jsx("div",{className:"absolute z-20 text-cinnabar dark:text-red-400 font-serif-tc font-bold select-none opacity-85",style:{writingMode:"horizontal-tb",...U(V.position)},title:V.note,children:w.jsx("div",{className:`
                             border-2 border-cinnabar dark:border-red-400 
                             flex items-center justify-center text-lg shadow-sm bg-[#fdfbf7] dark:bg-zinc-900 transform rotate-12
@@ -305,7 +305,7 @@ Please report this to https://github.com/markedjs/marked.`,f){const m="<p>An err
                         pb-4
                         ${at?"bg-cinnabar/10 dark:bg-red-900/30":""}
                     `,style:{paddingTop:`${Math.max(0,6+V.elevation*2)}rem`},children:w.jsx("div",{className:`
-                    font-serif-tc writing-vertical-rl text-justify tracking-[0.2em] leading-loose
+                    font-serif-tc writing-vertical-rl text-justify tracking-[0.2em] leading-loose whitespace-nowrap
                     ${V.is_interlinear?"text-sm text-stone-500 dark:text-zinc-500 font-normal pl-1":"text-2xl font-bold text-ink dark:text-zinc-200"}
                   `,children:V.text_zh})},V.id)})]})]})})}),w.jsx("div",{className:`
         lg:hidden fixed bottom-16 left-0 right-0 

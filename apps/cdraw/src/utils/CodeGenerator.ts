@@ -1,88 +1,9 @@
 import { GlobalProperty, AppNode, ListPropertySet } from '../types';
-
-export class RawValue {
-    constructor(public value: string) {}
-    toString() { return this.value; }
-}
-
-export const raw = (str: string) => new RawValue(str);
-
-export class ScriptBuilder {
-  private buffer: string[] = [];
-  private indentLevel = 0;
-
-  constructor(header?: string) {
-    if (header) {
-        this.addBlockComment(header);
-        this.addNewLine();
-    }
-  }
-
-  indent() { this.indentLevel++; }
-  outdent() { if (this.indentLevel > 0) this.indentLevel--; }
-
-  private write(str: string) {
-    if (!str) {
-        this.buffer.push('');
-        return;
-    }
-    const prefix = '\t'.repeat(this.indentLevel);
-    this.buffer.push(prefix + str);
-  }
-
-  addComment(text: string) {
-    this.write(`// ${text}`);
-  }
-
-  addBlockComment(text: string) {
-    this.write('/*');
-    text.split('\n').forEach(line => this.write(` * ${line}`));
-    this.write(' */');
-  }
-
-  addNewLine() {
-    this.write('');
-  }
-
-  // Definition: varName := context.method(Type, key := value, ...)
-  define(varName: string, context: string, method: string, type: string, params: Record<string, any>) {
-    const args = [type, this.formatParams(params)].filter(Boolean).join(', ');
-    this.write(`${varName} := ${context}.${method}(${args})`);
-  }
-
-  // Call: context.method(Type, key := value, ...)
-  call(context: string, method: string, type: string | null, params: Record<string, any>) {
-    const args = [type, this.formatParams(params)].filter(Boolean).join(', ');
-    this.write(`${context}.${method}(${args})`);
-  }
-
-  // Expression: context.method(arg1, arg2) - Generic
-  expression(context: string, method: string, ...args: any[]) {
-      const argStr = args.map(a => this.formatValue(a)).join(', ');
-      this.write(`${context}.${method}(${argStr})`);
-  }
-
-  private formatParams(params: Record<string, any>): string {
-    return Object.entries(params)
-      .filter(([_, val]) => val !== undefined && val !== null)
-      .map(([key, val]) => `${key} := ${this.formatValue(val)}`)
-      .join(', ');
-  }
-
-  private formatValue(val: any): string {
-    if (val instanceof RawValue) return val.value;
-    if (typeof val === 'string') return `'${val.replace(/'/g, "\\'")}'`;
-    return String(val);
-  }
-
-  toString() {
-    return this.buffer.join('\n');
-  }
-}
+import { ScriptBuilder, raw } from './ScriptBuilder';
 
 export const generateCorporaterScript = (
-    nodes: AppNode[], 
-    globalProperties: GlobalProperty[], 
+    nodes: AppNode[],
+    globalProperties: GlobalProperty[],
     listSets: ListPropertySet[]
 ): string => {
     const builder = new ScriptBuilder(`Corporater Visual Architect - Generated Specification\nGenerated: ${new Date().toISOString()}`);
@@ -113,7 +34,7 @@ export const generateCorporaterScript = (
         usedListSets.forEach(list => {
             const listVar = toVar(list.id);
             builder.define(listVar, '_cat_lists', 'add', 'ListPropertySet', { id: list.id, name: list.name });
-            
+
             builder.indent();
             list.items.forEach(item => {
                 builder.call(listVar, 'add', 'ListPropertySetItem', { id: item.id, name: item.name });
@@ -148,30 +69,30 @@ export const generateCorporaterScript = (
             }
 
             if (prop.type.includes('Reference') || prop.type.includes('Reverse')) {
-                 params.advanced = true;
-                 params.allowBlank = true;
-                 
-                 if (prop.config.targetClass) {
-                     const isMulti = prop.config.multiSelect;
-                     
-                     if (prop.config.targetClass.toLowerCase() === 'user') {
-                         params.expression = 'select User from root.user';
-                     } else if (prop.type.includes('Reverse')) {
-                         params.filter = raw(`filter(${prop.config.targetClass}, *everywhere)`);
-                     } else {
-                         params.expression = `select ${prop.config.targetClass} from root.${prop.config.targetClass}`;
-                     }
+                params.advanced = true;
+                params.allowBlank = true;
 
-                     if (isMulti && !prop.type.includes('Reverse')) {
+                if (prop.config.targetClass) {
+                    const isMulti = prop.config.multiSelect;
+
+                    if (prop.config.targetClass.toLowerCase() === 'user') {
+                        params.expression = 'select User from root.user';
+                    } else if (prop.type.includes('Reverse')) {
+                        params.filter = raw(`filter(${prop.config.targetClass}, *everywhere)`);
+                    } else {
+                        params.expression = `select ${prop.config.targetClass} from root.${prop.config.targetClass}`;
+                    }
+
+                    if (isMulti && !prop.type.includes('Reverse')) {
                         params.multiselect = true;
-                     }
-                     
-                     if (prop.config.targetClass.toLowerCase() !== 'user' && !prop.type.includes('Reverse')) {
+                    }
+
+                    if (prop.config.targetClass.toLowerCase() !== 'user' && !prop.type.includes('Reverse')) {
                         params.listDisplayType = 'FLAT_LIST';
-                     }
-                 }
+                    }
+                }
             }
-            
+
             if (prop.type === 'ExtendedMethodConfig' && prop.config.expression) {
                 params.expression = prop.config.expression;
             }
@@ -189,12 +110,12 @@ export const generateCorporaterScript = (
         nodes.forEach(node => {
             if (node.data.linkedProperties.length > 0) {
                 builder.addComment(`Link Properties for: ${node.data.label} (${node.data.className})`);
-                
+
                 node.data.linkedProperties.forEach(pid => {
                     const exists = usedProperties.find(p => p.id === pid);
                     if (exists) {
-                         const propVar = toVar(pid);
-                         builder.expression(`c.get(${node.data.className}.name)`, 'link', raw(propVar));
+                        const propVar = toVar(pid);
+                        builder.expression(`c.get(${node.data.className}.name)`, 'link', raw(propVar));
                     }
                 });
                 builder.addNewLine();

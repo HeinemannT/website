@@ -366,10 +366,11 @@ if (data.value.length === 0) addTabSet()
 
         <!-- Right Panel: Output -->
         <template #sidebar>
-             <CodeOutputPanel title="Code Output" :code="scriptOutput">
+             <CodeOutputPanel title="Extended Code" :code="scriptOutput">
 
              </CodeOutputPanel>
         </template>
+
 
     </ToolLayout>
 </template>

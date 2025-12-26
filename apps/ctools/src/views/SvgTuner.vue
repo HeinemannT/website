@@ -7,6 +7,7 @@ import {
 } from 'lucide-vue-next'
 import InspectorPanel from '../components/ui/InspectorPanel.vue'
 import BaseButton from '../components/ui/BaseButton.vue'
+import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
 import BaseInput from '../components/ui/BaseInput.vue'
 import { useToast } from '../composables/useToast'
 import { useDownload } from '../composables/useDownload'

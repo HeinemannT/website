@@ -146,11 +146,9 @@ const updateModel = () => {
         col.name = currentHex.value
     }
     
-    // Only auto-update ID if it is NOT empty (i.e. user has set it or it was generated)
-    // User requested ID to be empty by default. If they type something, we keep it.
-    // Actually, if it *matches* the old hex pattern, maybe update it? 
-    // But user said "leave ID empty". So we don't auto-generate ID anymore.
-    // We only update hex.
+    // Auto-update ID to match hex for consistency
+    const safeHex = currentHex.value.replace('#', '')
+    col.id = `color_${safeHex}`
 
     col.hex = currentHex.value
     generatePreview()

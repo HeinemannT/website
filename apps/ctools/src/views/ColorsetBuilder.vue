@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { Plus, Trash2, Palette, Wand2, ArrowRight, ExternalLink } from 'lucide-vue-next'
-import {
-    hexToHsv, hsvToHex, hexToHsl, hslToHex, interpolateColors, hexToRgb, rgbToHex
-} from '../utils/colors'
+import tinycolor from 'tinycolor2' // Optimization: Use tinycolor directly
+import { ScriptBuilder } from '../utils/ScriptBuilder'
 import BaseButton from '../components/ui/BaseButton.vue'
 import BaseInput from '../components/ui/BaseInput.vue'
 import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
+import ColorMatrix from '../components/colors/ColorMatrix.vue'
+import ToolLayout from '../components/layout/ToolLayout.vue'
+import { generateScale, generatePastel, generateShades, generateInterpolate } from '../utils/ColorGenerators'
 import { useToast } from '../composables/useToast'
 const { add: toast } = useToast()
 
@@ -44,11 +46,8 @@ const currentVal = ref(100)
 
 const currentRgb = ref({ r: 239, g: 68, b: 68 })
 
-// Canvas Refs
-const matrixCanvasFn = ref<HTMLCanvasElement | null>(null)
-const matrixContainer = ref<HTMLDivElement | null>(null)
+// UI Refs (Canvas Logic moved to ColorMatrix)
 const hueContainer = ref<HTMLDivElement | null>(null)
-const isMatrixDragging = ref(false)
 const isHueDragging = ref(false)
 
 // Generator State
@@ -71,12 +70,13 @@ watch(selectedIndex, (newIdx) => {
 
 const setColorState = (hex: string) => {
     currentHex.value = hex
-    const hsv = hexToHsv(hex)
+    const color = tinycolor(hex)
+    const hsv = color.toHsv()
     currentHue.value = hsv.h
-    currentSat.value = hsv.s
-    currentVal.value = hsv.v
-    const rgb = hexToRgb(hex)
-    if (rgb) currentRgb.value = rgb
+    currentSat.value = hsv.s * 100
+    currentVal.value = hsv.v * 100
+    const rgb = color.toRgb()
+    currentRgb.value = { r: rgb.r, g: rgb.g, b: rgb.b }
 }
 
 const updateColorFromHex = (val: string) => {
@@ -87,64 +87,29 @@ const updateColorFromHex = (val: string) => {
 }
 
 const updateColorFromHsv = () => {
-    const hex = hsvToHex(currentHue.value, currentSat.value, currentVal.value)
+    const color = tinycolor({ h: currentHue.value, s: currentSat.value / 100, v: currentVal.value / 100 })
+    const hex = color.toHexString().toUpperCase()
     currentHex.value = hex
-    const rgb = hexToRgb(hex)
-    if (rgb) currentRgb.value = rgb
+    const rgb = color.toRgb()
+    currentRgb.value = { r: rgb.r, g: rgb.g, b: rgb.b }
     updateModel()
 }
 
 const updateColorFromRgb = () => {
-    const hex = rgbToHex(currentRgb.value.r, currentRgb.value.g, currentRgb.value.b)
+    const color = tinycolor({ r: currentRgb.value.r, g: currentRgb.value.g, b: currentRgb.value.b })
+    const hex = color.toHexString().toUpperCase()
     currentHex.value = hex
-    const hsv = hexToHsv(hex)
+    const hsv = color.toHsv()
     currentHue.value = hsv.h
-    currentSat.value = hsv.s
-    currentVal.value = hsv.v
+    currentSat.value = hsv.s * 100
+    currentVal.value = hsv.v * 100
     updateModel()
 }
 
 // --- Canvas Logic ---
-const drawMatrix = () => {
-    if (!matrixCanvasFn.value || !matrixContainer.value) return
-    const canvas = matrixCanvasFn.value
-    const ctx = canvas.getContext('2d', { willReadFrequently: true })
-    if (!ctx) return
-    
-    // Resize to container
-    const rect = matrixContainer.value.getBoundingClientRect()
-    if (rect.width === 0 || rect.height === 0) return
-
-    canvas.width = rect.width
-    canvas.height = rect.height
-
-    // Hue Layer
-    ctx.fillStyle = `hsl(${currentHue.value}, 100%, 50%)`
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-    // White Gradient (Horizontal)
-    const grWhite = ctx.createLinearGradient(0, 0, canvas.width, 0)
-    grWhite.addColorStop(0, 'white')
-    grWhite.addColorStop(1, 'rgba(255,255,255,0)')
-    ctx.fillStyle = grWhite
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-    // Black Gradient (Vertical)
-    const grBlack = ctx.createLinearGradient(0, 0, 0, canvas.height)
-    grBlack.addColorStop(0, 'rgba(0,0,0,0)')
-    grBlack.addColorStop(1, 'black')
-    ctx.fillStyle = grBlack
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-}
-
-const updateMatrixFromMouse = (e: MouseEvent) => {
-    if (!matrixContainer.value) return
-    const rect = matrixContainer.value.getBoundingClientRect()
-    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width))
-    const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height))
-    
-    currentSat.value = (x / rect.width) * 100
-    currentVal.value = 100 - ((y / rect.height) * 100)
+const handleMatrixUpdate = (s: number, v: number) => {
+    currentSat.value = s
+    currentVal.value = v
     updateColorFromHsv()
 }
 
@@ -159,27 +124,15 @@ const updateHueFromMouse = (e: MouseEvent) => {
 // Lifecycle Hooks for Canvas
 onMounted(() => {
     window.addEventListener('mousemove', (e) => {
-        if (isMatrixDragging.value) updateMatrixFromMouse(e)
         if (isHueDragging.value) updateHueFromMouse(e)
     })
     window.addEventListener('mouseup', () => {
-        isMatrixDragging.value = false
         isHueDragging.value = false
     })
 })
 
 // Update canvas when color changes
-watch([currentHue, currentSat, currentVal], () => {
-    requestAnimationFrame(drawMatrix)
-})
 
-watch(activeTab, () => {
-   if (activeTab.value === 'studio') {
-       nextTick(() => {
-           setTimeout(drawMatrix, 50)
-       })
-   }
-})
 
 const updateModel = () => {
     if (selectedIndex.value === -1) return
@@ -220,33 +173,24 @@ const deleteColor = (idx: number) => {
 
 // --- Generator ---
 const generatePreview = () => {
-    if (selectedIndex.value === -1 && genStrategy.value !== 'interpolate') {
-        genColors.value = []
+    genColors.value = []
+    
+    if (genStrategy.value === 'interpolate') {
+        const cols = generateInterpolate(interStart.value, interEnd.value, interSteps.value)
+        genColors.value = cols
         return
     }
 
-    const seedHex = selectedIndex.value !== -1 && palette.value[selectedIndex.value] ? palette.value[selectedIndex.value]!.hex : '#000000'
-    genColors.value = []
+    const selectedColor = palette.value[selectedIndex.value]
+    if (selectedIndex.value === -1 || !selectedColor) return
+    const base = selectedColor.hex
 
-    if (genStrategy.value === 'interpolate') {
-        const colors = interpolateColors(interStart.value, interEnd.value, interSteps.value)
-        colors.forEach((hex, i) => genColors.value.push({ name: `Step ${i + 1}`, hex }))
-    } else {
-        const { h, s } = hexToHsl(seedHex)
-        
-        if (genStrategy.value === 'scale') {
-             [95, 85, 75, 65, 55, 45, 35, 25, 15].forEach((light, i) => {
-                genColors.value.push({ name: `Weight ${(i + 1) * 100}`, hex: hslToHex(h, s, light) })
-            })
-        } else if (genStrategy.value === 'pastel') {
-            for (let i = 0; i < 6; i++) {
-                genColors.value.push({ name: `Pastel ${i + 1}`, hex: hslToHex(h, Math.max(s - 30, 10), 88 - (i * 4)) })
-            }
-        } else if (genStrategy.value === 'shades') {
-             for (let i = 0; i < 6; i++) {
-                genColors.value.push({ name: `Shade ${i + 1}`, hex: hslToHex(h, s, 35 - (i * 6)) })
-            }
-        }
+    if (genStrategy.value === 'scale') {
+        genColors.value = generateScale(base)
+    } else if (genStrategy.value === 'pastel') {
+        genColors.value = generatePastel(base)
+    } else if (genStrategy.value === 'shades') {
+        genColors.value = generateShades(base)
     }
 }
 
@@ -265,17 +209,22 @@ const commitGenerated = () => {
 // --- Script Generation ---
 const scriptOutput = computed(() => {
     const parent = rootParentId.value || 't'
-    let script = `// Set: ${setName.value}\n`
-    script += `var targetFolder = ${parent}.create(Folder, id:='${setId.value}', name:='${setName.value}');\n\n`
+    const sb = new ScriptBuilder(`Set: ${setName.value}`)
+    
+    sb.createObjectVar('targetFolder', parent, 'Folder', { 
+        id: setId.value, 
+        name: setName.value 
+    })
+    sb.addNewLine()
     
     palette.value.forEach(col => {
-        if (col.id && col.id.trim() !== '') {
-            script += `targetFolder.create(Color, id:='${col.id}', name:='${col.name}', color:='${col.hex}');\n`
-        } else {
-             script += `targetFolder.create(Color, name:='${col.name}', color:='${col.hex}');\n`
-        }
+        sb.createObject('targetFolder', 'Color', { 
+            id: col.id, 
+            name: col.name, 
+            color: col.hex 
+        })
     })
-    return script
+    return sb.toString()
 })
 
 // --- Import ---
@@ -303,11 +252,10 @@ const processPaste = () => {
 </script>
 
 <template>
-    <div class="h-full flex flex-col lg:flex-row overflow-hidden bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+    <ToolLayout sidebarClass="lg:w-[45%]">
         
-        <!-- Left: Palette Grid -->
-        <div class="lg:w-[55%] flex flex-col border-r border-slate-200 dark:border-slate-800 relative bg-grid-pattern">
-            
+        <!-- Main: Palette Grid -->
+        <template #main>
             <!-- Header Actions -->
             <div class="p-6 bg-white/90 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-10 sticky top-0">
                 <div class="flex items-start justify-between gap-6">
@@ -341,10 +289,10 @@ const processPaste = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </template>
 
-        <!-- Right: Studio -->
-        <div class="lg:w-[45%] flex flex-col bg-white dark:bg-slate-800 shadow-2xl relative z-20">
+        <!-- Sidebar: Studio -->
+        <template #sidebar>
             <!-- Tabs -->
             <div class="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
                 <button v-for="tab in ['studio', 'generate', 'import', 'script']" :key="tab"
@@ -368,18 +316,13 @@ const processPaste = () => {
                         <!-- Photoshop Style Picker -->
                         <div class="flex gap-4 h-64 mb-6 select-none">
                             <!-- Sat/Val Matrix -->
-                            <div class="flex-1 relative rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden cursor-crosshair shadow-sm"
-                                 ref="matrixContainer"
-                                 @mousedown="isMatrixDragging = true; $event.preventDefault(); updateMatrixFromMouse($event)">
-                                <canvas ref="matrixCanvasFn" class="w-full h-full block"></canvas>
-                                <!-- Cursor -->
-                                <div class="absolute w-3 h-3 rounded-full border-2 border-white shadow-sm ring-1 ring-black/20 pointer-events-none -translate-x-1/2 -translate-y-1/2"
-                                     :style="{
-                                         left: `${currentSat}%`,
-                                         top: `${100 - currentVal}%`,
-                                         backgroundColor: currentHex
-                                     }"></div>
-                            </div>
+                            <ColorMatrix 
+                                :hue="currentHue" 
+                                :saturation="currentSat" 
+                                :value="currentVal" 
+                                :hex="currentHex"
+                                @update="handleMatrixUpdate"
+                            />
 
                             <!-- Hue Strip -->
                             <div class="w-8 relative rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden cursor-ns-resize"
@@ -521,7 +464,6 @@ const processPaste = () => {
                 </div>
 
                 <!-- SCRIPT -->
-                <!-- SCRIPT -->
                 <div v-if="activeTab === 'script'" class="h-full flex flex-col">
                      <CodeOutputPanel title="Generated Script" :code="scriptOutput">
                          <template #actions>
@@ -532,6 +474,6 @@ const processPaste = () => {
                      </CodeOutputPanel>
                 </div>
             </div>
-        </div>
-    </div>
+        </template>
+    </ToolLayout>
 </template>

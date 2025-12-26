@@ -31,15 +31,15 @@ interface Level {
 }
 
 // --- State ---
-const method = usePersistentState<1 | 2 | 3 | 4>('table:method', 2) // 1: Simple, 2: Headers, 3: Manual, 4: Hierarchy
-const sourceList = usePersistentState('table:sourceList', 'vListOfObjects')
-const tableVar = usePersistentState('table:tableVar', 'vTable')
-const columns = usePersistentState<Column[]>('table:columns', [
-    { id: '1', header: 'Name', prop: 'name', align: 'left', styles: [], format: '' },
-    { id: '2', header: 'Description', prop: 'description', align: 'left', styles: [], format: '' },
-    { id: '3', header: 'ID', prop: 'id', align: 'left', styles: [], format: '' }
+const method = usePersistentState<1 | 2 | 3 | 4>('table:method_v2', 2) // 1: Simple, 2: Headers, 3: Manual, 4: Hierarchy
+const sourceList = usePersistentState('table:sourceList_v2', 'vListOfObjects')
+const tableVar = usePersistentState('table:tableVar_v2', 'vTable')
+const columns = usePersistentState<Column[]>('table:columns_v2', [
+    { id: '1', header: 'Application Security Risk', prop: 'applicationSecurityRisk', align: 'left', styles: [], format: '' },
+    { id: '2', header: 'Backup Failure Risk', prop: 'backupFailureRisk', align: 'left', styles: [], format: '' },
+    { id: '3', header: 'Cloud Compliance Risk', prop: 'cloudComplianceRisk', align: 'left', styles: [], format: '' }
 ])
-const levels = usePersistentState<Level[]>('table:levels', [])
+const levels = usePersistentState<Level[]>('table:levels_v2', [])
 
 // --- Actions ---
 const createId = () => crypto.randomUUID()
@@ -192,12 +192,12 @@ const generateNestedLoop = (sb: ScriptBuilder, levelIdx: number) => {
 </script>
 
 <template>
-    <ToolLayout sidebar-class="w-full md:w-1/2 lg:w-[500px]" sidebar-position="left">
+    <ToolLayout sidebar-class="w-full md:w-1/2 lg:w-[500px] shadow-none border-r border-slate-200 dark:border-slate-800" sidebar-position="left">
         
         <!-- Sidebar: Configuration -->
         <template #sidebar>
             <!-- Global Config -->
-            <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-10 shrink-0 shadow-sm">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-10 shrink-0 shadow-none">
                 <!-- Method Selector -->
                 <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 mb-4">
                     <button v-for="m in [1, 2, 3, 4]" :key="m" @click="setMethod(m as any)"
@@ -348,16 +348,16 @@ const generateNestedLoop = (sb: ScriptBuilder, levelIdx: number) => {
         <template #main>
             <div class="h-full flex flex-col">
                 <!-- Top Half: Preview -->
-                <div class="h-[40%] border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 p-6 overflow-auto">
+                <div class="h-[40%] border-b border-slate-200 dark:border-slate-800 bg-white p-6 overflow-auto">
                     <div class="max-w-4xl mx-auto space-y-2">
-                        <label class="text-xs font-bold uppercase text-slate-400 tracking-wider">Live Preview</label>
+                        <label class="text-xs font-bold uppercase text-slate-400 tracking-wider">Preview</label>
                         <TablePreview :columns="columns" />
                     </div>
                 </div>
 
                 <!-- Bottom Half: Code -->
                 <div class="h-[60%] overflow-hidden bg-white dark:bg-slate-900 relative">
-                    <CodeOutputPanel :code="scriptOutput" />
+                    <CodeOutputPanel title="Extended Code" :code="scriptOutput" />
                 </div>
             </div>
         </template>

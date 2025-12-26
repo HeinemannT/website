@@ -14,6 +14,7 @@ const { add: toast } = useToast()
 interface ImageItem {
     id: string
     file?: File
+    blob?: Blob     // For URL fetched images
     url?: string
     name: string
     scriptId: string
@@ -25,8 +26,93 @@ interface ImageItem {
 
 const items = ref<ImageItem[]>([])
 const folderName = ref('vFolder')
+const urlInput = ref('')
 const isProcessing = ref(false)
 const generatedScript = ref('')
+
+const importFromUrl = async () => {
+    if (!urlInput.value) return
+    
+    const targetUrl = urlInput.value.trim()
+    // Handle multi-line support
+    const lines = targetUrl.split(/\r?\n/).filter(line => line.trim() !== '')
+    
+    if (lines.length > 1) {
+        lines.forEach(line => {
+             const cleanUrl = line.trim()
+             // Recursively call for each line (simplified, but careful of async)
+             // Ideally we process them in batch, but for now we'll just push them
+             const namePart = cleanUrl.split('/').pop()?.split('?')[0] || 'image'
+             const baseName = namePart.split('.')[0].replace(/[^a-zA-Z0-9_-]/g, '_')
+             
+             items.value.push({
+                id: crypto.randomUUID(),
+                url: cleanUrl,
+                name: baseName,
+                scriptId: `img_${baseName}`,
+                status: 'pending',
+                mimeType: 'image/png', // Will be updated on fetch
+                sizeLabel: 'Remote',
+                // We'll fetch later or right now? 
+                // The legacy tool fetches ON GENERATION. 
+                // But the user wants an "Import" button. 
+                // Let's fetch immediately to show preview if possible, or support "Remote" state.
+             })
+        })
+        urlInput.value = ''
+        toast(`Added ${lines.length} URLs`, 'success')
+        return
+    }
+
+    // Single URL Immediate Fetch
+    const strategies = [
+        `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+        `https://thingproxy.freeboard.io/fetch/${targetUrl}`
+    ]
+
+    let blob: Blob | null = null
+    let lastError
+
+    const loadingToast = toast('Fetching image...', 'info')
+
+    for (const proxyUrl of strategies) {
+        try {
+            const res = await fetch(proxyUrl)
+            if (!res.ok) continue
+            blob = await res.blob()
+            if (blob.size > 0) break
+        } catch (e) {
+            lastError = e
+        }
+    }
+
+    if (!blob) {
+        toast('Failed to fetch image. blocked by CORS or invalid.', 'error')
+        return
+    }
+
+    if (!blob.type.startsWith('image/')) {
+        toast('URL did not return a valid image', 'error')
+        return
+    }
+
+    const namePart = targetUrl.split('/').pop()?.split('?')[0] || 'url_image'
+    const baseName = namePart.split('.')[0].replace(/[^a-zA-Z0-9_-]/g, '_')
+    
+    items.value.push({
+        id: crypto.randomUUID(),
+        blob, // Store the blob for processing
+        name: baseName,
+        scriptId: `img_${baseName}`,
+        status: 'pending',
+        previewUrl: URL.createObjectURL(blob),
+        mimeType: blob.type,
+        sizeLabel: (blob.size / 1024).toFixed(1) + ' KB'
+    })
+    urlInput.value = ''
+    toast('Image imported successfully', 'success')
+}
 
 const handleFiles = (files: File[] | FileList) => {
     const fileArray = Array.from(files).filter(f => f.type.startsWith('image/'))
@@ -85,11 +171,15 @@ const processImages = async () => {
             if (item.file) {
                 const buffer = await item.file.arrayBuffer()
                 data = new Uint8Array(buffer)
+            } else if (item.blob) {
+                const buffer = await item.blob.arrayBuffer()
+                data = new Uint8Array(buffer)
             } else {
-                throw new Error('URL processing not yet implemented')
+                throw new Error('No data found for item')
             }
 
             const base64 = await gzipAndBase64Async(data)
+// ... existing code ...
             const chunked = chunkString(base64)
             const contentString = `${item.name};${item.mimeType};${chunked}`
             
@@ -136,7 +226,13 @@ const processImages = async () => {
                             <span class="text-sm font-semibold text-slate-500">Target Folder Variable:</span>
                             <input v-model="folderName" type="text" autocomplete="off" spellcheck="false" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-3 py-1 text-sm font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none w-48" />
                         </div>
-                        <button @click="clearAll" v-if="items.length" class="text-xs text-red-500 hover:text-red-600 font-medium px-2 py-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">Clear All</button>
+                        
+                        <div class="flex items-center gap-2">
+                             <input v-model="urlInput" @keyup.enter="importFromUrl" placeholder="Import from URL..." class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-3 py-1 text-sm w-64 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none" />
+                             <button @click="importFromUrl" :disabled="!urlInput" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold px-3 py-1.5 rounded transition-colors disabled:opacity-50">Fetch</button>
+                             <div class="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+                             <button @click="clearAll" v-if="items.length" class="text-xs text-red-500 hover:text-red-600 font-medium px-2 py-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">Clear All</button>
+                        </div>
                     </div>
 
                     <!-- Staging List -->

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, shallowRef } from 'vue'
-import BpmnJS from 'bpmn-js/dist/bpmn-modeler.production.min.js'
+import { ref, onMounted, shallowRef, nextTick } from 'vue'
+import BpmnModeler from 'bpmn-js/lib/Modeler'
 import {
     PlusCircle, RotateCcw, Code, Download, FileCode, CheckCircle,
     LayoutTemplate, Zap, User, X
@@ -47,7 +47,7 @@ const props = ref({
 })
 const helper = ref({ script: '', variable: '' })
 const isResizing = ref(false)
-const sidebarWidth = ref(320)
+const sidebarWidth = ref(400) // Default wider sidebar
 
 // Modeler instance (shallow to avoid Proxy issues)
 const modeler = shallowRef<any>(null)
@@ -76,13 +76,24 @@ const camundaModdleDescriptor = {
 }
 
 // --- Lifecycle ---
-onMounted(() => {
-    initModeler()
+onMounted(async () => {
+    // Wait for DOM to be ready
+    await nextTick()
+    
+    try {
+        initModeler()
+    } catch (e) {
+        console.error("Failed to init BpmnJS:", e)
+        toast('Failed to load BPMN Editor. Please check console.', 'error')
+    }
 })
 
 // --- Methods ---
 const initModeler = () => {
-    modeler.value = new BpmnJS({
+    const canvas = document.querySelector('#canvas')
+    if (!canvas) return;
+
+    modeler.value = new BpmnModeler({
         container: '#canvas',
         keyboard: { bindTo: window },
         moddleExtensions: {
@@ -108,6 +119,14 @@ const initModeler = () => {
             inspectorVisible.value = false;
         }
     });
+
+    // If we have content, load it
+    if (xmlContent.value) {
+        renderDiagram(xmlContent.value).catch(() => {
+             // If fails, maybe empty it 
+             hasDiagram.value = false
+        })
+    }
 }
 
 const createNewDiagram = async () => {
@@ -181,7 +200,11 @@ const renderDiagram = async (xml: string) => {
     try {
         await modeler.value.importXML(xml);
         hasDiagram.value = true;
-        modeler.value.get('canvas').zoom('fit-viewport');
+        
+        // Wait for render
+        await nextTick()
+        const canvas = modeler.value.get('canvas')
+        canvas.zoom('fit-viewport');
     } catch (err) {
         statusMsg.value = 'Invalid BPMN XML';
         statusType.value = 'error';
@@ -370,10 +393,10 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
     
     <!-- Canvas -->
     <template #main>
-        <div id="canvas" class="w-full h-full"></div>
+        <div id="canvas" class="w-full h-full bg-slate-50 dark:bg-slate-900 bg-grid-pattern relative"></div>
 
         <!-- Empty State -->
-        <div v-if="!hasDiagram" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <div v-if="!hasDiagram" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
             <div class="w-16 h-16 mb-4 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
                 <LayoutTemplate class="w-8 h-8 text-slate-400" />
             </div>
@@ -390,12 +413,13 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
         <div class="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize z-50 -ml-0.5 hover:bg-indigo-500 transition-colors" 
              @mousedown="startResize"></div>
 
-        <div class="h-full flex flex-col">
+        <div class="h-full flex flex-col relative">
             <div class="flex border-b border-slate-700">
                 <button @click="activeTab = 'input'" :class="activeTab === 'input' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-slate-200'" class="flex-1 py-3 text-xs font-semibold uppercase border-b-2 transition-colors">Input</button>
                 <button @click="activeTab = 'xml'" :class="activeTab === 'xml' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-slate-200'" class="flex-1 py-3 text-xs font-semibold uppercase border-b-2 transition-colors">XML Editor</button>
             </div>
 
+            <!-- Input Tab -->
             <div v-show="activeTab === 'input'" class="flex-grow flex flex-col p-4">
                  <div class="relative flex-grow flex flex-col">
                     <textarea v-model="inputString" @input="processInput"
@@ -408,6 +432,7 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
                  <div class="mt-2 text-xs h-4" :class="statusType === 'error' ? 'text-pink-400' : 'text-emerald-400'">{{ statusMsg }}</div>
             </div>
 
+            <!-- XML Tab -->
             <div v-show="activeTab === 'xml'" class="flex-grow flex flex-col relative border-t border-slate-700">
                  <CodeOutputPanel 
                     title="XML Editor" 
@@ -417,92 +442,81 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
                  >
                  </CodeOutputPanel>
             </div>
+
+            <!-- Inspector (Overlay inside sidebar for now, or just replace content?) -->
+            <!-- If inspector is visible, we overlay the input/xml tabs in the sidebar -->
+            <div v-if="inspectorVisible" class="absolute inset-0 bg-slate-50 dark:bg-slate-900 z-20 flex flex-col">
+                 <InspectorPanel :title="inspectorTitle" :subtitle="inspectorType">
+                    <template #header-actions>
+                         <button @click="inspectorVisible = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                             <X class="w-4 h-4" />
+                         </button>
+                    </template>
+                     
+                     <div class="space-y-4 p-4 overflow-y-auto flex-1">
+                         <BaseInput label="ID" v-model="props.id" @change="updateProps" />
+                         <BaseInput label="Name" v-model="props.name" @change="updateProps" />
+
+                         <!-- Service Task -->
+                         <div v-if="isServiceTask" class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center gap-2 text-indigo-500 mb-2">
+                                <Zap class="w-3.5 h-3.5" /> <span class="text-xs font-bold uppercase">Extended Logic</span>
+                            </div>
+                            <BaseInput label="Topic (Raw)" v-model="props.topic" @change="updateProps" mono class="mb-2" />
+                            
+                            <div className="grid grid-cols-2 gap-2">
+                                <BaseInput label="Script Name" v-model="helper.script" @input="buildTopic" />
+                                <BaseInput label="Variable" v-model="helper.variable" @input="buildTopic" />
+                            </div>
+                         </div>
+
+                         <!-- User Task -->
+                         <div v-if="isUserTask" class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center gap-2 text-pink-500 mb-2">
+                                <User class="w-3.5 h-3.5" /> <span class="text-xs font-bold uppercase">Form Config</span>
+                            </div>
+                            <BaseInput label="Form Key" v-model="props.formKey" @change="updateProps" />
+
+                            <div class="mt-3">
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-xs font-bold text-slate-500">Roles</label>
+                                    <button @click="addRole" class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">+ Add</button>
+                                </div>
+                                <div class="space-y-2">
+                                    <div v-for="(role, idx) in props.roles" :key="idx" class="flex gap-1">
+                                       <input type="text" v-model="role.value" @change="updateRoles" class="flex-1 text-xs p-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded" />
+                                       <button @click="removeRole(idx)" class="text-slate-400 hover:text-red-500"><X class="w-4 h-4" /></button>
+                                    </div>
+                                    <p v-if="props.roles.length === 0" class="text-[10px] text-slate-400 italic text-center">No roles assigned</p>
+                                </div>
+                            </div>
+                         </div>
+                     </div>
+
+                     <div class="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                         <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Export / Controls</h4>
+                         <div class="space-y-2">
+                             <div class="flex gap-2">
+                                <BaseInput v-model="filename" placeholder="Filename" mono />
+                                <div class="flex items-center text-xs text-slate-400">.bpmn</div>
+                             </div>
+                             <div class="flex gap-2">
+                                 <BaseButton size="sm" class="flex-1" @click="downloadSVG"><Download class="w-3 h-3 mr-2" /> SVG</BaseButton>
+                                 <BaseButton size="sm" variant="outline" class="flex-1" @click="downloadXML"><FileCode class="w-3 h-3 mr-2" /> XML</BaseButton>
+                             </div>
+                             <BaseInput v-model="targetObject" label="Target Object" mono />
+                             <BaseButton size="sm" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-600" @click="copyAsExtendedScript">
+                                 <Code class="w-3 h-3 mr-2" /> Copy Script
+                             </BaseButton>
+                             <BaseButton size="sm" variant="ghost" class="w-full text-slate-400" @click="clearAll">
+                                 <RotateCcw class="w-3 h-3 mr-2" /> Reset All
+                             </BaseButton>
+                         </div>
+                     </div>
+                 </InspectorPanel>
+            </div>
         </div>
     </template>
-
-    <!-- Inspector Overlay (Global, or dependent on sidebar?) -->
-    <!-- Original code had InspectorPanel outside the flex container, overlaying the screen or absolute? -->
-    <!-- Re-checked: InspectorPanel was a sibling of the root flex container or last element. -->
-    <!-- Let's check InspectorPanel implementation. It usually is fixed or absolute. -->
-    
-    <div class="pointer-events-none absolute inset-0 z-50" v-if="inspectorVisible">
-        <!-- InspectorPanel logic here or slot? InspectorPanel implementation is unknown but likely handles its own positioning if we just drop it here. -->
-        <!-- Actually, if InspectorPanel is a sidebar itself, we might have issues. -->
-        <!-- Based on previous view, InspectorPanel was at the end of the template. -->
-        <div class="pointer-events-auto absolute top-4 bottom-4 w-80 bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden flex flex-col transition-all duration-300"
-             :style="{ right: (sidebarWidth + 24) + 'px' }">
-             <!-- Inspector Content Copied Inline or Component? -->
-             <!-- Original used <InspectorPanel ...> -->
-             <InspectorPanel :title="inspectorTitle" :subtitle="inspectorType">
-                 <!-- ... slots ... -->
-                 <!-- I need to copy the *content* of the inspector panel from previous file -->
-                 <template #header-actions></template>
-                 
-                 <div class="space-y-4 p-4 overflow-y-auto flex-1">
-                     <BaseInput label="ID" v-model="props.id" @change="updateProps" />
-                     <BaseInput label="Name" v-model="props.name" @change="updateProps" />
-
-                     <!-- Service Task -->
-                     <div v-if="isServiceTask" class="pt-4 border-t border-slate-100 dark:border-slate-800">
-                        <div class="flex items-center gap-2 text-indigo-500 mb-2">
-                            <Zap class="w-3.5 h-3.5" /> <span class="text-xs font-bold uppercase">Extended Logic</span>
-                        </div>
-                        <BaseInput label="Topic (Raw)" v-model="props.topic" @change="updateProps" mono class="mb-2" />
-                        
-                        <div className="grid grid-cols-2 gap-2">
-                            <BaseInput label="Script Name" v-model="helper.script" @input="buildTopic" />
-                            <BaseInput label="Variable" v-model="helper.variable" @input="buildTopic" />
-                        </div>
-                     </div>
-
-                     <!-- User Task -->
-                     <div v-if="isUserTask" class="pt-4 border-t border-slate-100 dark:border-slate-800">
-                        <div class="flex items-center gap-2 text-pink-500 mb-2">
-                            <User class="w-3.5 h-3.5" /> <span class="text-xs font-bold uppercase">Form Config</span>
-                        </div>
-                        <BaseInput label="Form Key" v-model="props.formKey" @change="updateProps" />
-
-                        <div class="mt-3">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-xs font-bold text-slate-500">Roles</label>
-                                <button @click="addRole" class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">+ Add</button>
-                            </div>
-                            <div class="space-y-2">
-                                <div v-for="(role, idx) in props.roles" :key="idx" class="flex gap-1">
-                                   <input type="text" v-model="role.value" @change="updateRoles" class="flex-1 text-xs p-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded" />
-                                   <button @click="removeRole(idx)" class="text-slate-400 hover:text-red-500"><X class="w-4 h-4" /></button>
-                                </div>
-                                <p v-if="props.roles.length === 0" class="text-[10px] text-slate-400 italic text-center">No roles assigned</p>
-                            </div>
-                        </div>
-                     </div>
-                 </div>
-
-                 <div class="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
-                     <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Export / Controls</h4>
-                     <div class="space-y-2">
-                         <div class="flex gap-2">
-                            <BaseInput v-model="filename" placeholder="Filename" mono />
-                            <div class="flex items-center text-xs text-slate-400">.bpmn</div>
-                         </div>
-                         <div class="flex gap-2">
-                             <BaseButton size="sm" class="flex-1" @click="downloadSVG"><Download class="w-3 h-3 mr-2" /> SVG</BaseButton>
-                             <BaseButton size="sm" variant="outline" class="flex-1" @click="downloadXML"><FileCode class="w-3 h-3 mr-2" /> XML</BaseButton>
-                         </div>
-                         <BaseInput v-model="targetObject" label="Target Object" mono />
-                         <BaseButton size="sm" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-600" @click="copyAsExtendedScript">
-                             <Code class="w-3 h-3 mr-2" /> Copy Script
-                         </BaseButton>
-                         <BaseButton size="sm" variant="ghost" class="w-full text-slate-400" @click="clearAll">
-                             <RotateCcw class="w-3 h-3 mr-2" /> Reset All
-                         </BaseButton>
-                     </div>
-                 </div>
-
-             </InspectorPanel>
-        </div>
-    </div>
-
   </ToolLayout>
 </template>
 

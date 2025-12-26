@@ -90,32 +90,56 @@ const navigateTo = (path?: string) => {
 </script>
 
 <template>
-    <div class="h-full overflow-y-auto p-8 bg-slate-50 dark:bg-slate-950">
-        <div class="max-w-5xl mx-auto">
-            <header class="mb-10">
-                <h1 class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">CTools Suite</h1>
-                <p class="text-lg text-slate-500 dark:text-slate-400">Select a tool to get started.</p>
-            </header>
+    <div class="h-full overflow-y-auto bg-slate-50 dark:bg-slate-950 flex flex-col items-center py-20 px-8">
+        
+        <!-- Hero Section -->
+        <div class="max-w-6xl w-full mb-16 text-center space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-widest mb-4">
+                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                Corporater Tools Suite
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                Empower your <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Workflow</span>
+            </h1>
+            <p class="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                A collection of specialized utilities designed to accelerate Corporater solution delivery.
+                Generate scripts, clean assets, and build layouts with precision.
+            </p>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div v-for="tool in tools" :key="tool.id" 
-                    @click="navigateTo(tool.path)"
-                    class="group cursor-pointer bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 block"
-                    :class="tool.border"
-                >
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 duration-300" :class="tool.bg">
-                        <component :is="tool.icon" class="w-6 h-6" :class="tool.color" />
+        <!-- Grid -->
+        <div class="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div v-for="tool in tools" :key="tool.id" 
+                 @click="navigateTo(tool.path)"
+                 class="group relative cursor-pointer bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+            >
+                <!-- Hover Gradient -->
+                <div class="absolute inset-0 bg-gradient-to-br from-white via-white to-indigo-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                <div class="relative z-10 flex flex-col h-full">
+                    <!-- Icon Box -->
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-105 shadow-sm border border-slate-100 dark:border-slate-700/50 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900">
+                        <component :is="tool.icon" class="w-7 h-7" :class="tool.color" />
                     </div>
                     
-                    <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         {{ tool.name }}
                     </h3>
                     
-                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                    <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6 flex-grow">
                         {{ tool.description }}
                     </p>
+
+                    <div class="flex items-center text-xs font-bold text-slate-400 group-hover:text-indigo-500 transition-colors uppercase tracking-wider">
+                        Open Tool <span class="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
                 </div>
             </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="mt-20 text-center">
+            <p class="text-sm text-slate-400 font-medium">© 2024 Corporater Tools. Built for speed.</p>
         </div>
     </div>
 </template>

@@ -16,6 +16,7 @@ import { base64AndGunzip, gzipAndBase64, chunkString } from '../utils/gzip'
 import { ScriptBuilder } from '../utils/ScriptBuilder'
 import ToolLayout from '../components/layout/ToolLayout.vue'
 import { usePersistentState } from '../composables/usePersistentState'
+import { camundaModdleDescriptor } from '../config/camundaModdle'
 
 // Import BPMN styles
 import 'bpmn-js/dist/assets/diagram-js.css'
@@ -55,25 +56,7 @@ const selectedElement = shallowRef<any>(null)
 const isInternalUpdate = ref(false)
 let debounceTimer: any = null
 
-// --- Camunda Moddle Definition ---
-const camundaModdleDescriptor = {
-    "name": "Camunda",
-    "uri": "http://camunda.org/schema/1.0/bpmn",
-    "prefix": "camunda",
-    "xml": { "tagAlias": "lowerCase" },
-    "associations": [],
-    "types": [
-        { "name": "Topic", "isAbstract": true, "extends": ["bpmn:ServiceTask"], "properties": [{ "name": "topic", "isAttr": true, "type": "String" }, { "name": "type", "isAttr": true, "type": "String" }] },
-        { "name": "Form", "isAbstract": true, "extends": ["bpmn:UserTask"], "properties": [{ "name": "formKey", "isAttr": true, "type": "String" }, { "name": "formData", "type": "FormData" }] },
-        { "name": "FormData", "superClass": ["Element"], "properties": [{ "name": "fields", "isMany": true, "type": "FormField" }] },
-        { "name": "FormField", "superClass": ["Element"], "properties": [{ "name": "id", "isAttr": true, "type": "String" }, { "name": "label", "isAttr": true, "type": "String" }, { "name": "type", "isAttr": true, "type": "String" }, { "name": "validation", "type": "Validation" }, { "name": "values", "isMany": true, "type": "Value" }] },
-        { "name": "Validation", "superClass": ["Element"], "properties": [{ "name": "constraints", "isMany": true, "type": "Constraint" }] },
-        { "name": "Constraint", "superClass": ["Element"], "properties": [{ "name": "name", "isAttr": true, "type": "String" }, { "name": "config", "isAttr": true, "type": "String" }] },
-        { "name": "Value", "superClass": ["Element"], "properties": [{ "name": "id", "isAttr": true, "type": "String" }, { "name": "name", "isAttr": true, "type": "String" }] },
-        { "name": "Properties", "superClass": ["Element"], "meta": { "allowedIn": ["bpmn:ExtensionElements"] }, "properties": [{ "name": "values", "isMany": true, "type": "Property" }] },
-        { "name": "Property", "superClass": ["Element"], "properties": [{ "name": "id", "isAttr": true, "type": "String" }, { "name": "name", "isAttr": true, "type": "String" }, { "name": "value", "isAttr": true, "type": "String" }] }
-    ]
-}
+
 
 // --- Lifecycle ---
 onMounted(async () => {
@@ -525,5 +508,11 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
 #canvas {
     height: 100%;
     width: 100%;
+}
+
+/* Dark Mode Support for BPMN.js */
+/* Inverts the black lines/text to white-ish, preserves hues roughly via rotation */
+:global(.dark) #canvas :deep(svg) {
+    filter: invert(0.9) hue-rotate(180deg);
 }
 </style>

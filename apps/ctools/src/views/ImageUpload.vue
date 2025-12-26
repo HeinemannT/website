@@ -30,88 +30,84 @@ const urlInput = ref('')
 const isProcessing = ref(false)
 const generatedScript = ref('')
 
-const importFromUrl = async () => {
-    if (!urlInput.value) return
-    
-    const targetUrl = urlInput.value.trim()
-    // Handle multi-line support
-    const lines = targetUrl.split(/\r?\n/).filter(line => line.trim() !== '')
-    
-    if (lines.length > 1) {
-        lines.forEach(line => {
-             const cleanUrl = line.trim()
-             // Recursively call for each line (simplified, but careful of async)
-             // Ideally we process them in batch, but for now we'll just push them
-             const namePart = cleanUrl.split('/').pop()?.split('?')[0] || 'image'
-             const baseName = namePart.split('.')[0].replace(/[^a-zA-Z0-9_-]/g, '_')
-             
-             items.value.push({
-                id: crypto.randomUUID(),
-                url: cleanUrl,
-                name: baseName,
-                scriptId: `img_${baseName}`,
-                status: 'pending',
-                mimeType: 'image/png', // Will be updated on fetch
-                sizeLabel: 'Remote',
-                // We'll fetch later or right now? 
-                // The legacy tool fetches ON GENERATION. 
-                // But the user wants an "Import" button. 
-                // Let's fetch immediately to show preview if possible, or support "Remote" state.
-             })
-        })
-        urlInput.value = ''
-        toast(`Added ${lines.length} URLs`, 'success')
-        return
-    }
-
-    // Single URL Immediate Fetch
+const fetchBlobWithRetry = async (url: string) => {
     const strategies = [
-        `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
-        `https://thingproxy.freeboard.io/fetch/${targetUrl}`
+        `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        `https://thingproxy.freeboard.io/fetch/${url}`
     ]
-
-    let blob: Blob | null = null
-    let lastError
-
-    const loadingToast = toast('Fetching image...', 'info')
 
     for (const proxyUrl of strategies) {
         try {
             const res = await fetch(proxyUrl)
             if (!res.ok) continue
-            blob = await res.blob()
-            if (blob.size > 0) break
+            const blob = await res.blob()
+            if (blob.size > 0 && blob.type.startsWith('image/')) return blob
         } catch (e) {
-            lastError = e
+            console.warn(`Proxy failed: ${proxyUrl}`, e)
         }
     }
+    throw new Error('All proxies failed')
+}
 
-    if (!blob) {
-        toast('Failed to fetch image. blocked by CORS or invalid.', 'error')
-        return
-    }
-
-    if (!blob.type.startsWith('image/')) {
-        toast('URL did not return a valid image', 'error')
-        return
-    }
-
-    const namePart = targetUrl.split('/').pop()?.split('?')[0] || 'url_image'
-    const baseName = namePart.split('.')[0].replace(/[^a-zA-Z0-9_-]/g, '_')
+const importFromUrl = async () => {
+    if (!urlInput.value) return
     
-    items.value.push({
-        id: crypto.randomUUID(),
-        blob, // Store the blob for processing
-        name: baseName,
-        scriptId: `img_${baseName}`,
-        status: 'pending',
-        previewUrl: URL.createObjectURL(blob),
-        mimeType: blob.type,
-        sizeLabel: (blob.size / 1024).toFixed(1) + ' KB'
+    // Parse Lines
+    const rawLines = urlInput.value.trim().split(/\r?\n/).filter(line => line.trim() !== '')
+    const uniqueUrls = [...new Set(rawLines.map(l => l.trim()))]
+    
+    if (uniqueUrls.length === 0) return
+
+    toast(`Fetching ${uniqueUrls.length} image(s)...`, 'info')
+    
+    // Create placeholders first (optimistic UI)
+    const newItems = uniqueUrls.map(url => {
+        const namePart = url.split('/').pop()?.split('?')[0] || 'image'
+        const baseName = namePart.split('.')[0].replace(/[^a-zA-Z0-9_-]/g, '_')
+        const id = crypto.randomUUID()
+        
+        return {
+            id,
+            url,
+            name: baseName,
+            scriptId: `img_${baseName}`,
+            status: 'processing' as const, // Start as processing
+            mimeType: 'image/png',
+            sizeLabel: 'Fetching...'
+        }
     })
+
+    // Add to list immediately
+    items.value.push(...newItems as any)
     urlInput.value = ''
-    toast('Image imported successfully', 'success')
+
+    // Process in background
+    let success = 0
+    let fail = 0
+
+    // Concurrency limit could be added here, but for now Promise.all is okay for small batches
+    await Promise.all(newItems.map(async (item) => {
+        const realItem = items.value.find(i => i.id === item.id)
+        if (!realItem) return
+
+        try {
+            const blob = await fetchBlobWithRetry(item.url)
+            realItem.blob = blob
+            realItem.previewUrl = URL.createObjectURL(blob)
+            realItem.mimeType = blob.type
+            realItem.sizeLabel = (blob.size / 1024).toFixed(1) + ' KB'
+            realItem.status = 'pending' // Ready for generation
+            success++
+        } catch (e) {
+            realItem.status = 'error'
+            realItem.sizeLabel = 'Failed'
+            fail++
+        }
+    }))
+
+    if (success > 0) toast(`Successfully imported ${success} images`, 'success')
+    if (fail > 0) toast(`Failed to import ${fail} images`, 'error')
 }
 
 const handleFiles = (files: File[] | FileList) => {

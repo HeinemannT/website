@@ -48,19 +48,19 @@ jobs:
 
       - name: Build Genealogy App
         run: |
-          cd genealogy-src
+          cd apps/genealogy
           npm ci
           npm run build
 
       - name: Build Cdraw App
         run: |
-          cd cdraw-src
+          cd apps/cdraw
           npm install --legacy-peer-deps
           npm run build
 
       - name: Build CTools App
         run: |
-          cd ctools-app
+          cd apps/ctools
           npm ci
           npm run build
 

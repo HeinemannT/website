@@ -11,7 +11,9 @@ import {
   Edit3,
   Sun,
   Moon,
-  HelpCircle
+  HelpCircle,
+  Wand2,
+  PenTool
 } from 'lucide-vue-next'
 import { useThemeStore } from '../stores/theme'
 import AboutModal from '../components/ui/AboutModal.vue'
@@ -27,8 +29,8 @@ const navigation = [
   { name: 'Process', path: '/process', icon: Activity, color: 'text-emerald-500' },
   { name: 'Table', path: '/table', icon: Table, color: 'text-orange-500' },
   { name: 'Image', path: '/image', icon: ImageIcon, color: 'text-violet-500' },
-  { name: 'SVG Tuner', path: '/tuner', icon: Edit3, color: 'text-teal-500' },
-  { name: 'Visual IDE', path: '/cdraw', icon: Edit3, color: 'text-sky-500' },
+  { name: 'SVG Tuner', path: '/tuner', icon: Wand2, color: 'text-teal-500' },
+  { name: 'cDraw', path: '/cdraw', icon: PenTool, color: 'text-sky-500' },
 ]
 
 const currentTool = computed(() => navigation.find(n => n.path === route.path))

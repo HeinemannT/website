@@ -1,6 +1,6 @@
 export type ViewMode = 'simple' | 'architect';
 
-export type MethodConfigType = 
+export type MethodConfigType =
   | 'HistoricalNumberMethodConfig' | 'NumberMethodConfig'
   | 'StringMethodConfig' | 'HistoricalTextMethodConfig' | 'TextMethodConfig'
   | 'ReferenceMethodConfig' | 'HistoricalReferenceMethodConfig'
@@ -32,6 +32,7 @@ export interface ListItem {
 export interface ListPropertySet {
   id: string;
   name: string;
+  scriptId?: string;
   items: ListItem[];
 }
 
@@ -56,7 +57,7 @@ export interface NodeData {
   iconType: 'shield' | 'chart' | 'folder' | 'alert' | 'user' | 'cube' | 'check' | 'globe' | 'mail' | 'calendar';
   description?: string;
   color?: string; // Hex code (Background)
-  
+
   // Cosmetic Styling
   fontSize?: number;
   isBold?: boolean;
@@ -66,11 +67,11 @@ export interface NodeData {
   borderColor?: string;
   borderStyle?: 'solid' | 'dashed' | 'dotted' | 'none';
   borderWidth?: number;
-  
+
   // Architect Customization
   nameFieldLabel?: string; // Default: 'name'
   descFieldLabel?: string; // Default: 'description'
-  
+
   // Layout
   locked?: boolean;
 

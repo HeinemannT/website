@@ -5,7 +5,9 @@ import {
     Activity, 
     Table, 
     Image as ImageIcon, 
-    Edit3 
+    Edit3,
+    Wand2,
+    PenTool
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 
@@ -66,18 +68,17 @@ const tools = [
         id: 'tuner',
         name: 'SVG Tuner', 
         description: 'Clean, resize, and optimize SVG files. Fix colors and backgrounds for dashboard usage.',
-        path: '/tuner', 
-        icon: Edit3, 
+        icon: Wand2, 
         color: 'text-teal-500',
         bg: 'bg-teal-50 dark:bg-teal-900/20',
         border: 'hover:border-teal-300 dark:hover:border-teal-700'
     },
     { 
         id: 'cdraw',
-        name: 'Visual IDE', 
-        description: 'Local-first Visual IDE for GRC. Diagramming and modeling with smart connectors.',
+        name: 'cDraw', 
+        description: 'Local-first Diagramming and Modelling tool. Create GRC models with smart connectors.',
         path: '/cdraw', 
-        icon: Edit3, 
+        icon: PenTool, 
         color: 'text-sky-500',
         bg: 'bg-sky-50 dark:bg-sky-900/20',
         border: 'hover:border-sky-300 dark:hover:border-sky-700'

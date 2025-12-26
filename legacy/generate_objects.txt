@@ -1,0 +1,126 @@
+[meta file tags] architect-mode, risk-management-model, property-creation-order, list-and-reference-configs, frontend-setup, net-risk-calculation
+
+# Risk and Measures
+[thought]…[/thought] notes are internal processes invisible to the user. Do not make these visible to the user.
+
+## Properties
+[thought] I will model risks with CeRiskAssessment and measures with CeControlMeasure (enterprise objects). I’ll add reusable properties and link them to the types so the same definitions can be reused elsewhere. Name, description and ID already exist by default. Relationships are wired explicitly with reference properties because enterprise objects aren’t hierarchical. [/thought]
+
+
+
+### Risk:
+// pProbability [Numerical]
+// pImpact [Numerical]
+[thought] Risk needs time-aware numerics for gross probability/impact, so I use HistoricalNumberMethodConfig. I’ll later compute net values via ExtendedMethodConfig. [/thought]
+
+_hnmc_probability := root.property.add(HistoricalNumberMethodConfig, id := 'pProbability', name := 'Probability', description := 'Probability of a risk occurring', category := 'Risk Assessment', decimalPlaces := 0)
+	c.get(CeRiskAssessment.name).link(_hnmc_probability)
+_hnmc_impact := root.property.add(HistoricalNumberMethodConfig, id := 'pImpact', name := 'Impact', description := 'Potential impact of a risk occuring, in leading currency', category := 'Risk Assessment', formatPostfix := '\u20AC', decimalPlaces := 0)
+	c.get(CeRiskAssessment.name).link(_hnmc_impact)
+
+// pApprovalStatus [Enum, Single Select]
+// pRiskType [Enum, Multi Select]
+[thought] Single-select enums use ListMethodConfig bound to a ListPropertySet. For true multi-select taxonomy (Risk Type), ListMethodConfig can’t multi-select, so we reference the LPS items with ReferenceMethodConfig (multiselect := true). I have to be careful to use advanced := true so the expression resolves. [/thought]
+_cat := root.portal.add(Category, id := 'new_list_propertysets', name := 'DEV')
+_lps := _cat.add(ListPropertySet, id := 'lps_approval_status', name := 'Approval Status')
+        _lps.add(ListPropertySetItem, id := 'lp_approved', name := 'Approved')
+        _lps.add(ListPropertySetItem, id := 'lp_rejected', name := 'Rejected')
+        _lps.add(ListPropertySetItem, id := 'lp_sentforapproval', name := 'Sent for Approval')
+        _lps.add(ListPropertySetItem, id := 'lp_1stapproval', name := '1st Approval')
+        _lps.add(ListPropertySetItem, id := 'lp_2ndapproval', name := '2nd Approval')
+_lps1 := _cat.add(ListPropertySet, id := 'lps_risktype', name := 'Risk Type')
+        _lps1.add(ListPropertySetItem, id := 'lp_risktype_IT', name := 'IT')
+        _lps1.add(ListPropertySetItem, id := 'lp_risktype_currency', name := 'Currency')
+        _lps1.add(ListPropertySetItem, id := 'lp_risktype_supplierrelations', name := 'Supplier Relations')
+        _lps1.add(ListPropertySetItem, id := 'lp_risktype_actsofgod', name := 'Acts of God')
+
+_lmc_approval := root.property.add(ListMethodConfig, id := 'pApprovalStatus', name := 'Approval Status', description := 'The approval status', category := 'Risk Assessment', allowBlank := true, listPropertySet := t.lps_approval_status)
+	c.get(CeRiskAssessment.name).link(_lmc_approval)
+_rmc_risktype := root.property.add(ReferenceMethodConfig, id := 'pRiskType', name := 'Risk Type', description := 'Type of risk - category by customer', category := 'Risk Information', multiselect := true, advanced := true, expression := 't.lps_risktype.children')
+	c.get(CeRiskAssessment.name).link(_rmc_risktype)
+
+// refOrganisation [Object Reference]
+// refLinkedMeasures [Object Reference]
+[thought]I will need to consider all references. A risk will be assigend to an organisation so I will create that reference Property. The request was for linked measures so I will need to reference the measure objects.[/thought]
+_hrmc_linkedmeasures := root.property.add(HistoricalReferenceMethodConfig, id := 'refLinkedMeasures', name := 'Linked Measures', description := 'Measures mitigating this risk', listDisplayType := 'FLAT_LIST', allowBlank := true, advanced := true, expression := 'SELECT CeControlMeasure FROM root.CeControlMeasure')
+	c.get(CeRiskAssessment.name).link(_hrmc_linkedmeasures)
+_rmc_reforg := root.property.add(ReferenceMethodConfig, id := 'refOrganisation', name := 'Organisation', category := 'References', listDisplayType := 'TREE', allowBlank := true, advanced := true, expression := 'SELECT Organisation')
+	c.get(CeRiskAssessment.name).link(_rmc_reforg)
+
+[thought]I need the probability and impact after a measure is applied to a risk. First I should create the measure objects.[/thought]
+
+### Measure:
+// //pImpact_reduction [Numerical]
+pProbability_reduction [Numerical]
+_hnmc_impact_red := root.property.add(HistoricalNumberMethodConfig, id := 'pImpact_reduction', name := 'Impact', description := 'Reduction of the Impact of a Risk Ocurring (Absolute)', category := 'Measure', formatPostfix := '\u20AC', decimalPlaces := 0)
+        c.get(CeControlMeasure.name).link(_hnmc_impact_red)
+_hnmc_prob_red := root.property.add(HistoricalNumberMethodConfig, id := 'pProbability_reduction', name := 'Probability', description := 'Reduction of the Probability of a Risk Ocurring', category := 'Measure', decimalPlaces := 0)
+        c.get(CeControlMeasure.name).link(_hnmc_prob_red)
+
+// refMeasureOwner [Reference, Single Selection]
+[thought] A measure has an accountable owner; I will make a reference to User. Using the user root keeps the picker fast and universal. [/thought]
+_rmc_measureowner := root.property.add(ReferenceMethodConfig, id := 'refMeasureOwner', name := 'Measure Owner', description := 'Owner of the control\/measure', allowBlank := true, advanced := true, expression := 'select User from root.user')
+	c.get(CeControlMeasure.name).link(_rmc_measureowner)
+[thought]I should add a property refOrganisation for Measures as well. However I already created this property earlier and need to avoid duplicates. I will reuse the property to avoid collision[/thought]
+        c.get(CeControlMeasure.name).link(_rmc_reforg)
+// rrefLinkedRisks [Reverse Reference]
+[thought] For two-way navigation, I will a reverse reference on Measure back to Risks through the forward property refLinkedMeasures on Risk. [/thought]
+_rrmc_linkedrisks := root.property.add(ReverseReferenceMethodConfig, id := 'rrefLinkedRisks', name := 'Linked Risks', overrideTableName := 'Linked Risks', referenceModel := 'CERISKASSESSMENT', types := list(CeRiskAssessment), property := 'refLinkedMeasures', filter := filter(CeRiskAssessment, *everywhere), propertyReadonly := false)
+	c.get(CeControlMeasure.name).link(_rrmc_linkedrisks)
+
+// pApprovalStatus [Enum, Single Select]
+[thought] Since pApprovalStatus already exists, I cannot create it again with the same ID. I will reuse the same pApprovalStatus for simplicity and link it to Measures. [/thought]
+	c.get(CeControlMeasure.name).link(_lmc_approval)
+
+
+### Risk
+[thought] For the Risk Net values I will choose to calculate the numbers via ExtendedMethodConfig. [/thought]
+// pProbability_Net [Calculated]
+// pImpact_Net [Calculated]
+_emc_probNet := root.property.add(ExtendedMethodConfig, id := 'pProbability_Net', name := 'Probability', description := 'Probability of a risk occuring after measures have been applied', category := 'Risk Assessment', expression := '\/\/ Fetch all assigned measureswhich are approved\nmeasure_list := this.object.refLinkedMeasures.filter(pApprovalStatus = t.lp_approved)\n\nprobability_gross := this.object.pProbability\nprobability_net := probability_gross\n\n\/\/ For each measure we have a simple flat reduction of the probability\nmeasure_list.foreach(measure:\n     probability_net := probability_net - measure.pProbability_reduction\n     )\nprobability_net')
+        c.get(CeRiskAssessment.name).link(_emc_probNet)
+_emc_impactNet := root.property.add(ExtendedMethodConfig, id := 'pImpact_net', name := 'Impact', description := 'Impact of a risk occuring after measures have been applied', category := 'Risk Assessment', expression := '\/\/ Fetch all assigned measureswhich are approved\nmeasure_list := this.object.refLinkedMeasures.filter(pApprovalStatus = t.lp_approved)\n\nimpact_gross := this.object.pimpact\nimpact_net := impact_gross\n\n\/\/ For each measure we have a simple flat reduction of the impact\nmeasure_list.foreach(measure:\n     impact_net := impact_net - measure.pimpact_reduction\n     )\nimpact_net')
+        c.get(CeRiskAssessment.name).link(_emc_impactNet)
+
+
+## Defaults
+[thought]Since I use the CeRiskAssessment and CeControlMeasure objects I should add them to defaults so we can work with them later.[/thought]
+_cat_defaults := root.defaults.add(Category, id := 'defaults_enterpriseobjects', name := 'Enterprise Objects')
+        _cat_default_RA := _cat_defaults.add(CeRiskAssessment, id := 'default_ceRiskAssessment')
+        _cat_default_CM := _cat_defaults.add(CeControlMeasure, id := 'default_ceControlMeasure')
+
+## Frontend
+### Risk Overview
+[thought] We build a simple overview page under the first Organisation: a table with the Risks for that Organisation and an object creation widget that uses the EditPage for richer input. [/thought]
+[thought] I will use the columnsLargeScreen property to create the page layout. The maximum for the page is 6. I will aim for a 4–2 layout [/thought]
+_org := root.organisation.children.first() // Create under the first organisation
+_sco_riskoverview := _org.add(Scorecard, id := 'sc_RiskOverview', name := 'Risk Overview')
+        _sco_riskoverview.add(ExtendedTable, id := 'risk_overview_tbl_risks', name := 'Risk Overview', columnsLargeScreen := 4, columnsMediumScreen := 4, columnsSmallScreen := 4)
+        
+[thought] CreateObjectView needs an EditPage and a default object type which I created earlier. It will be in its standard namespace which is ceras for ceRiskAssessment[/thought]
+_cat_actions := root.portal.add(Category, id := 'dev_actions_folder', name := 'Create Objects Folder')
+_edi_newrisk := _cat_actions.add(EditPage, id := 'editpage_create_risk', name := 'Create a new Risk', types := list(CeRiskAssessment), afterExpression := 'after.change(refOrganisation := this.organisation)')
+        _edi_newrisk.add(EditField, id := 'editpage_create_risk_name', propertyMapping := 'name', required := true)
+        _edi_newrisk.add(EditField, id := 'editpage_create_risk_probability', propertyMapping := 'pProbability', required := true)
+        _edi_newrisk.add(EditField, id := 'editpage_create_risk_impact', propertyMapping := 'pImpact', required := true, propertyHint := '      Please insert the impact in the group currency')
+
+_sco_riskoverview.add(CreateObjectView, id := 'risk_overview_cro_risks', name := 'Create new risk', createMode := 'EDITORADD', objectType := ceras.default_ceRiskAssessment, parentDestinationExpression := 'root.CeRiskAssessment', editPage := t.editpage_create_risk, columnsLargeScreen := 2, columnsMediumScreen := 2, columnsSmallScreen := 2)
+
+### Risk Object
+[thought]I need to configure the risk object so users can see information in the frontend. Since we are using enterprise objects we need to use templates. I will need to add this template to the default object.[/thought]
+_cat_obj := root.templatecategory.add(Category, id := 'folder_objects')
+_ent_risk := _cat_obj.add(EnterpriseTemplate, id := 'cet_risk', name := '[Template] Risk')
+        _ent_risk.add(DescriptionView, id := 'cet_risk_description', name := 'Risk Information', viewTypes := list(CeRiskAssessment), sortVisibility := list('name','id','description', 'pApprovalStatus', 'lastModifiedDate','pProbability','pImpact','pProbability_Net','pImpact_net'), columnsLargeScreen := 3, columnsMediumScreen := 3, columnsSmallScreen := 3)
+        _ent_risk.add(ExtendedTable, id := 'ce_risk_measure_tbl', name := 'All Measures', expression := 'vLinkedMeasures := this.object.refLinkedMeasures\n\nvLinkedMeasures.table(id, name, pImpact_reduction, pProbability_reduction)', columnsLargeScreen := 3, columnsMediumScreen := 3, columnsSmallScreen := 3, borderStyle := 'NONE')
+_cat_default_RA.change(template := _ent_risk)
+
+[thought]Users should be able to create measures on a risk. An InputView is what the frontend displays, an InputSet is a SWI that defines the logic. I will first create the InputSet, then add the inputview to the risk object template and link the InputSet.[/thought]
+_inp_measureset := _cat_actions.add(InputSet, id := 'inputset_create_measure', name := 'Create new Measure')
+	_inp_measures_btn := _inp_measurebutton.add(ButtonInput, id := 'inputset_create_measure_btn', name := 'Create new Measure', buttonType := 'ADD', destinationExpression := 'root.CeControlMeasure', objectType := cecme.default_ceControlMeasure, afterExpression := 'this.object.change(refLinkedMeasures := refLinkedMeasures.merge(after))')
+
+_ent_risk.add(InputView, id := 'ce_risk_create_measure', name := 'Create Measure', inputSet := _inp_measures_btn)
+		
+
+### Measure Object 
+_ent := _cat_obj.add(EnterpriseTemplate, id := 'cet_measure', name := '[Template] Measure')
+        _ent.add(DescriptionView, id := 'cet_measure_description', name := 'Measure Information', viewTypes := list(CeControlMeasure), sortVisibility := list('name','pApprovalStatus','refMeasureOwner','pProbability_reduction','pImpact_reduction'), columnsLargeScreen := 3, columnsMediumScreen := 3, columnsSmallScreen := 3)

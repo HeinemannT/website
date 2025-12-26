@@ -76,7 +76,7 @@ export class ScriptBuilder {
         props: Record<string, any>
     ): ScriptBuilder {
         const args = [type, this.formatPropsList(props)].filter(Boolean).join(', ')
-        this.add(`${varName} := ${context}.${method}(${args});`) // Added semicolon
+        this.add(`${varName} := ${context}.${method}(${args})`)
         return this
     }
 
@@ -91,7 +91,7 @@ export class ScriptBuilder {
         props: Record<string, any>
     ): ScriptBuilder {
         const args = [type, this.formatPropsList(props)].filter(Boolean).join(', ')
-        this.add(`${context}.${method}(${args});`) // Added semicolon
+        this.add(`${context}.${method}(${args})`)
         return this
     }
 
@@ -101,7 +101,7 @@ export class ScriptBuilder {
      */
     expression(context: string, method: string, ...args: any[]): ScriptBuilder {
         const argStr = args.map(a => this.formatValue(a)).join(', ')
-        this.add(`${context}.${method}(${argStr});`) // Added semicolon
+        this.add(`${context}.${method}(${argStr})`)
         return this
     }
 

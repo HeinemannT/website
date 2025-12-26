@@ -1,0 +1,493 @@
+
+/* Tags: Create object, Change object
+*  Name: Create Risk Treatment Agreement
+*/
+this.object.change(LH_ahRisk_BU_RiskOwner := this.user)
+
+// Find the correct Risk Treatment Agreement list 
+SelectRTATable := select IncidentList 
+                  from this.object.location 
+                  where parent = this.object.parent.parent and (LinkedTo = t.applicationTreatmentAgreementList or LinkedTo = t.piiaapplicationTreatmentAgreementList or LinkedTo = t.OTapplicationTreatmentAgreementList)
+
+// Add Risk treatment agreement
+AddIncidents := SelectRTATable.link(t.V3_01rta)
+               .change(riskCycleStatus := t.rc_sentforapproval_load, 
+                       riskAssessmentLink := this.object,
+                       LH_ahRisk_BU_RiskOwner := this.user,
+                       name:= name + " " + today.day)
+
+this.object.ancestor(Incident)
+  .change(LH_Treatmentstatus_workflow := t.sbf_status_sentforapproval,
+          riskCycleStatus := t.rc_sentforapproval_load)
+          
+// On CISO Approval necessary, add an approval row          
+IF this.object.RTACISOApprovalRequired = "Yes" THEN
+    AddIncidents.children(CheckList)
+        .filter(linkedTo = t.V3_01rta_Check13rov)
+        .first()
+        .link(t.'4app_check_rta')
+ENDIF
+
+---
+
+/* Tags: After expression, Change object
+*  Name: unhide IssueList and append AI Act Questionnaire
+*/
+assmt := after
+
+IF assmt.aiact_usesAI = "Yes" THEN
+     //Unhide Ext. Table
+     vAIA_status := assmt.descendants(ExtendedTable).filter(linkedTo = t.sbf_aiact_extTableStatus)
+     vAIA_status.change(visibility := "VISIBLE")
+     //Add Questionnaire
+     vAIA_list := assmt.descendants(IssueList).filter(linkedTo = t.sbf_aiact_issuelist).first()
+     IF vAIA_list.children().size() < 1 THEN
+          vAIA_list.link(t.aiact_questionnaire)
+     ELSE '' ENDIF
+ELSE '' ENDIF
+
+// ### Extended Property with conditional return ###
+//Fetch all SBF templates from shared web items and merge them into 1 list
+vTemplates := LIST()
+vTemplates := t.template_list_sbf.children
+             .foreach(c: vTemplates := vTemplates.merge(c.LH_template_object))
+
+vPRA_list := SELECT incident FROM this.object WHERE linkedTo IN vTemplates
+
+vPRA_approved := vPRA_list.filter(LH_PRAstatus_workflow = t.sbf_status_approved)
+vPRA_latest := vPRA_list.last()
+
+IF vPRA_approved.size()>0 THEN
+     vPRA_output := vPRA_approved.first()
+ELSE 
+     vPRA_output := vPRA_latest
+ENDIF
+vPRA_output
+
+---
+
+/* Tags: Show expression, Boolean expression
+*  Name: AI Act show expression
+*/
+//Check if SBF considers the AI Act
+bool_usesAI := (this.object.aiact_usesAI = "Yes")
+
+//Check if SBF Workflow status is correct (open or blank)
+bool_status := (this.object.LH_PRAstatus_workflow IN LIST(t.sbf_status_blank, t.sbf_status_open, t.sbf_status_rejected))
+
+bool_usesAI AND bool_status
+
+---
+/* Tags: Create Table, url, hidden, addColumn
+*  Name: Advanced table with addColumn
+*/
+
+vTable := vFRFlist.sort(riskPriority).table()
+
+vTable.addColumn("Name", name)
+          .url(self).style(wrapped, separator)
+vTable.addColumn("Gross", riskPriority)
+          .url(self).align(CENTER)
+vTable.addColumn(" ", _LH_RA_RISKCLASSGROSS_STATIC)
+          .url(self).style(separator)
+vTable.addColumn("Net", IF riskResponse = "Avoid" THEN t.416268.statusClassification ELSE self.descendants(treatmentactivity).first().statusClassification ENDIF)
+          .url(self).align(CENTER)
+vTable.addColumn("",riskClassTreatV2)
+          .url(self).style(separator)
+vTable.addColumn("Number", IF self.NUMBERING.whenmissing("") = "" THEN self.isoTitle.whenMissing("-") ELSE self.NUMBERING ENDIF)
+          .url(self).style(separator)
+          
+vTable.addColumn("Asset",asset_indicator_extended)
+vTable.addColumn("Asset Label", asset_indicator_extended.applicationLabel)
+          .hidden()
+vTable.addColumn("Org Tag", asset_indicator_extended.organisation_tag)
+          .hidden()
+vTable.addColumn("Protection Level", asset_indicator_extended.overallSBF.whenMissing("-"))
+          .style(separator)
+IF vOrg.descendants(organisation).size() > 0 THEN
+     vTable.addColumn("Organisation", self.organisation)
+               .style(separator)
+ELSE vTable.addColumn("Organisation", self.organisation)
+               .style(separator).hidden() 
+ENDIF
+
+---
+/* Tags: Query, SELECT, List
+*  Name: Specialized Risk Query Function 
+*/
+
+/*
+ * TAKES: vAssets - List of Assets. Otherwise defaults to this.object
+ * TAKES vAssessmentType - List of linkedTo template objects e.g. [t.V3_01rta]
+ * TAKES: vTreatmentProgress - Treatment Progress (On risk object), defaults to all
+ * Returns: vFRFlist */
+vFRFlist := LIST()
+vTemplates:= LIST()
+
+// Gather templates from SWI list objec ts- defaults to all treatments
+
+IF vAssessmentType = MISSING  OR vAssessmentType.size() < 1 THEN 
+     vTemplates := LIST()
+     vTemplates := t.template_list_treatments.children
+            .foreach(c: vTemplates := vTemplates.merge(c.LH_template_object))
+ELSE vTemplates := vAssessmentType ENDIF
+
+vAssets.whenMissing(this.object).foreach(vAsset:
+
+// Gather FRF
+vFRFlist:= vFRFlist.merge(
+         vAsset.descendants(incident)
+         .filter(LH_Treatmentstatus_workflow = t.sbf_status_approved
+                AND linkedTo IN vTemplates)
+                     .descendants(functionriskfactor)
+                     .filter(visibility != NOVISIBLE 
+                              AND excludeFromHeatmap = FALSE
+                              AND parent.linkedTo != t.BUAHriskTreatmentList //explicitly exclude adhoc BU
+                              )
+          )
+)
+
+IF vTreatmentProgress.size() > 0 THEN
+    vFilteredByTreatmentProgress := LIST() // Empty list to start with
+    vTreatmentProgress.foreach(vTP:
+        vFilteredByTreatmentProgress := vFilteredByTreatmentProgress.merge(vFRFlist.filter(LH_Treat_Progr.whenMissing("Empty") = vTP))
+    )
+    vFRFlist := vFilteredByTreatmentProgress
+ELSE "" ENDIF
+
+vFRFlist.whenMissing(LIST())
+
+---
+/* Tags: HTML, label, Styles
+*  Name: Label HTML Code 
+*/
+vOrg := keyOrg.name.whenMissing('') + '\n'
+vBackgroundColor := '#FFFFFF'
+vHeaderTextColor := '#FFAD00'
+vTextColor := '#000000'
+vPadding := '10px'
+vBorderRadius := '3px'
+vBorderStyle := 'border: 1px solid #e0e0e0;'
+vFilterLabelText := 'FILTER:'
+vFilterLabelStyle := 'font-size: small; color: ' + vHeaderTextColor + '; font-weight: normal; margin-bottom: 2px;'
+vHatchStyle := 'background-image: linear-gradient(45deg, rgba(0, 0, 0, 0.03) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, 0.03) 50%, rgba(0, 0, 0, 0.03) 75%, transparent 75%, transparent); background-size: 8px 8px;'
+
+// Construct the final HTML string with only Filter and Org
+vString := '<div style="font-weight: bold; font-size: large; background-color: ' + vBackgroundColor + '; ' + vHatchStyle + '; padding: ' + vPadding + '; border-radius: ' + vBorderRadius + '; color: ' + vTextColor + '; ' + vBorderStyle + '">'
+           + '<div style="' + vFilterLabelStyle + '">' + vFilterLabelText + '</div>'
+           + '<span style="color: ' + vTextColor + ';">' + vOrg + '</span>'
+           + '</div>'
+
+str(vString)
+
+---
+/* Tags: HTML, label, Styles
+*  Name: HTML CSS Style generator
+*/
+
+
+/* @purpose      This script generates a set of CSS style variables that can be used to create 
+*                consistently formatted HTML within other Extended Code expressions.
+* 
+*  @input        (Optional) To customize the theme, define these variables before calling this expression:
+*                - vColorPrimary: An RGB string for primary elements e.g., vColorPrimary := "rgb(0, 83, 159)"
+*                - vColorSecondary: An RGB string for accent elements
+* 
+*  @output       This script defines a set of ready-to-use style variables in the calling context
+*                (e.g., vStyleH1, vStyleBody, vStyleBoxSubtleGray, vStyleBoxLeftBorder, vStyleBoxSoftBlue, 
+*                vStyleBoxDark, vStyleTextSimpleBold).
+* 
+*  @usage        Concatenate the output variables into the 'style' attribute of your HTML tags.
+*                Example:
+*                vMyHtml := "<h1 style='" + vStyleH1 + "'>My Title</h1>"
+*/                        + "<div style='" + vStyleBoxSubtleGray + "'>My Info</div>"
+
+// 1. DESIGN TOKENS (EDIT THESE VALUES)
+// These variables control the fundamental look of the theme. Modify these tokens to easily change the entire design.
+
+// Color Tokens
+// Define the primary and secondary colors for the theme.
+vColorPrimary   := vColorPrimary.whenMissing("rgb(5, 22, 77)")         // Main color for H1/H2 headers and links.
+vColorSecondary := vColorSecondary.whenMissing("rgb(255, 173, 0)")    // Accent color for H3/H4 headers and highlights.
+vColorText      := "rgb(0, 0, 0)"                                    // Standard color for body text.
+vColorBorder    := "rgb(204, 204, 204)"                             // Color for dividers and borders.
+vColorBackground        := "rgb(245, 245, 245)"                    // Background color for highlight boxes.
+
+// Font Size Tokens
+vFontSizeH1     := "1.250em"       // For main page titles.
+vFontSizeH2     := "1.000em"    // For major section titles.
+vFontSizeH3     := "1.000em"       // For subsection titles.
+vFontSizeH4     := "0.875em"      // For minor, simple headers.
+vFontSizeBase   := "0.875em"    // For all standard body and list text.
+vLineHeight     := "1.5"       // Default line height for readability.
+
+// Spacing Tokens
+// Define spacing values to ensure consistent margins.
+vSpaceUnit      := "0.625em"    // The base unit for margins between text elements.
+vSpaceLg        := "1.25em"     // A larger unit for gaps between major sections.
+vStyleHighlightBox      := "background-color: " + vColorBackground + "; border-left: 4px solid " + vColorPrimary + "; padding: " + vSpaceLg + "; margin: " + vSpaceUnit + " 0 " + vSpaceLg + " 0;"
+
+// 2. STYLE COMPOSITION (DO NOT EDIT)
+// This section builds the final style variables from the tokens defined above.
+
+// Foundational Style (Used for composition)
+vBaseTextStyle := "font-size: " + vFontSizeBase + "; line-height: " + vLineHeight + "; color: " + vColorText + ";"
+
+// Layout & Utility Styles
+vStyleContainer := "padding: 0em;" // A wrapper style for the entire HTML container.
+vStyleDivider   := "border-bottom: 1px solid " + vColorBorder + "; margin: " + vSpaceLg + " 0;" // A horizontal line to separate content.
+
+// -- Standard Box Styles -- //
+vStyleBoxSubtleGray   := "font-size: " + vFontSizeBase + "; background-color: rgb(248, 249, 250); border: 1px solid rgb(222, 226, 230); border-radius: 4px; padding: 16px; color: rgb(33, 37, 41);"
+vStyleBoxLeftBorder   := "font-size: " + vFontSizeBase + "; border-left: 5px solid " + vColorSecondary + "; padding: 16px; background-color: rgb(248, 249, 250); color: rgb(33, 37, 41);"
+vStyleBoxSoftBlue     := "font-size: " + vFontSizeBase + "; background-color: rgb(231, 245, 255); border-radius: 4px; padding: 16px; color: rgb(0, 64, 128);"
+vStyleBoxDark         := "font-size: " + vFontSizeBase + "; background-color: rgb(5, 22, 77); color: rgb(255, 255, 255); border-radius: 4px; padding: 16px;"
+vStyleTextSimpleBold  := "font-size: " + vFontSizeBase + "; font-weight: bold; color: rgb(85, 85, 85); margin: 24px 0;"
+
+vStylePanelWarning    := "font-size: " + vFontSizeBase + "; border: 1px solid rgb(251, 191, 36); border-radius: 4px; background-color: rgb(255, 251, 235); padding: 1rem;"
+vStyleHeaderStripe    := "font-size: " + vFontSizeBase + "; background-color: white; border: 1px solid rgb(229, 231, 235); border-top: 4px solid " + vColorPrimary + "; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); border-radius: 4px; padding: 1rem;"
+vStyleHeaderStripe2   := "font-size: " + vFontSizeBase + "; padding: 1rem; background-color: white; border-top: 4px solid " + vColorPrimary + "; border-right: 1px solid " + vColorBorder + "; border-bottom: 1px solid " + vColorBorder + "; border-left: 1px solid " + vColorBorder + "; border-radius: 4px;" //box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.07);"
+vStyleIndentedNote    := "font-size: " + vFontSizeBase + "; padding: 0.75rem 1rem 0.75rem 1.5rem; border-left: 4px solid " + vColorSecondary + "; background-color: rgba(255, 173, 0, 0.05);"
+vStyleInsetBox        := "font-size: " + vFontSizeBase + "; padding: 1rem; background-color: rgb(229, 231, 235); border-radius: 4px; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);"
+
+// Header Styles
+vStyleH1        := "font-size: " + vFontSizeH1 + "; font-weight: bold; color: " + vColorPrimary + "; border-bottom: 2px solid " + vColorPrimary + "; padding-bottom: 0.25em; margin-top: 0em; margin-bottom: " + vSpaceLg + ";"
+vStyleH1NoBorder:= "font-size: " + vFontSizeH1 + "; font-weight: bold; color: " + vColorPrimary + "; margin-top: 0em; margin-bottom: " + vSpaceLg + ";"
+vStyleH2        := "font-size: " + vFontSizeH2 + "; font-weight: bold; color: " + vColorPrimary + "; margin-bottom: " + vSpaceUnit + ";"
+vStyleH3        := "font-size: " + vFontSizeH3 + "; font-weight: bold; color: " + vColorSecondary + "; margin-top: 1em; margin-bottom: 0.25em;"
+vStyleH4        := "font-size: " + vFontSizeH4 + "; font-weight: bold; color: " + vColorSecondary + "; margin: 0;"
+
+// Text & Content Styles
+vStyleBody          := vBaseTextStyle + " margin-bottom: " + vSpaceUnit + ";" // The primary style for all standard paragraph text.
+vStyleBodyHighlight := vBaseTextStyle + " color: " + vColorSecondary + "; font-weight: bold;" // For bold, accented text within a paragraph.
+vStyleListItem      := vBaseTextStyle + " margin: 0.25em 0 0.25em 1.5em;" // For items in a bulleted or numbered list.
+vStyleLink          := "color: " + vColorPrimary + "; text-decoration: underline; font-weight: bold;" // For all hyperlink tags.
+
+---
+/* Tags: Profile Mapping, link profiles
+*  Name: Profile Mapping
+*/
+
+// Maps a specified group to a profile on a given object
+vObject := t.<MODEL OBJECT ID>
+vGroup := g.<GROUP ID>
+vProfile := ap.<PROFILE ID>
+
+vObject.add(ObjectProfileMapping, profileMapping, userOrGroup := vGroup, profile := vProfile)
+
+---
+/* Tags: Helper, Property, ID, Name
+*  Name: Display All Property Names and IDs
+*/
+
+// Generates a table of all property names and their corresponding IDs
+root.property.children.table(name, id)
+
+---
+/* Tags: Move Objects, Sort alphabetically
+*  Name: Alphabetize Objects in Config Studio
+*/
+
+// Sorts a flat list of objects alphabetically by name.
+// WARNING: This script can move objects between parents if the hierarchy is not flat. There is no undo.
+vStartObject := t.<START OBJECT>
+vAllObjects := SELECT <CLASS NAME> FROM vStartObject
+
+// Establish the initial index order
+vAllObjects := vAllObjects.sort(indexOrder)
+
+// Sort the objects by name
+vSortedObjects := vAllObjects.sort(name)
+
+// Reorder the objects based on the sorted list
+vCounter := 0
+vAllObjects.forEach(objectOrder:
+    IF vCounter = 0 THEN
+        vSortedObjects.item(vCounter).moveBefore(vAllObjects.item(vCounter))
+    ELSE
+        vSortedObjects.item(vCounter).moveAfter(vSortedObjects.item(vCounter - 1))
+    ENDIF
+    vCounter := vCounter + 1
+)
+
+---
+/* Tags: Change Objects, Bulk Edit
+*  Name: Bulk Editing of Tables
+*/
+
+// Applies specified property changes to all ExtendedTables and FilterTables within a given context.
+vContext := t.<ROOT OBJECT>
+vTemplate := t.<TEMPLATE ID>
+
+vExtendedTables := SELECT ExtendedTable FROM vContext
+vFilterTables := SELECT FilterTable FROM vContext
+
+vAllTables := vExtendedTables.merge(vFilterTables)
+
+vAllTables.change(
+    exportTemplate := vTemplate,
+    openFiltersEnabled := TRUE,
+    everyBorderVisible := TRUE,
+    tableViewsOptionEnabled := TRUE,
+    advancedFiltersEnabled := TRUE
+)
+
+---
+/* Tags: Change Objects, Bulk Edit
+*  Name: Change All Button Font Colors
+*/
+
+// Changes the font color to white for all template ActionButtons with default background colors.
+vWhiteColor := t.white
+vAllButtons := SELECT ActionButton FROM root.TEMPLATECATEGORY WHERE buttonBackgroundColor.isMissing() AND buttonFontColor.isMissing()
+
+vAllButtons.change(buttonFontColor := vWhiteColor)
+
+---
+/* Tags: Change Objects, Bulk Edit
+*  Name: Change Transparency of All Button Backgrounds
+*/
+
+// Sets the background transparency to 100% for all ActionButtons in the template.
+vAllButtons := SELECT ActionButton FROM root.TEMPLATECATEGORY
+
+vAllButtons.change(transparency := 100)
+
+---
+/* Tags: Information, Bulk Edit
+*  Name: List and Generate All Custom Properties
+*/
+
+// Generates the transactional code for all custom properties of the 'Indicator' class.
+// This is useful for moving properties between workspaces.
+vIndicatorProperties := root.property.children.filter(className != 'SystemMethodConfig' AND links.calculate(parent.name) CONTAINS 'Indicator')
+
+vIndicatorProperties.calculate(
+    self.generate(TRUE)
+).join('')
+
+
+---
+/* Tags: Change Properties, Temporary Variables
+*  Name: Reverse Risk Chart Axes
+*/
+
+// Reverses the axes of all RiskCharts in the template.
+// Suggestion: Run this on template objects. Changing them multiple times will flip the axes back and forth.
+vRiskCharts := SELECT RiskChart FROM root.TEMPLATECATEGORY
+
+vRiskCharts.forEach(vChart:
+    // Change labels on risk chart axes
+    vChart.change(consequenceLabel := 'Probability', probabilityLabel := 'Impact')
+
+    // Store current labels in variables before changing them
+    vProbFrom := vChart.probabilityFrom.whenMissing('')
+    vProbTo := vChart.probabilityTo.whenMissing('')
+    vConsequenceFrom := vChart.consequenceFrom.whenMissing('')
+    vConsequenceTo := vChart.consequenceTo.whenMissing('')
+
+    vVeryLowRiskLabel := vChart.veryLowRiskLabel
+    vLowRiskLabel := vChart.lowRiskLabel
+    vModerateRiskLabel := vChart.moderateRiskLabel
+    vSeriousRiskLabel := vChart.seriousRiskLabel
+    vVerySeriousRiskLabel := vChart.verySeriousRiskLabel
+
+    vVerySmallProbLabel := vChart.verySmallProbabilityLabel
+    vSmallProbLabel := vChart.smallProbabilityLabel
+    vModerateProbLabel := vChart.moderateProbabilityLabel
+    vGreatProbLabel := vChart.greatProbabilityLabel
+    vVeryGreatProbLabel := vChart.veryGreatProbabilityLabel
+
+    // Change mapping of 'from' and 'to' fields
+    vChart.change(probabilityFrom := vConsequenceFrom, probabilityTo := vConsequenceTo, consequenceFrom := vProbFrom, consequenceTo := vProbTo)
+
+    // Change probability labels
+    vChart.change(
+        verySmallProbabilityLabel := vVeryLowRiskLabel,
+        smallProbabilityLabel := vLowRiskLabel,
+        moderateProbabilityLabel := vModerateRiskLabel,
+        greatProbabilityLabel := vSeriousRiskLabel,
+        veryGreatProbabilityLabel := vVerySeriousRiskLabel
+    )
+
+    // Change consequence labels
+    vChart.change(
+        veryLowRiskLabel := vVerySmallProbLabel,
+        lowRiskLabel := vSmallProbLabel,
+        moderateRiskLabel := vModerateProbLabel,
+        seriousRiskLabel := vGreatProbLabel,
+        verySeriousRiskLabel := vVeryGreatProbLabel
+    )
+)
+
+---
+/* Tags: Email, HTML
+*  Name: Send Test Email to myself
+*/
+/* This script sends a test customized email to this.user based on user-selected recipients and 
+ * templates. It processes business unit selections, generates personalized 
+ * content using assessment data, and logs all sent emails.
+ */
+
+
+// --- 1. Recipients - Select object persistent inputs
+vInputFilter := this.object.inputviews.filter(inputset = t.itsec_email_recipients).first()
+vEmail_Selection := vInputFilter.key_businessunits.whenMissing(LIST())
+vRoles_Recipients := vInputFilter.key_userrole.whenMissing(LIST())
+
+// BCC Recipients - split the entry string into a list of emails
+vBCC_Recipients_str := vInputFilter.key_manualentry.whenMissing("")
+funcSplitString_string := vBCC_Recipients_str
+funcSplitString_delimiter :=","
+vBCC_Recipients := {funcSplitString}
+
+// --- 2. Subject & Body
+vInputSubject := str(this.object.inputviews.filter(inputset = t.itsec_email_template).first().key_subject)
+vInputText := str(this.object.inputviews.filter(inputset = t.itsec_email_template).first().key_texteditor)
+vEmail_Html := ''
+// --- Add HTML resoure if it exists
+vInputSet := this.object.inputviews.filter(inputset = t.itsec_email_template).first()
+html_insert := vInputSet.key_resource
+IF html_insert.whenMissing("") = "" THEN
+     html_insert := ''
+ELSE html_insert := str(html_insert)
+ENDIF
+
+
+// --- 3. Customize per Assessment / BU
+vEmail_Selection.foreach(vSelection:
+     // Fetch variables that can be entered into the email 
+     unit_name :=        str(vSelection.name)
+	 unit_organization:= str(vSelection.ITSEC_Organization.name)
+	 assessment_rid :=   str(vSelection.rid)
+	 assessment_linkpt :=str('https://rico.dlh.de/rico/?rid=' + vSelection.rid)
+	 assessment_link :=  str('<a target="_blank" rel="noopener noreferrer" href="https://sbx.rico.dlh.de/rico/?rid=' + vSelection.rid + '">
+                          https://sbx.rico.dlh.de/rico/?rid=' + vSelection.rid + '</a>')
+
+     
+     // Render input text with variables - md() expands variables into HTML
+     vRendered_Mail := md(vInputText) 
+)
+
+
+// --- 4. Send mail to SELF - only 1 mail gets sent out
+// --- 4.1 Add Header & Footer
+IF this.object.inputviews.filter(inputset = t.itsec_email_template).first().key_showdefaults 
+THEN vEmail_Html := t.itsec_emailcenter_defaults_header.pEmailBody
+                + vRendered_Mail
+                + t.itsec_emailcenter_defaults_footer.pEmailBody
+ELSE vEmail_Html := vRendered_Mail
+ENDIF
+
+// --- 4.2 Send mail
+sendmail(vInputSubject           //Subject
+         ,vEmail_Html            //Content  
+         ,this.user              //Send to self
+         )     
+         
+// --- 4.3 Append log object          
+t.ITSEC_email_center_log.link(t.email_log_object
+                             ,pEmailBody := vEmail_Html
+                             ,pSubjectLine := vInputSubject
+                             ,description := "Test email sent to: " + this.user + " (" + this.user.email + ")"
+                             )

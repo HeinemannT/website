@@ -4,6 +4,16 @@
  * Handles indentation, headers, and specific object creation patterns.
  */
 
+export class RawValue {
+    public value: string;
+    constructor(value: string) {
+        this.value = value;
+    }
+    toString() { return this.value }
+}
+
+export const raw = (str: string) => new RawValue(str)
+
 export class ScriptBuilder {
     private lines: string[] = []
     private indentLevel: number = 0
@@ -58,30 +68,30 @@ export class ScriptBuilder {
 
     /**
      * Helper for .create() calls (Server-side object creation).
-     * e.g. target.create(Type, loop:='...', ...)
+     * e.g. target.add(Type, loop:='...', ...)
      */
     createObject(
         parentVar: string,
         type: string,
-        props: Record<string, string | number | boolean | null | undefined>
+        props: Record<string, any>
     ): ScriptBuilder {
         const propStr = this.formatProps(props)
-        this.add(`${parentVar}.create(${type}${propStr});`)
+        this.add(`${parentVar}.add(${type}${propStr})`)
         return this
     }
 
     /**
      * Helper for .create() calls that assign to a variable.
-     * e.g. var folder = parent.create(...)
+     * e.g. folder := parent.add(...)
      */
     createObjectVar(
         varName: string,
         parentVar: string,
         type: string,
-        props: Record<string, string | number | boolean | null | undefined>
+        props: Record<string, any>
     ): ScriptBuilder {
         const propStr = this.formatProps(props)
-        this.add(`var ${varName} = ${parentVar}.create(${type}${propStr});`)
+        this.add(`${varName} := ${parentVar}.add(${type}${propStr})`)
         return this
     }
 
@@ -93,7 +103,7 @@ export class ScriptBuilder {
         targetVar: string,
         parentVar: string,
         type: string,
-        props: Record<string, string | number | boolean | null | undefined>
+        props: Record<string, any>
     ): ScriptBuilder {
         const propStr = this.formatProps(props)
         this.add(`${targetVar} := ${parentVar}.add(${type}${propStr})`)
@@ -116,10 +126,10 @@ export class ScriptBuilder {
     callMethod(
         variable: string,
         method: string,
-        props: Record<string, string | number | boolean | null | undefined>
+        props: Record<string, any>
     ): ScriptBuilder {
         const propStr = this.formatPropsList(props)
-        this.add(`${variable}.${method}(${propStr});`)
+        this.add(`${variable}.${method}(${propStr})`)
         return this
     }
 
@@ -130,7 +140,7 @@ export class ScriptBuilder {
     /**
      * Formats property map into ", key:='value', key2:=123" string
      */
-    private formatProps(props: Record<string, string | number | boolean | null | undefined>): string {
+    private formatProps(props: Record<string, any>): string {
         const str = this.formatPropsList(props)
         if (!str) return ''
         return ', ' + str
@@ -139,11 +149,12 @@ export class ScriptBuilder {
     /**
      * Formats property map into "key:='value', key2:=123" string w/o leading comma
      */
-    private formatPropsList(props: Record<string, string | number | boolean | null | undefined>): string {
+    private formatPropsList(props: Record<string, any>): string {
         const entries = Object.entries(props).filter(([, v]) => v !== undefined && v !== null && v !== '')
         if (entries.length === 0) return ''
 
         return entries.map(([k, v]) => {
+            if (v instanceof RawValue) return `${k}:=${v.value}`
             if (typeof v === 'string') return `${k}:='${v}'`
             return `${k}:=${v}`
         }).join(', ')

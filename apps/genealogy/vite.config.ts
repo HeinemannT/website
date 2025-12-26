@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
       }
     },
     build: {
-      outDir: '../genealogy',
+      outDir: '../../genealogy',
       emptyOutDir: true
     }
   };

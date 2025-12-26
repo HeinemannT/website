@@ -19,5 +19,4 @@ plugins:
   - jekyll-seo-tag
 
 exclude:
-  - genealogy-src/
-  - cdraw-src/
+  - apps/

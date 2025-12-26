@@ -8,7 +8,7 @@ const jekyllFrontMatter = () => {
   return {
     name: 'vite-plugin-jekyll-frontmatter',
     closeBundle() {
-      const distIndex = path.resolve(__dirname, '../ctools/index.html')
+      const distIndex = path.resolve(__dirname, '../../ctools/index.html')
       if (fs.existsSync(distIndex)) {
         const content = fs.readFileSync(distIndex, 'utf-8')
         const frontMatter = `---
@@ -34,7 +34,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../ctools', // Build directly to the output directory
+    outDir: '../../ctools', // Build directly to the output directory
     emptyOutDir: true,
   }
 })

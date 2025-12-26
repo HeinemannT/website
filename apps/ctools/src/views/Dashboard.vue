@@ -5,7 +5,6 @@ import {
     Activity, 
     Table, 
     Image as ImageIcon, 
-    Edit3,
     Wand2,
     PenTool
 } from 'lucide-vue-next'
@@ -85,8 +84,8 @@ const tools = [
     }
 ]
 
-const navigateTo = (path: string) => {
-    router.push(path)
+const navigateTo = (path?: string) => {
+    if (path) router.push(path)
 }
 </script>
 

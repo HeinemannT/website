@@ -8,7 +8,6 @@ import {
   Activity,
   Table,
   Image as ImageIcon,
-  Edit3,
   Sun,
   Moon,
   HelpCircle,

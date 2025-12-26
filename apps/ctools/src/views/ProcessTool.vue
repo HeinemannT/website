@@ -13,6 +13,8 @@ import { useToast } from '../composables/useToast'
 import { useClipboard } from '../composables/useClipboard'
 import { useDownload } from '../composables/useDownload'
 import { base64AndGunzip, gzipAndBase64, chunkString } from '../utils/gzip'
+import { ScriptBuilder } from '../utils/ScriptBuilder'
+import ToolLayout from '../components/layout/ToolLayout.vue'
 
 // Import BPMN styles
 import 'bpmn-js/dist/assets/diagram-js.css'
@@ -200,7 +202,10 @@ const copyAsExtendedScript = async () => {
         const fullPayload = `${name};application/xml;${base64}`;
         const chunked = chunkString(fullPayload)
         const target = targetObject.value.trim() || 'this.object';
-        const finalString = `${target}.change(content := '${chunked}')`;
+        
+        const sb = new ScriptBuilder();
+        sb.callMethod(target, 'change', { content: chunked });
+        const finalString = sb.toString();
 
         copyToClipboard(finalString, 'Extended Script');
     } catch (err: any) {
@@ -357,10 +362,15 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
 </script>
 
 <template>
-  <div class="flex h-full w-full overflow-hidden" @mousemove="handleResize" @mouseup="stopResize">
+  <ToolLayout 
+      :sidebarStyle="{ width: sidebarWidth + 'px' }" 
+      @mousemove="handleResize" 
+      @mouseup="stopResize"
+      class="select-none"
+  >
     
     <!-- Canvas -->
-    <div class="flex-grow relative bg-slate-50 dark:bg-slate-900 overflow-hidden bg-grid-pattern">
+    <template #main>
         <div id="canvas" class="w-full h-full"></div>
 
         <!-- Empty State -->
@@ -373,115 +383,128 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
                 <PlusCircle class="w-4 h-4 mr-2" /> Create New Diagram
             </BaseButton>
         </div>
-    </div>
-
-    <!-- Resizer -->
-    <div class="w-1 bg-slate-700 hover:bg-indigo-500 cursor-col-resize z-20 transition-colors" @mousedown="startResize"></div>
+    </template>
 
     <!-- Right Panel -->
-    <div class="bg-slate-800 border-l border-slate-700 flex flex-col z-10 shadow-2xl shrink-0"
-         :style="{ width: sidebarWidth + 'px' }">
-        <div class="flex border-b border-slate-700">
-            <button @click="activeTab = 'input'" :class="activeTab === 'input' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-slate-200'" class="flex-1 py-3 text-xs font-semibold uppercase border-b-2 transition-colors">Input</button>
-            <button @click="activeTab = 'xml'" :class="activeTab === 'xml' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-slate-200'" class="flex-1 py-3 text-xs font-semibold uppercase border-b-2 transition-colors">XML Editor</button>
+    <template #sidebar>
+        <!-- Resizer Handle -->
+        <div class="absolute left-0 top-0 bottom-0 w-1 cursor-col-resize z-50 -ml-0.5 hover:bg-indigo-500 transition-colors" 
+             @mousedown="startResize"></div>
+
+        <div class="h-full flex flex-col">
+            <div class="flex border-b border-slate-700">
+                <button @click="activeTab = 'input'" :class="activeTab === 'input' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-slate-200'" class="flex-1 py-3 text-xs font-semibold uppercase border-b-2 transition-colors">Input</button>
+                <button @click="activeTab = 'xml'" :class="activeTab === 'xml' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-slate-200'" class="flex-1 py-3 text-xs font-semibold uppercase border-b-2 transition-colors">XML Editor</button>
+            </div>
+
+            <div v-show="activeTab === 'input'" class="flex-grow flex flex-col p-4">
+                 <div class="relative flex-grow flex flex-col">
+                    <textarea v-model="inputString" @input="processInput"
+                      class="w-full h-full p-3 text-xs font-mono bg-slate-900 border border-slate-700 rounded text-slate-300 focus:ring-1 focus:ring-indigo-500 outline-none resize-none placeholder-slate-600"
+                      placeholder="Paste extended script or gzip content..."></textarea>
+                    <div class="absolute bottom-2 right-2" v-if="statusMsg === 'Decoded successfully'">
+                        <CheckCircle class="w-4 h-4 text-emerald-500" />
+                    </div>
+                 </div>
+                 <div class="mt-2 text-xs h-4" :class="statusType === 'error' ? 'text-pink-400' : 'text-emerald-400'">{{ statusMsg }}</div>
+            </div>
+
+            <div v-show="activeTab === 'xml'" class="flex-grow flex flex-col relative border-t border-slate-700">
+                 <CodeOutputPanel 
+                    title="XML Editor" 
+                    :code="xmlContent" 
+                    :editable="true"
+                    @update:code="(val: string) => { xmlContent = val; handleXmlEdit() }"
+                 >
+                 </CodeOutputPanel>
+            </div>
         </div>
+    </template>
 
-        <div v-show="activeTab === 'input'" class="flex-grow flex flex-col p-4">
-             <div class="relative flex-grow flex flex-col">
-                <textarea v-model="inputString" @input="processInput"
-                  class="w-full h-full p-3 text-xs font-mono bg-slate-900 border border-slate-700 rounded text-slate-300 focus:ring-1 focus:ring-indigo-500 outline-none resize-none placeholder-slate-600"
-                  placeholder="Paste extended script or gzip content..."></textarea>
-                <div class="absolute bottom-2 right-2" v-if="statusMsg === 'Decoded successfully'">
-                    <CheckCircle class="w-4 h-4 text-emerald-500" />
-                </div>
-             </div>
-             <div class="mt-2 text-xs h-4" :class="statusType === 'error' ? 'text-pink-400' : 'text-emerald-400'">{{ statusMsg }}</div>
-        </div>
+    <!-- Inspector Overlay (Global, or dependent on sidebar?) -->
+    <!-- Original code had InspectorPanel outside the flex container, overlaying the screen or absolute? -->
+    <!-- Re-checked: InspectorPanel was a sibling of the root flex container or last element. -->
+    <!-- Let's check InspectorPanel implementation. It usually is fixed or absolute. -->
+    
+    <div class="pointer-events-none absolute inset-0 z-50" v-if="inspectorVisible">
+        <!-- InspectorPanel logic here or slot? InspectorPanel implementation is unknown but likely handles its own positioning if we just drop it here. -->
+        <!-- Actually, if InspectorPanel is a sidebar itself, we might have issues. -->
+        <!-- Based on previous view, InspectorPanel was at the end of the template. -->
+        <div class="pointer-events-auto absolute top-4 bottom-4 w-80 bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden flex flex-col transition-all duration-300"
+             :style="{ right: (sidebarWidth + 24) + 'px' }">
+             <!-- Inspector Content Copied Inline or Component? -->
+             <!-- Original used <InspectorPanel ...> -->
+             <InspectorPanel :title="inspectorTitle" :subtitle="inspectorType">
+                 <!-- ... slots ... -->
+                 <!-- I need to copy the *content* of the inspector panel from previous file -->
+                 <template #header-actions></template>
+                 
+                 <div class="space-y-4 p-4 overflow-y-auto flex-1">
+                     <BaseInput label="ID" v-model="props.id" @change="updateProps" />
+                     <BaseInput label="Name" v-model="props.name" @change="updateProps" />
 
-        <div v-show="activeTab === 'xml'" class="flex-grow flex flex-col relative border-t border-slate-700">
-             <CodeOutputPanel 
-                title="XML Editor" 
-                :code="xmlContent" 
-                :editable="true"
-                @update:code="(val: string) => { xmlContent = val; handleXmlEdit() }"
-             >
+                     <!-- Service Task -->
+                     <div v-if="isServiceTask" class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-2 text-indigo-500 mb-2">
+                            <Zap class="w-3.5 h-3.5" /> <span class="text-xs font-bold uppercase">Extended Logic</span>
+                        </div>
+                        <BaseInput label="Topic (Raw)" v-model="props.topic" @change="updateProps" mono class="mb-2" />
+                        
+                        <div className="grid grid-cols-2 gap-2">
+                            <BaseInput label="Script Name" v-model="helper.script" @input="buildTopic" />
+                            <BaseInput label="Variable" v-model="helper.variable" @input="buildTopic" />
+                        </div>
+                     </div>
 
-             </CodeOutputPanel>
+                     <!-- User Task -->
+                     <div v-if="isUserTask" class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-2 text-pink-500 mb-2">
+                            <User class="w-3.5 h-3.5" /> <span class="text-xs font-bold uppercase">Form Config</span>
+                        </div>
+                        <BaseInput label="Form Key" v-model="props.formKey" @change="updateProps" />
+
+                        <div class="mt-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-bold text-slate-500">Roles</label>
+                                <button @click="addRole" class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">+ Add</button>
+                            </div>
+                            <div class="space-y-2">
+                                <div v-for="(role, idx) in props.roles" :key="idx" class="flex gap-1">
+                                   <input type="text" v-model="role.value" @change="updateRoles" class="flex-1 text-xs p-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded" />
+                                   <button @click="removeRole(idx)" class="text-slate-400 hover:text-red-500"><X class="w-4 h-4" /></button>
+                                </div>
+                                <p v-if="props.roles.length === 0" class="text-[10px] text-slate-400 italic text-center">No roles assigned</p>
+                            </div>
+                        </div>
+                     </div>
+                 </div>
+
+                 <div class="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                     <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Export / Controls</h4>
+                     <div class="space-y-2">
+                         <div class="flex gap-2">
+                            <BaseInput v-model="filename" placeholder="Filename" mono />
+                            <div class="flex items-center text-xs text-slate-400">.bpmn</div>
+                         </div>
+                         <div class="flex gap-2">
+                             <BaseButton size="sm" class="flex-1" @click="downloadSVG"><Download class="w-3 h-3 mr-2" /> SVG</BaseButton>
+                             <BaseButton size="sm" variant="outline" class="flex-1" @click="downloadXML"><FileCode class="w-3 h-3 mr-2" /> XML</BaseButton>
+                         </div>
+                         <BaseInput v-model="targetObject" label="Target Object" mono />
+                         <BaseButton size="sm" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-600" @click="copyAsExtendedScript">
+                             <Code class="w-3 h-3 mr-2" /> Copy Script
+                         </BaseButton>
+                         <BaseButton size="sm" variant="ghost" class="w-full text-slate-400" @click="clearAll">
+                             <RotateCcw class="w-3 h-3 mr-2" /> Reset All
+                         </BaseButton>
+                     </div>
+                 </div>
+
+             </InspectorPanel>
         </div>
     </div>
 
-    <!-- Inspector -->
-    <InspectorPanel v-if="inspectorVisible" :title="inspectorTitle" :subtitle="inspectorType">
-        <template #header-actions>
-             <!-- No extra actions for now -->
-        </template>
-        
-        <!-- Action Buttons (in panel or nearby?) - Let's put these in the main toolbar actually, but for now here is fine or we can add a persistent toolbar overlay -->
-        
-        <div class="space-y-4">
-             <BaseInput label="ID" v-model="props.id" @change="updateProps" />
-             <BaseInput label="Name" v-model="props.name" @change="updateProps" />
-
-             <!-- Service Task -->
-             <div v-if="isServiceTask" class="pt-4 border-t border-slate-100 dark:border-slate-800">
-                <div class="flex items-center gap-2 text-indigo-500 mb-2">
-                    <Zap class="w-3.5 h-3.5" /> <span class="text-xs font-bold uppercase">Extended Logic</span>
-                </div>
-                <BaseInput label="Topic (Raw)" v-model="props.topic" @change="updateProps" mono class="mb-2" />
-                
-                <div className="grid grid-cols-2 gap-2">
-                    <BaseInput label="Script Name" v-model="helper.script" @input="buildTopic" />
-                    <BaseInput label="Variable" v-model="helper.variable" @input="buildTopic" />
-                </div>
-             </div>
-
-             <!-- User Task -->
-             <div v-if="isUserTask" class="pt-4 border-t border-slate-100 dark:border-slate-800">
-                <div class="flex items-center gap-2 text-pink-500 mb-2">
-                    <User class="w-3.5 h-3.5" /> <span class="text-xs font-bold uppercase">Form Config</span>
-                </div>
-                <BaseInput label="Form Key" v-model="props.formKey" @change="updateProps" />
-
-                <div class="mt-3">
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="text-xs font-bold text-slate-500">Roles</label>
-                        <button @click="addRole" class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">+ Add</button>
-                    </div>
-                    <div class="space-y-2">
-                        <div v-for="(role, idx) in props.roles" :key="idx" class="flex gap-1">
-                           <input type="text" v-model="role.value" @change="updateRoles" class="flex-1 text-xs p-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded" />
-                           <button @click="removeRole(idx)" class="text-slate-400 hover:text-red-500"><X class="w-4 h-4" /></button>
-                        </div>
-                        <p v-if="props.roles.length === 0" class="text-[10px] text-slate-400 italic text-center">No roles assigned</p>
-                    </div>
-                </div>
-             </div>
-        </div>
-
-        <div class="mt-8 pt-4 border-t border-slate-100 dark:border-slate-800">
-             <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Export / Controls</h4>
-             <div class="space-y-2">
-                 <div class="flex gap-2">
-                    <BaseInput v-model="filename" placeholder="Filename" mono />
-                    <div class="flex items-center text-xs text-slate-400">.bpmn</div>
-                 </div>
-                 <div class="flex gap-2">
-                     <BaseButton size="sm" class="flex-1" @click="downloadSVG"><Download class="w-3 h-3 mr-2" /> SVG</BaseButton>
-                     <BaseButton size="sm" variant="outline" class="flex-1" @click="downloadXML"><FileCode class="w-3 h-3 mr-2" /> XML</BaseButton>
-                 </div>
-                 <BaseInput v-model="targetObject" label="Target Object" mono />
-                 <BaseButton size="sm" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-600" @click="copyAsExtendedScript">
-                     <Code class="w-3 h-3 mr-2" /> Copy Script
-                 </BaseButton>
-                 <BaseButton size="sm" variant="ghost" class="w-full text-slate-400" @click="clearAll">
-                     <RotateCcw class="w-3 h-3 mr-2" /> Reset All
-                 </BaseButton>
-             </div>
-        </div>
-
-    </InspectorPanel>
-
-  </div>
+  </ToolLayout>
 </template>
 
 <style scoped>

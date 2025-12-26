@@ -261,7 +261,7 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Tree View (View Mode) */}
           <button
-            onClick={() => setViewMode('tree')}
+            onClick={() => setViewMode(viewMode === 'tree' ? 'digital' : 'tree')}
             className={`sidebar-icon-btn group relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300
                       ${viewMode === 'tree'
                 ? 'bg-cinnabar text-white shadow-md'

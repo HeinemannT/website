@@ -110,8 +110,12 @@ const GenealogyApp: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleOpenTab = (tab: Tab) => {
-    setActiveTab(tab);
-    setIsMenuOpen(true);
+    if (activeTab === tab && isMenuOpen) {
+      setIsMenuOpen(false);
+    } else {
+      setActiveTab(tab);
+      setIsMenuOpen(true);
+    }
   };
 
   // Fetch and Parse YAML Data
@@ -397,7 +401,7 @@ const GenealogyApp: React.FC = () => {
             ].map((btn) => (
               <button
                 key={btn.id}
-                onClick={() => setMobileViewMode(btn.id as MobileViewMode)}
+                onClick={() => setMobileViewMode(curr => curr === btn.id ? 'read' : btn.id as MobileViewMode)}
                 className={`
                   flex flex-col items-center gap-1 p-2 rounded-lg min-w-[3.5rem]
                   active:bg-stone-50 dark:active:bg-zinc-900 transition-all duration-200 active:scale-95

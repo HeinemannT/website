@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import jsyaml from 'js-yaml';
 import { Network } from 'lucide-react';
+import { useDraggableScroll } from '../hooks/useDraggableScroll';
 
 interface FamilyMember {
     id: string;
@@ -26,6 +27,7 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
     const [data, setData] = useState<TreeData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const dragProps = useDraggableScroll();
 
     useEffect(() => {
         fetch('./family_tree.yaml')
@@ -57,12 +59,12 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
     // 2. Safer Scroll Logic using requestAnimationFrame
     useEffect(() => {
         if (!isLoading && data && data.root_id) {
-            // Using requestAnimationFrame ensures DOM is ready
             requestAnimationFrame(() => {
                 setTimeout(() => {
                     const rootElement = document.getElementById(`node-${data.root_id}`);
                     if (rootElement) {
                         try {
+                            // Only scroll to center if not manually dragging (initial load)
                             rootElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
                         } catch (e) {
                             console.warn("Scroll failed", e);
@@ -75,15 +77,10 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
 
     // 3. Recursive Renderer with Circular Dependency Check
     const renderNode = (id: string, depth: number, visited: Set<string>) => {
-        // Crash Prevention 1: Depth Limit
         if (depth > 60) return <div key={id} className="text-red-500 font-bold p-2">Max Depth</div>;
-
-        // Crash Prevention 2: Circular Dependency Check
         if (visited.has(id)) return <div key={id} className="text-orange-500 font-bold text-xs p-1">Loop Detected</div>;
 
-        // Add to visited set for this branch
         const newVisited = new Set(visited).add(id);
-
         const person = peopleMap.get(id);
         if (!person) return null;
 
@@ -93,8 +90,16 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
             <div key={id} className="flex flex-col items-center">
                 {/* Node Card */}
                 <div
-                    id={`node-${id}`} // ID for scrolling
-                    onClick={() => person.page_ref && onNavigate(person.page_ref)}
+                    id={`node-${id}`}
+                    onClick={(e) => {
+                        // Prevent click propagation if we were dragging (simple check: if dragProps.isDragging usually blocks click, 
+                        // but here we just need to ensure click works if not dragging. 
+                        // The hook prevents click on drag, but let's be safe)
+                        if (person.page_ref) {
+                            e.stopPropagation();
+                            onNavigate(person.page_ref);
+                        }
+                    }}
                     className={`
                         relative p-5 rounded-sm border transition-all duration-300 group
                         ${person.page_ref ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1 hover:border-cinnabar/50 dark:hover:border-red-500/50' : 'cursor-default'}
@@ -130,23 +135,28 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
                     <div className="h-8 w-px bg-stone-300 dark:bg-zinc-700"></div>
                 )}
 
-                {/* Children Container */}
+                {/* Children Container - REMOVED gap-8, added padding to children for lines to connect */}
                 {hasChildren && (
-                    <div className="flex flex-nowrap gap-8 relative pt-4">
-                        {/* Render Children */}
+                    <div className="flex flex-nowrap relative pt-4">
                         {person.children!.map((childId, index, arr) => {
                             const isFirst = index === 0;
                             const isLast = index === arr.length - 1;
                             const isOnly = arr.length === 1;
 
                             return (
-                                <div key={childId} className="flex flex-col items-center relative">
+                                <div key={childId} className="flex flex-col items-center relative px-4">
                                     {/* Connector Lines Logic */}
                                     {!isOnly && (
                                         <>
-                                            {/* Line to Left (if not first) */}
+                                            {/* Line to Left (if not first) - Extends from center to left edge (-left-0 to -right-1/2) NO, just center to left edge */}
+                                            {/* Since we are in the child container, we want a line at the top spanning from the center of this child to the left edge (connecting to left neighbor) and right edge (connecting the right neighbor) */}
+
+                                            {/* The gap was removing the connection. Now they touch. 
+                                                Width 50% starts at center (left: 50%) and goes right.
+                                                Width 50% starts at center (right: 50%) and goes left.
+                                            */}
+
                                             <div className={`absolute top-0 right-1/2 h-px bg-stone-300 dark:bg-zinc-700 ${isFirst ? 'hidden' : 'w-1/2'}`}></div>
-                                            {/* Line to Right (if not last) */}
                                             <div className={`absolute top-0 left-1/2 h-px bg-stone-300 dark:bg-zinc-700 ${isLast ? 'hidden' : 'w-1/2'}`}></div>
                                         </>
                                     )}
@@ -154,7 +164,6 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
                                     {/* Vertical line from horizontal bar down to node */}
                                     <div className="h-4 w-px bg-stone-300 dark:bg-zinc-700"></div>
 
-                                    {/* Pass cloned/new set to branches */}
                                     {renderNode(childId, depth + 1, newVisited)}
                                 </div>
                             );
@@ -169,14 +178,24 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
     if (error || !data) return <div className="p-8 text-center text-red-500">{error}</div>;
 
     return (
-        <div className="w-full h-full overflow-auto bg-texture-paper p-4 pb-32 md:p-12">
-            <div className="min-w-max mx-auto flex flex-col items-center">
+        <div
+            ref={dragProps.ref}
+            {...dragProps.events}
+            className={`
+                w-full h-full overflow-auto bg-texture-paper p-4 pb-32 md:p-12
+                ${dragProps.cursorClass}
+                scrollbar-none [&::-webkit-scrollbar]:hidden
+            `}
+        >
+            <div className="min-w-max mx-auto flex flex-col items-center pointer-events-none">
                 <div className="mb-4 flex items-center gap-2 text-stone-400 dark:text-zinc-500 uppercase tracking-widest text-xs">
                     <Network size={16} />
                     <span>Lineage Graph (WIP)</span>
                 </div>
-                {/* Initial Call with empty visited set */}
-                {data.root_id && renderNode(data.root_id, 0, new Set())}
+                {/* Enable pointer events on nodes so clicking works */}
+                <div className="pointer-events-auto">
+                    {data.root_id && renderNode(data.root_id, 0, new Set())}
+                </div>
             </div>
         </div>
     );

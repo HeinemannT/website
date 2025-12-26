@@ -3,7 +3,7 @@ import { ContentColumn, MarginaliaItem, GlossaryTerm } from '../types';
 import { X, Globe } from 'lucide-react';
 import { useDraggableScroll } from '../hooks/useDraggableScroll';
 import { marked } from 'marked';
-// Removed unused SmartText import
+
 
 interface DigitalRecreationProps {
   columns: ContentColumn[];

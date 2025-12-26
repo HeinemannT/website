@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
     },
     base: '/cdraw/',
     build: {
-      outDir: '../cdraw',
+      outDir: '../../cdraw',
       emptyOutDir: true,
     },
     plugins: [react()],

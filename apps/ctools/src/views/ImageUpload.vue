@@ -64,8 +64,8 @@ const importFromUrl = async () => {
     // Create placeholders first (optimistic UI)
     const newItems = uniqueUrls.map(url => {
         const lastSegment = url.split('/').pop() ?? 'image'
-        const namePart = lastSegment.split('?')[0]
-        const baseName = namePart.split('.')[0].replace(/[^a-zA-Z0-9_-]/g, '_')
+        const namePart = lastSegment.split('?')[0] ?? 'image'
+        const baseName = (namePart.split('.')[0] ?? 'image').replace(/[^a-zA-Z0-9_-]/g, '_')
         const id = crypto.randomUUID()
         
         return {

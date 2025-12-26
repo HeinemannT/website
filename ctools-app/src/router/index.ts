@@ -8,6 +8,7 @@ import ImageUpload from '../views/ImageUpload.vue'
 import ColorsetBuilder from '../views/ColorsetBuilder.vue'
 import LayoutBuilder from '../views/LayoutBuilder.vue'
 import TableBuilder from '../views/TableBuilder.vue'
+import CdrawTool from '../views/CdrawTool.vue'
 
 import Dashboard from '../views/Dashboard.vue'
 
@@ -27,6 +28,7 @@ const router = createRouter({
                 { path: 'table', component: TableBuilder },
                 { path: 'image', component: ImageUpload },
                 { path: 'tuner', component: SvgTuner },
+                { path: 'cdraw', component: CdrawTool },
                 { path: '/:pathMatch(.*)*', redirect: '/' }
             ]
         }

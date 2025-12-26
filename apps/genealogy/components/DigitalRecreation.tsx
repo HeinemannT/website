@@ -100,7 +100,7 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                 shadow-[inset_0_0_20px_rgba(0,0,0,0.05)]
                 py-16 px-10 md:px-16
                 transition-colors duration-500
-                flex flex-col flex-wrap content-start items-start
+                flex flex-col flex-nowrap content-start items-start
                 "
               style={{
                 writingMode: 'vertical-rl',
@@ -171,7 +171,7 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                   >
                     <div
                       className={`
-                    font-serif-tc writing-vertical-rl text-justify tracking-[0.2em] leading-loose
+                    font-serif-tc writing-vertical-rl text-justify tracking-[0.2em] leading-loose whitespace-nowrap
                     ${col.is_interlinear
                           ? 'text-sm text-stone-500 dark:text-zinc-500 font-normal pl-1'
                           : 'text-2xl font-bold text-ink dark:text-zinc-200'}

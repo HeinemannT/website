@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { Plus, Trash2, Palette, Wand2, ArrowRight, ExternalLink } from 'lucide-vue-next'
-import tinycolor from 'tinycolor2' // Optimization: Use tinycolor directly
+import { Plus, Trash2, Palette, ExternalLink } from 'lucide-vue-next'
+import tinycolor from 'tinycolor2'
 import { ScriptBuilder } from '../utils/ScriptBuilder'
 import BaseButton from '../components/ui/BaseButton.vue'
 import BaseInput from '../components/ui/BaseInput.vue'
@@ -10,6 +10,8 @@ import ColorMatrix from '../components/colors/ColorMatrix.vue'
 import ToolLayout from '../components/layout/ToolLayout.vue'
 import { generateScale, generatePastel, generateShades, generateInterpolate } from '../utils/ColorGenerators'
 import { useToast } from '../composables/useToast'
+import { usePersistentState } from '../composables/usePersistentState'
+
 const { add: toast } = useToast()
 
 // --- Types ---
@@ -25,11 +27,11 @@ interface GeneratorOutput {
 }
 
 // --- State ---
-const rootParentId = ref('dashboards_colors_folder')
-const setName = ref('New Palette')
-const setId = ref('')
+const rootParentId = usePersistentState('colorset:rootParentId', 'dashboards_colors_folder')
+const setName = usePersistentState('colorset:setName', 'New Palette')
+const setId = usePersistentState('colorset:setId', '')
 
-const palette = ref<ColorStart[]>([
+const palette = usePersistentState<ColorStart[]>('colorset:palette', [
     { id: '', name: 'Color Name', hex: '#EF4444' },
     { id: '', name: 'Color Name', hex: '#EAB308' },
     { id: '', name: 'Color Name', hex: '#22C55E' }

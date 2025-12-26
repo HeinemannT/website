@@ -15,6 +15,7 @@ import { useDownload } from '../composables/useDownload'
 import { base64AndGunzip, gzipAndBase64, chunkString } from '../utils/gzip'
 import { ScriptBuilder } from '../utils/ScriptBuilder'
 import ToolLayout from '../components/layout/ToolLayout.vue'
+import { usePersistentState } from '../composables/usePersistentState'
 
 // Import BPMN styles
 import 'bpmn-js/dist/assets/diagram-js.css'
@@ -23,15 +24,13 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
 const { add: toast } = useToast()
 const { copy: copyToClipboard } = useClipboard()
 const { downloadBlob } = useDownload()
-
-// --- Data ---
 const activeTab = ref<'input' | 'xml'>('input')
-const inputString = ref('')
-const xmlContent = ref('')
+const inputString = usePersistentState('process:inputString', '')
+const xmlContent = usePersistentState('process:xmlContent', '')
 const statusMsg = ref('')
 const statusType = ref<'info' | 'error'>('info')
-const targetObject = ref('t.exampleProcess')
-const filename = ref('process_diagram')
+const targetObject = usePersistentState('process:targetObject', 't.exampleProcess')
+const filename = usePersistentState('process:filename', 'process_diagram')
 const hasDiagram = ref(false)
 const inspectorVisible = ref(false)
 const inspectorTitle = ref('')

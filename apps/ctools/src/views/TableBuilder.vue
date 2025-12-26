@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import draggable from 'vuedraggable'
+import { ScriptBuilder } from '../utils/ScriptBuilder'
 import { 
     Table, Plus, Trash2, GripVertical, Settings, 
     AlignLeft, AlignCenter, AlignRight, EyeOff,
     ListTree, Lock, WrapText
 } from 'lucide-vue-next'
-// import BaseInput from '../components/ui/BaseInput.vue'
 import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
+import ToolLayout from '../components/layout/ToolLayout.vue'
+import TablePreview from '../components/tables/TablePreview.vue'
+import { usePersistentState } from '../composables/usePersistentState'
 
 // --- Types ---
 interface Column {
@@ -28,15 +31,15 @@ interface Level {
 }
 
 // --- State ---
-const method = ref<1 | 2 | 3 | 4>(2) // 1: Simple, 2: Headers, 3: Manual, 4: Hierarchy
-const sourceList = ref('vListOfObjects')
-const tableVar = ref('vTable')
-const columns = ref<Column[]>([
+const method = usePersistentState<1 | 2 | 3 | 4>('table:method', 2) // 1: Simple, 2: Headers, 3: Manual, 4: Hierarchy
+const sourceList = usePersistentState('table:sourceList', 'vListOfObjects')
+const tableVar = usePersistentState('table:tableVar', 'vTable')
+const columns = usePersistentState<Column[]>('table:columns', [
     { id: '1', header: 'Name', prop: 'name', align: 'left', styles: [], format: '' },
     { id: '2', header: 'Description', prop: 'description', align: 'left', styles: [], format: '' },
     { id: '3', header: 'ID', prop: 'id', align: 'left', styles: [], format: '' }
 ])
-const levels = ref<Level[]>([])
+const levels = usePersistentState<Level[]>('table:levels', [])
 
 // --- Actions ---
 const createId = () => crypto.randomUUID()
@@ -89,41 +92,49 @@ const escapeString = (str: string) => str ? str.replace(/"/g, '\\"') : ''
 
 // --- Code Generation ---
 const scriptOutput = computed(() => {
-    let c = `// Table created by CTools\n`
+    const sb = new ScriptBuilder('Table created by CTools')
 
     if (method.value === 3 || method.value === 4) {
-        c += `${tableVar.value} := createTable()\n`
+        sb.add(`${tableVar.value} := createTable()`)
         columns.value.forEach(col => {
-            c += `${tableVar.value}.addColumn("${escapeString(col.header)}", "")`
-            c += buildStyleChain(col)
-            c += `\n`
+            let line = `${tableVar.value}.addColumn("${escapeString(col.header)}", "")`
+            line += buildStyleChain(col)
+            sb.add(line)
         })
     } else {
-        c += `${tableVar.value} := ${sourceList.value}.table()\n`
+        sb.assign(tableVar.value, `${sourceList.value}.table()`)
         columns.value.forEach(col => {
+            let line = ''
             if (method.value === 1) {
-                c += `${tableVar.value}.addColumn(${col.prop})`
+                line = `${tableVar.value}.addColumn(${col.prop})`
             } else {
-                c += `${tableVar.value}.addColumn("${escapeString(col.header)}", ${col.prop})`
+                line = `${tableVar.value}.addColumn("${escapeString(col.header)}", ${col.prop})`
             }
-            c += buildStyleChain(col)
-            c += `\n`
+            line += buildStyleChain(col)
+            sb.add(line)
         })
     }
 
     if (method.value === 3) {
-        c += `\n// --- Population ---\n`
-        c += `${sourceList.value}.foreach(item:\n`
-        c += `    ${tableVar.value}.addRow(item, ${columns.value.map(c => 'item.' + c.prop).join(', ')})\n`
-        c += `)\n`
+        sb.addNewLine()
+        sb.addComment('--- Population ---')
+        sb.add(`${sourceList.value}.foreach(item:`)
+        sb.indent()
+        
+        const rowProps = columns.value.map(c => 'item.' + c.prop).join(', ')
+        sb.add(`${tableVar.value}.addRow(item, ${rowProps})`)
+        sb.outdent()
+        sb.add(')')
     } else if (method.value === 4) {
-        c += `\n// --- Hierarchy Population ---\n`
-        c += generateNestedLoop(0)
+        sb.addNewLine()
+        sb.addComment('--- Hierarchy Population ---')
+        generateNestedLoop(sb, 0)
     }
 
-    c += `\n${tableVar.value}`
+    sb.addNewLine()
+    sb.add(tableVar.value)
 
-    return c
+    return sb.toString()
 })
 
 const buildStyleChain = (col: Column) => {
@@ -148,13 +159,14 @@ const buildStyleChain = (col: Column) => {
     return chain
 }
 
-const generateNestedLoop = (levelIdx: number): string => {
-    if (levelIdx >= levels.value.length) return ''
+const generateNestedLoop = (sb: ScriptBuilder, levelIdx: number) => {
+    if (levelIdx >= levels.value.length) return
     const lvl = levels.value[levelIdx]
     const itemVar = levelIdx === 0 ? 'item' : `item_${levelIdx + 1}`
-    const indent = "    ".repeat(levelIdx)
     
-    let s = `${indent}${lvl ? lvl.source : ''}.foreach(${itemVar}:\n`
+    // Header
+    sb.add(`${lvl ? lvl.source : ''}.foreach(${itemVar}:`)
+    sb.indent()
     
     // Auto-detect if prop needs prefix
     const rowProps = columns.value.map(c => {
@@ -162,26 +174,28 @@ const generateNestedLoop = (levelIdx: number): string => {
         return c.prop
     }).join(', ')
 
-    s += `${indent}    ${tableVar.value}.addRow(${itemVar}, ${rowProps})`
-    if (lvl && lvl.indent > 0) s += `.indent(${lvl.indent})`
-    if (lvl && lvl.collapse) s += `.collapse()`
-    s += `\n`
+    let addRowLine = `${tableVar.value}.addRow(${itemVar}, ${rowProps})`
+    if (lvl) {
+        if (lvl.indent > 0) addRowLine += `.indent(${lvl.indent})`
+        if (lvl.collapse) addRowLine += `.collapse()`
+    }
+    sb.add(addRowLine)
 
-    s += generateNestedLoop(levelIdx + 1)
-    s += `${indent})\n`
-    return s
+    // Recurse
+    generateNestedLoop(sb, levelIdx + 1)
+    
+    // Footer
+    sb.outdent()
+    sb.add(')')
 }
-
-// const copyResult = () => copy(scriptOutput.value, 'Generated Code')
 
 </script>
 
 <template>
-    <div class="h-full flex flex-col md:flex-row overflow-hidden bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+    <ToolLayout sidebar-class="w-full md:w-1/2 lg:w-[500px]" sidebar-position="left">
         
-        <!-- Left Panel: Config -->
-        <div class="w-full md:w-1/2 flex flex-col border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 overflow-hidden">
-            
+        <!-- Sidebar: Configuration -->
+        <template #sidebar>
             <!-- Global Config -->
             <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-10 shrink-0 shadow-sm">
                 <!-- Method Selector -->
@@ -212,7 +226,7 @@ const generateNestedLoop = (levelIdx: number): string => {
             </div>
 
             <!-- Scrollable List -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-6 bg-grid-pattern">
+            <div class="flex-1 overflow-y-auto p-4 space-y-6 bg-slate-50 dark:bg-slate-900">
                 
                 <!-- Hierarchy Config -->
                 <div v-if="method === 4" class="space-y-3">
@@ -247,98 +261,105 @@ const generateNestedLoop = (levelIdx: number): string => {
                                 </div>
                             </div>
                         </div>
-
-                        <button @click="addLevel" class="w-full py-2 border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-900/50 rounded-lg text-slate-400 hover:text-indigo-500 text-xs font-bold transition-all flex items-center justify-center gap-2">
-                            <Plus class="w-3 h-3" /> Add Nested Level
-                        </button>
                     </div>
                 </div>
 
                 <!-- Columns -->
-                <div class="space-y-3">
-                    <label class="text-[10px] uppercase font-bold text-indigo-900 dark:text-indigo-300 tracking-wider flex items-center gap-2">
-                        <Table class="w-3 h-3" /> Table Columns
-                    </label>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end border-b border-slate-200 dark:border-slate-800 pb-2">
+                        <label class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-2">
+                            <Table class="w-3 h-3" /> Columns
+                        </label>
+                        <button class="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:text-indigo-800 flex items-center gap-1" @click="addColumn">
+                            <Plus class="w-3 h-3" /> Add Column
+                        </button>
+                    </div>
 
                     <draggable 
                         v-model="columns" 
                         item-key="id"
                         handle=".drag-handle"
-                        class="space-y-2"
-                        :animation="200"
+                        class="space-y-3"
                     >
-                        <template #item="{ element: col }">
-                            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm transition-all group">
-                                <div class="flex items-center h-10">
-                                    <!-- Drag Handle -->
-                                    <div class="drag-handle w-8 h-full flex items-center justify-center text-slate-300 hover:text-indigo-500 cursor-grab active:cursor-grabbing border-r border-slate-100 dark:border-slate-700">
-                                        <GripVertical class="w-3 h-3" />
+                        <template #item="{ element: col, index }">
+                            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md transition-shadow group">
+                                <!-- Main Row -->
+                                <div class="flex items-center p-2 gap-2">
+                                    <div class="drag-handle cursor-move text-slate-300 hover:text-slate-500"><GripVertical class="w-4 h-4" /></div>
+                                    
+                                    <div class="flex-1 grid grid-cols-2 gap-2">
+                                        <input v-model="col.header" placeholder="Header" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-bold" />
+                                        <input v-model="col.prop" placeholder="Property" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-mono text-slate-600 dark:text-slate-400" />
                                     </div>
-
-                                    <!-- Content -->
-                                    <div class="flex-1 flex gap-2 px-3 items-center">
-                                        <input v-model="col.header" :disabled="method === 1" class="flex-1 bg-transparent border-none text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-300 focus:outline-none" placeholder="Header Name" />
-                                        <span class="text-[px] font-mono text-slate-300">::</span>
-                                        <input v-model="col.prop" class="flex-1 bg-transparent border-none text-xs font-mono text-indigo-600 dark:text-indigo-400 placeholder-slate-300 focus:outline-none text-right" placeholder="prop" />
+                                    
+                                    <div class="flex items-center border-l border-slate-100 dark:border-slate-700 pl-2 gap-1">
+                                        <button @click="col.showSettings = !col.showSettings" 
+                                            :class="col.showSettings ? 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30' : 'text-slate-400 hover:text-slate-600'" 
+                                            class="p-1.5 rounded transition-colors">
+                                            <Settings class="w-3.5 h-3.5" />
+                                        </button>
+                                        <button @click="removeColumn(index)" class="p-1.5 text-slate-300 hover:text-red-500 transition-colors">
+                                            <Trash2 class="w-3.5 h-3.5" />
+                                        </button>
                                     </div>
-
-                                    <!-- Controls -->
-                                    <button @click="col.showSettings = !col.showSettings" :class="col.showSettings ? 'text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' : 'text-slate-300 hover:text-indigo-500'" class="w-8 h-full flex items-center justify-center border-l border-slate-100 dark:border-slate-700 transition-colors">
-                                        <Settings class="w-3 h-3" />
-                                    </button>
-                                    <button @click="removeColumn(columns.indexOf(col))" class="w-8 h-full flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 border-l border-slate-100 dark:border-slate-700 transition-colors">
-                                        <Trash2 class="w-3 h-3" />
-                                    </button>
                                 </div>
 
                                 <!-- Settings Panel -->
-                                <div v-if="col.showSettings" class="border-t border-slate-100 dark:border-slate-700 p-2 bg-slate-50 dark:bg-slate-900/50 rounded-b-lg grid gap-3">
-                                    <div class="flex justify-between items-center">
-                                        <div class="flex rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-0.5">
-                                            <button @click="col.align = 'left'" :class="col.align === 'left' ? 'bg-slate-100 dark:bg-slate-700 text-indigo-500' : 'text-slate-400'" class="p-1 rounded"><AlignLeft class="w-3 h-3" /></button>
-                                            <button @click="col.align = 'center'" :class="col.align === 'center' ? 'bg-slate-100 dark:bg-slate-700 text-indigo-500' : 'text-slate-400'" class="p-1 rounded"><AlignCenter class="w-3 h-3" /></button>
-                                            <button @click="col.align = 'right'" :class="col.align === 'right' ? 'bg-slate-100 dark:bg-slate-700 text-indigo-500' : 'text-slate-400'" class="p-1 rounded"><AlignRight class="w-3 h-3" /></button>
-                                        </div>
-
-                                        <div class="flex gap-1">
-                                            <button @click="toggleStyle(col, 'separator')" :class="col.styles.includes('separator') ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600' : 'bg-white dark:bg-slate-800 text-slate-400'" class="px-2 py-1 rounded text-[10px] font-bold border border-slate-200 dark:border-slate-600">|</button>
-                                            <button @click="toggleStyle(col, 'hidden')" :class="col.styles.includes('hidden') ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600' : 'bg-white dark:bg-slate-800 text-slate-400'" class="p-1 rounded border border-slate-200 dark:border-slate-600"><EyeOff class="w-3 h-3" /></button>
-                                            <button @click="toggleStyle(col, 'wrapped')" :class="col.styles.includes('wrapped') ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600' : 'bg-white dark:bg-slate-800 text-slate-400'" class="p-1 rounded border border-slate-200 dark:border-slate-600"><WrapText class="w-3 h-3" /></button>
-                                            <button @click="toggleStyle(col, 'readonly')" :class="col.styles.includes('readonly') ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600' : 'bg-white dark:bg-slate-800 text-slate-400'" class="p-1 rounded border border-slate-200 dark:border-slate-600"><Lock class="w-3 h-3" /></button>
+                                <div v-if="col.showSettings" class="border-t border-slate-100 dark:border-slate-700 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-b-lg grid grid-cols-2 gap-4">
+                                    
+                                    <!-- Align -->
+                                    <div>
+                                        <label class="text-[8px] uppercase font-bold text-slate-400 block mb-1">Alignment</label>
+                                        <div class="flex bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 p-0.5">
+                                            <button v-for="a in ['left', 'center', 'right']" :key="a" @click="col.align = a as any"
+                                                :class="col.align === a ? 'bg-slate-100 dark:bg-slate-700 text-indigo-600 dark:text-indigo-400' : 'text-slate-400'"
+                                                class="flex-1 flex justify-center py-1 rounded hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                                <AlignLeft v-if="a === 'left'" class="w-3 h-3" />
+                                                <AlignCenter v-if="a === 'center'" class="w-3 h-3" />
+                                                <AlignRight v-if="a === 'right'" class="w-3 h-3" />
+                                            </button>
                                         </div>
                                     </div>
 
-                                    <div class="border-t border-slate-200 dark:border-slate-700 pt-2 flex flex-wrap gap-2">
-                                        <button @click="col.format = ''" :class="col.format === '' ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-600 ring-1 ring-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200'" class="px-2 py-1 rounded text-[10px] font-bold">Text</button>
-                                        
-                                        <button @click="col.format = 'decimals(0)'" :class="col.format === 'decimals(0)' ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-600 ring-1 ring-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200'" class="px-2 py-1 rounded text-[10px] font-bold">123</button>
-                                        
-                                        <button @click="col.format = 'decimals(2)'" :class="col.format === 'decimals(2)' ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-600 ring-1 ring-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200'" class="px-2 py-1 rounded text-[10px] font-bold">.00</button>
-                                        
-                                        <button @click="col.format = 'formatType(PERCENTAGE)'" :class="col.format === 'formatType(PERCENTAGE)' ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-600 ring-1 ring-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200'" class="px-2 py-1 rounded text-[10px] font-bold">%</button>
-                                        
-                                        <button @click="col.format = 'formatType(DATE)'" :class="col.format === 'formatType(DATE)' ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-600 ring-1 ring-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200'" class="px-2 py-1 rounded text-[10px] font-bold">Date</button>
-                                        
-                                        <button @click="col.format = 'formatType(THOUSANDS).postfix(\' €\')'" :class="col.format.includes('postfix') ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-600 ring-1 ring-indigo-200' : 'bg-white dark:bg-slate-800 text-slate-400 border border-slate-200'" class="px-2 py-1 rounded text-[10px] font-bold">€</button>
+                                    <!-- Format -->
+                                    <div>
+                                        <label class="text-[8px] uppercase font-bold text-slate-400 block mb-1">Format</label>
+                                        <input v-model="col.format" placeholder="decimals(2)" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-[10px] font-mono" />
                                     </div>
+
+                                    <!-- Toggles -->
+                                    <div class="col-span-2 flex gap-2 flex-wrap pt-1">
+                                        <button @click="toggleStyle(col, 'bold')" :class="col.styles.includes('bold') ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-white border-slate-200 text-slate-500'" class="px-2 py-1 rounded text-[10px] font-bold border flex items-center gap-1 transition-all">B</button>
+                                        <button @click="toggleStyle(col, 'hidden')" :class="col.styles.includes('hidden') ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-white border-slate-200 text-slate-500'" class="px-2 py-1 rounded text-[10px] font-bold border flex items-center gap-1 transition-all"><EyeOff class="w-3 h-3" />Hidden</button>
+                                        <button @click="toggleStyle(col, 'separator')" :class="col.styles.includes('separator') ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-white border-slate-200 text-slate-500'" class="px-2 py-1 rounded text-[10px] font-bold border flex items-center gap-1 transition-all"><GripVertical class="w-3 h-3" />Separator</button>
+                                        <button @click="toggleStyle(col, 'wrapped')" :class="col.styles.includes('wrapped') ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-white border-slate-200 text-slate-500'" class="px-2 py-1 rounded text-[10px] font-bold border flex items-center gap-1 transition-all"><WrapText class="w-3 h-3" />Wrap</button>
+                                        <button @click="toggleStyle(col, 'readonly')" :class="col.styles.includes('readonly') ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-white border-slate-200 text-slate-500'" class="px-2 py-1 rounded text-[10px] font-bold border flex items-center gap-1 transition-all"><Lock class="w-3 h-3" />Readonly</button>
+                                    </div>
+
                                 </div>
                             </div>
                         </template>
                     </draggable>
-
-                    <button @click="addColumn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 font-bold text-sm">
-                        <Plus class="w-4 h-4" /> Add Column
-                    </button>
                 </div>
             </div>
-        </div>
+        </template>
 
-        <!-- Right Panel: Code -->
-        <!-- Right Panel: Code -->
-        <div class="w-full md:w-1/3 flex flex-col relative border-l border-slate-200 dark:border-slate-800 shadow-2xl z-20">
-             <CodeOutputPanel title="Generated Code" :code="scriptOutput">
+        <!-- Main Content -->
+        <template #main>
+            <div class="h-full flex flex-col">
+                <!-- Top Half: Preview -->
+                <div class="h-[40%] border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 p-6 overflow-auto">
+                    <div class="max-w-4xl mx-auto space-y-2">
+                        <label class="text-xs font-bold uppercase text-slate-400 tracking-wider">Live Preview</label>
+                        <TablePreview :columns="columns" />
+                    </div>
+                </div>
 
-             </CodeOutputPanel>
-        </div>
-    </div>
+                <!-- Bottom Half: Code -->
+                <div class="h-[60%] overflow-hidden bg-white dark:bg-slate-900 relative">
+                    <CodeOutputPanel :code="scriptOutput" />
+                </div>
+            </div>
+        </template>
+    </ToolLayout>
 </template>

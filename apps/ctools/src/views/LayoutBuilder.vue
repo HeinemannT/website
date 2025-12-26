@@ -43,10 +43,12 @@ interface TabSet {
     children: Tab[]
 }
 
+import { usePersistentState } from '../composables/usePersistentState'
+
 // --- State ---
-const rootParentId = ref('swi_folder')
-const mobileStrategy = ref<'mirror' | 'stack' | 'grid'>('mirror')
-const data = ref<TabSet[]>([])
+const rootParentId = usePersistentState('layout:rootParentId', 'swi_folder')
+const mobileStrategy = usePersistentState<'mirror' | 'stack' | 'grid'>('layout:mobileStrategy', 'mirror')
+const data = usePersistentState<TabSet[]>('layout:data', [])
 
 const showMobileHelp = ref(false)
 

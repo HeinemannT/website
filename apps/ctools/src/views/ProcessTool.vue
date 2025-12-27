@@ -220,7 +220,7 @@ const copyAsExtendedScript = async () => {
 
 const downloadSVG = async () => {
     try {
-        const { svg } = await modeler.value.saveSVG();
+        const { svg } = await modeler.value.saveSVG({ format: true });
         downloadBlob(svg, `${filename.value || 'diagram'}.svg`, 'image/svg+xml');
     } catch (e: any) { toast(e.message, 'error') }
 }
@@ -512,7 +512,10 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
 
 /* Dark Mode Support for BPMN.js */
 /* Inverts the black lines/text to white-ish, preserves hues roughly via rotation */
-:global(.dark) #canvas :deep(svg) {
+/*
+:global(html.dark) #canvas :deep(svg) {
     filter: invert(0.9) hue-rotate(180deg);
+    background-color: transparent !important;
 }
+*/
 </style>

@@ -2,35 +2,24 @@
 import { useRoute } from 'vue-router'
 import { computed, ref } from 'vue'
 import {
-  LayoutDashboard,
-  Palette,
-  LayoutTemplate,
-  Activity,
-  Table,
-  Image as ImageIcon,
   Sun,
   Moon,
-  HelpCircle,
-  Wand2,
-  PenTool
+  HelpCircle
 } from 'lucide-vue-next'
 import { useThemeStore } from '../stores/theme'
 import AboutModal from '../components/ui/AboutModal.vue'
+import { TOOLS } from '../config/tools'
 
 const route = useRoute()
 const themeStore = useThemeStore()
 const showAbout = ref(false)
 
-const navigation = [
-  { name: 'Dashboard', path: '/', icon: LayoutDashboard, color: 'text-slate-500' },
-  { name: 'Colorset', path: '/colorset', icon: Palette, color: 'text-pink-500' },
-  { name: 'Layout', path: '/layout', icon: LayoutTemplate, color: 'text-blue-500' },
-  { name: 'Process', path: '/process', icon: Activity, color: 'text-emerald-500' },
-  { name: 'Table', path: '/table', icon: Table, color: 'text-orange-500' },
-  { name: 'Image', path: '/image', icon: ImageIcon, color: 'text-violet-500' },
-  { name: 'SVG Tuner', path: '/tuner', icon: Wand2, color: 'text-teal-500' },
-  { name: 'cDraw', path: '/cdraw', icon: PenTool, color: 'text-sky-500' },
-]
+const navigation = TOOLS.map(t => ({
+  name: t.name,
+  path: t.path,
+  icon: t.icon,
+  color: t.sidebarColor || t.color // Fallback if sidebarColor not set
+}))
 
 const currentTool = computed(() => navigation.find(n => n.path === route.path))
 </script>

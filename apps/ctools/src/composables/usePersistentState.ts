@@ -1,4 +1,4 @@
-import { useStorage } from '@vueuse/core'
+import { useStorage, debounceFilter } from '@vueuse/core'
 
 /**
  * Creates a reactive state that persists to localStorage.
@@ -9,5 +9,7 @@ import { useStorage } from '@vueuse/core'
  */
 export function usePersistentState<T>(key: string, initialValue: T) {
     const PREF_KEY = `ctools:v1:${key}`
-    return useStorage<T>(PREF_KEY, initialValue)
+    return useStorage<T>(PREF_KEY, initialValue, localStorage, {
+        eventFilter: debounceFilter(500)
+    })
 }

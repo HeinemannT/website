@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { Plus, Trash2, Palette, ExternalLink } from 'lucide-vue-next'
+import { Plus, Trash2, Palette, ExternalLink, ArrowRight } from 'lucide-vue-next'
 import tinycolor from 'tinycolor2'
 import { ScriptBuilder } from '../utils/ScriptBuilder'
 import BaseButton from '../components/ui/BaseButton.vue'
@@ -173,6 +173,8 @@ const deleteColor = (idx: number) => {
 
 // --- Generator ---
 const generatePreview = () => {
+    if (activeTab.value !== 'generate') return // Optimization: Don't calculate if not visible
+
     genColors.value = []
     
     if (genStrategy.value === 'interpolate') {
@@ -303,7 +305,7 @@ const processPaste = () => {
                 </button>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-6 relative">
+            <div class="flex-1 overflow-y-auto relative" :class="activeTab === 'script' ? '' : 'p-6'">
                 
                 <!-- STUDIO -->
                 <div v-if="activeTab === 'studio'" class="h-full flex flex-col">
@@ -465,7 +467,7 @@ const processPaste = () => {
 
                 <!-- SCRIPT -->
                 <div v-if="activeTab === 'script'" class="h-full flex flex-col">
-                     <CodeOutputPanel title="Generated Script" :code="scriptOutput">
+                     <CodeOutputPanel title="Extended Code" :code="scriptOutput">
                          <template #actions>
                              <div class="w-40">
                                  <input v-model="rootParentId" placeholder="Context Folder" class="w-full text-xs border-b border-slate-200 dark:border-slate-700 bg-transparent focus:border-indigo-500 outline-none pb-1 placeholder-slate-400" />

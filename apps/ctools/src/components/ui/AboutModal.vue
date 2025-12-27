@@ -22,7 +22,7 @@ const emit = defineEmits<{
             <!-- Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur">
                 <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-gradient-to-br from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 rounded text-[10px] text-white dark:text-slate-900 flex items-center justify-center font-bold">CT</span>
+                    <span class="w-6 h-6 bg-gradient-to-br from-purple-600 to-indigo-600 rounded text-[10px] text-white flex items-center justify-center font-bold">CT</span>
                     About CTools
                 </h3>
                 <button @click="emit('close')" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500">
@@ -52,6 +52,12 @@ const emit = defineEmits<{
                          <a href="mailto:tassiloDheinemann@gmail.com" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline">
                              <Mail class="w-4 h-4" /> tassiloDheinemann@gmail.com
                          </a>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-200 dark:border-slate-800">
+                        <p class="text-[10px] text-slate-400 leading-relaxed italic">
+                            Disclaimer: This tool is an independent utility and is not affiliated with, endorsed by, or connected to Corporater AS.
+                        </p>
                     </div>
                 </div>
             </div>

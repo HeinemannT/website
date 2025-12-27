@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Trash2, Image as ImageIcon, CheckCircle, AlertCircle } from 'lucide-vue-next'
 import FileDropZone from '../components/ui/FileDropZone.vue'
-import BaseButton from '../components/ui/BaseButton.vue'
+// BaseButton unused
 import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
 import ToolLayout from '../components/layout/ToolLayout.vue'
 import { useToast } from '../composables/useToast'
@@ -22,22 +22,23 @@ interface ImageItem {
     previewUrl?: string
     mimeType: string
     sizeLabel: string
+    // contentString removed: stored in non-reactive cache
 }
 
 const items = ref<ImageItem[]>([])
 const folderName = ref('vFolder')
 const urlInput = ref('')
-const isProcessing = ref(false)
-const generatedScript = ref('')
+// isProcessing unused
+
+const PROXY_TEMPLATES = [
+    (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    (url: string) => `https://thingproxy.freeboard.io/fetch/${url}`
+]
 
 const fetchBlobWithRetry = async (url: string) => {
-    const strategies = [
-        `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-        `https://thingproxy.freeboard.io/fetch/${url}`
-    ]
-
-    for (const proxyUrl of strategies) {
+    for (const template of PROXY_TEMPLATES) {
+        const proxyUrl = template(url)
         try {
             const res = await fetch(proxyUrl)
             if (!res.ok) continue
@@ -48,6 +49,52 @@ const fetchBlobWithRetry = async (url: string) => {
         }
     }
     throw new Error('All proxies failed')
+}
+
+// Optimization: Store heavy content outside Vue reactivity system
+const contentCache = new Map<string, string>()
+
+// Prepare item content in background (Heavy lifting)
+const processItemContent = async (item: ImageItem) => {
+    try {
+        item.status = 'processing'
+        let data: Uint8Array
+        
+        if (item.file) {
+            data = new Uint8Array(await item.file.arrayBuffer())
+        } else if (item.blob) {
+            data = new Uint8Array(await item.blob.arrayBuffer())
+        } else {
+            throw new Error('No data')
+        }
+
+        // Compress and encode
+        const base64 = await gzipAndBase64Async(data)
+        const chunked = chunkString(base64)
+        
+        // Store in non-reactive cache
+        const contentStr = `${item.name};${item.mimeType};${chunked}`
+        contentCache.set(item.id, contentStr)
+        
+        item.status = 'done'
+        console.log('ImageUpload: Item processed', item.name, item.status)
+    } catch (e) {
+        console.error('Processing failed for', item.name, e)
+        item.status = 'error'
+    }
+}
+
+const createItem = (id: string, url: string, baseName: string): ImageItem => {
+    const item: ImageItem = {
+        id,
+        url,
+        name: baseName,
+        scriptId: '', // Default to empty as requested
+        status: 'pending',
+        mimeType: 'image/png',
+        sizeLabel: 'Fetching...'
+    }
+    return item
 }
 
 const importFromUrl = async () => {
@@ -62,44 +109,39 @@ const importFromUrl = async () => {
     toast(`Fetching ${uniqueUrls.length} image(s)...`, 'info')
     
     // Create placeholders first (optimistic UI)
-    const newItems = uniqueUrls.map(url => {
+    const newItems: ImageItem[] = uniqueUrls.map(url => {
         const lastSegment = url.split('/').pop() ?? 'image'
         const namePart = lastSegment.split('?')[0] ?? 'image'
         const baseName = (namePart.split('.')[0] ?? 'image').replace(/[^a-zA-Z0-9_-]/g, '_')
         const id = crypto.randomUUID()
-        
-        return {
-            id,
-            url,
-            name: baseName,
-            scriptId: `img_${baseName}`,
-            status: 'processing' as const, // Start as processing
-            mimeType: 'image/png',
-            sizeLabel: 'Fetching...'
-        }
+        return createItem(id, url, baseName)
     })
 
     // Add to list immediately
-    items.value.push(...newItems as any)
+    items.value.push(...newItems)
     urlInput.value = ''
 
     // Process in background
     let success = 0
     let fail = 0
 
-    // Concurrency limit could be added here, but for now Promise.all is okay for small batches
-    await Promise.all(newItems.map(async (item) => {
+    // Use Promise.allSettled to handle all requests without failing early
+    await Promise.allSettled(newItems.map(async (item) => {
         const realItem = items.value.find(i => i.id === item.id)
         if (!realItem) return
 
         try {
-            const blob = await fetchBlobWithRetry(item.url)
+            const blob = await fetchBlobWithRetry(item.url!)
             realItem.blob = blob
             realItem.previewUrl = URL.createObjectURL(blob)
             realItem.mimeType = blob.type
             realItem.sizeLabel = (blob.size / 1024).toFixed(1) + ' KB'
-            realItem.status = 'pending' // Ready for generation
-            success++
+            
+            // Trigger processing immediately
+            await processItemContent(realItem)
+            
+            if (realItem.status === 'done') success++
+            else fail++
         } catch (e) {
             realItem.status = 'error'
             realItem.sizeLabel = 'Failed'
@@ -107,28 +149,37 @@ const importFromUrl = async () => {
         }
     }))
 
-    if (success > 0) toast(`Successfully imported ${success} images`, 'success')
+    if (success > 0) toast(`Imported ${success} images`, 'success')
     if (fail > 0) toast(`Failed to import ${fail} images`, 'error')
 }
 
 const handleFiles = (files: File[] | FileList) => {
     const fileArray = Array.from(files).filter(f => f.type.startsWith('image/'))
     
-    fileArray.forEach(file => {
+    fileArray.forEach(async (file) => {
         if (!file) return
         const parts = file.name.split('.')
         const namePart = parts[0] || 'image'
         const baseName = namePart.replace(/[^a-zA-Z0-9_-]/g, '_')
-        items.value.push({
+        
+        const newItem: ImageItem = {
             id: crypto.randomUUID(),
             file,
             name: baseName,
-            scriptId: `img_${baseName}`,
+            scriptId: '', // Default to empty
             status: 'pending',
             previewUrl: URL.createObjectURL(file), 
             mimeType: file.type || 'image/png',
             sizeLabel: (file.size / 1024).toFixed(1) + ' KB'
-        })
+        }
+        
+        items.value.push(newItem)
+        
+        // Fix: Retrieve the reactive proxy from the array to ensure deep reactivity triggers
+        const reactiveItem = items.value.find(i => i.id === newItem.id)
+        if (reactiveItem) {
+            await processItemContent(reactiveItem)
+        }
     })
 
     if (fileArray.length === 0 && (files instanceof FileList ? files.length > 0 : files.length > 0)) {
@@ -140,6 +191,7 @@ const removeItem = (id: string) => {
     const item = items.value.find(i => i.id === id)
     if (item) {
         if (item.previewUrl) URL.revokeObjectURL(item.previewUrl)
+        contentCache.delete(id) // Clear cache
         const idx = items.value.indexOf(item)
         items.value.splice(idx, 1)
     }
@@ -148,64 +200,37 @@ const removeItem = (id: string) => {
 const clearAll = () => {
     items.value.forEach(i => { if (i.previewUrl) URL.revokeObjectURL(i.previewUrl) })
     items.value = []
-    generatedScript.value = ''
+    contentCache.clear() // Clear all cache
 }
 
-const processImages = async () => {
-    isProcessing.value = true
-    generatedScript.value = ''
-    let successCount = 0
+
+
+// Reactive Script Generation
+const scriptOutput = computed(() => {
+    // Check if any done items exist
+    const readyItems = items.value.filter(i => i.status === 'done')
+    if (readyItems.length === 0) return ''
+
+    const sb = new ScriptBuilder(`Image Upload Script (${readyItems.length} files)`)
     
-    const sb = new ScriptBuilder(`Image Upload Script (${items.value.length} files)`)
+    for (const item of readyItems) {
+        // Retrieve content from non-reactive cache
+        const content = contentCache.get(item.id)
+        if (!content) continue
 
-    for (const item of items.value) {
-        if (item.status === 'done') continue
-
-        item.status = 'processing'
-        try {
-            let data: Uint8Array
-            
-            if (item.file) {
-                const buffer = await item.file.arrayBuffer()
-                data = new Uint8Array(buffer)
-            } else if (item.blob) {
-                const buffer = await item.blob.arrayBuffer()
-                data = new Uint8Array(buffer)
-            } else {
-                throw new Error('No data found for item')
-            }
-
-            const base64 = await gzipAndBase64Async(data)
-// ... existing code ...
-            const chunked = chunkString(base64)
-            const contentString = `${item.name};${item.mimeType};${chunked}`
-            
-            sb.callMethod(folderName.value, 'add', {
-                type: 'FileResource',
-                id: item.scriptId,
-                name: item.name,
-                content: contentString
-            })
-            sb.addNewLine()
-
-            item.status = 'done'
-            successCount++
-        } catch (err) {
-            console.error(err)
-            item.status = 'error'
-            sb.addComment(`ERROR processing ${item.name}: ${err}`)
-        }
+        // ScriptBuilder handles stripping empty ID automatically
+        sb.createObject(folderName.value, 'FileResource', {
+            id: item.scriptId,
+            name: item.name,
+            content: content
+        })
     }
 
-    generatedScript.value = sb.toString()
-    isProcessing.value = false
-    
-    if (successCount > 0) {
-        toast(`Generated scripts for ${successCount} images`, 'success')
-    } else {
-        toast('No images successfully processed', 'error')
-    }
-}
+    return sb.toString()
+})
+
+const isAnyProcessing = computed(() => items.value.some(i => i.status === 'processing' || i.status === 'pending'))
+
 </script>
 
 <template>
@@ -215,20 +240,56 @@ const processImages = async () => {
                 <div class="p-6 overflow-y-auto">
                     <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 mb-6">Image Upload</h2>
                     
-                    <FileDropZone @drop="handleFiles" class="mb-6 h-48" accept="image/*" description="Drag images here" />
-
-                    <!-- Configuration -->
-                    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 mb-6 flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <span class="text-sm font-semibold text-slate-500">Target Folder Variable:</span>
-                            <input v-model="folderName" type="text" autocomplete="off" spellcheck="false" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-3 py-1 text-sm font-mono focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none w-48" />
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <!-- Left: Drop Zone -->
+                        <div class="lg:col-span-2">
+                             <FileDropZone 
+                                @drop="handleFiles" 
+                                class="h-full min-h-[200px] border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 bg-slate-50 dark:bg-slate-900/50 rounded-xl transition-all group cursor-pointer" 
+                                accept="image/*"
+                            >
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                                    <div class="mb-4 p-4 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 group-hover:scale-110 transition-transform">
+                                         <ImageIcon class="w-8 h-8" />
+                                    </div>
+                                    <p class="mb-2 text-sm text-slate-500 dark:text-slate-400"><span class="font-bold text-indigo-500">Click to upload</span> or drag and drop</p>
+                                    <p class="text-xs text-slate-400 dark:text-slate-500">SVG, PNG, JPG or GIF (MAX. 10MB)</p>
+                                </div>
+                            </FileDropZone>
                         </div>
-                        
-                        <div class="flex items-center gap-2">
-                             <input v-model="urlInput" @keyup.enter="importFromUrl" placeholder="Import from URL..." class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-3 py-1 text-sm w-64 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none" />
-                             <button @click="importFromUrl" :disabled="!urlInput" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold px-3 py-1.5 rounded transition-colors disabled:opacity-50">Fetch</button>
-                             <div class="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
-                             <button @click="clearAll" v-if="items.length" class="text-xs text-red-500 hover:text-red-600 font-medium px-2 py-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">Clear All</button>
+
+                        <!-- Right: Smart Controls -->
+                        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm flex flex-col gap-4">
+                            <!-- Target Variable -->
+                            <div>
+                                <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-2 block">Target Variable</label>
+                                <div class="flex items-center bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2">
+                                    <span class="text-indigo-500 font-mono text-xs mr-2">:=</span>
+                                    <input v-model="folderName" type="text" spellcheck="false" class="bg-transparent border-none text-sm font-bold text-slate-700 dark:text-slate-200 focus:outline-none w-full" />
+                                </div>
+                            </div>
+
+                            <!-- Smart Import -->
+                            <div class="flex-1 flex flex-col">
+                                <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-2 flex justify-between">
+                                    <span>Smart Import</span>
+                                    <span class="text-indigo-400 text-[9px] normal-case">Paste URLs (one per line)</span>
+                                </label>
+                                <textarea 
+                                    v-model="urlInput" 
+                                    placeholder="https://example.com/image.png&#10;https://othersite.com/logo.svg" 
+                                    class="flex-1 w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-xs font-mono resize-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none mb-3"
+                                ></textarea>
+                                
+                                <div class="flex gap-2">
+                                     <button @click="importFromUrl" :disabled="!urlInput" class="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold py-2 rounded-lg transition-colors shadow-lg shadow-indigo-500/20">
+                                         Fetch Images
+                                     </button>
+                                     <button @click="clearAll" v-if="items.length" class="px-3 bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 rounded-lg transition-colors">
+                                         <Trash2 class="w-4 h-4" />
+                                     </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -250,7 +311,7 @@ const processImages = async () => {
                             <!-- Metadata Inputs -->
                             <div class="flex-grow min-w-0 grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Script ID</label>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">ID</label>
                                     <input v-model="item.scriptId" class="w-full text-xs font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 focus:border-indigo-500 outline-none" />
                                 </div>
                                 <div>
@@ -273,15 +334,15 @@ const processImages = async () => {
                         </div>
                     </div>
 
-                    <BaseButton v-if="items.length" @click="processImages" :disabled="isProcessing" class="mt-6 w-full py-4 text-base shadow-lg shadow-indigo-500/20">
-                        <span v-if="isProcessing">Processing...</span>
-                        <span v-else>Generate Script Block</span>
-                    </BaseButton>
+                    <div class="mt-6 text-center text-xs text-slate-400" v-if="isAnyProcessing">
+                        <span class="animate-pulse">Processing images...</span>
+                    </div>
+
                 </div>
              </div>
         </template>
         <template #sidebar>
-            <CodeOutputPanel title="Output Script" :code="generatedScript" />
+            <CodeOutputPanel title="Extended Code" :code="scriptOutput" />
         </template>
     </ToolLayout>
 </template>

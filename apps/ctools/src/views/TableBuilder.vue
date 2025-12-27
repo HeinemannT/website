@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import draggable from 'vuedraggable'
 import { ScriptBuilder } from '../utils/ScriptBuilder'
 import { 
@@ -93,10 +93,10 @@ const updateHeader = (col: Column) => {
 
 // ... Helpers ...
 
-const generateNestedLoop = (sb: ScriptBuilder, levelIdx: number, parentVar: string) => {
+const generateNestedLoop = (sb: ScriptBuilder, levelIdx: number, _parentVar: string) => {
     if (levelIdx >= levels.value.length) return
 
-    const lvl = levels.value[levelIdx]
+    const lvl = levels.value[levelIdx]!
     const itemVar = `item_${levelIdx + 1}` // 1-based indexing (item_1, item_2...)
     
     // Header
@@ -142,7 +142,7 @@ const scriptOutput = computed(() => {
         columns.value.forEach(col => {
             let line = ''
             if (m === 1) {
-                line = `${tableVar.value}.add(${sourceList.value.startsWith('v' || 'l') ? 'item' : 'item'}.${col.prop})`
+                line = `${tableVar.value}.add(${(sourceList.value.startsWith('v') || sourceList.value.startsWith('l')) ? 'item' : 'item'}.${col.prop})`
             } else {
                 line = `${tableVar.value}.addColumn("${escapeString(col.header)}", item.${col.prop})`
             }

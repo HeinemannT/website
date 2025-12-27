@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { Minus, Plus, Maximize, Sun, Moon, Grid, Monitor } from 'lucide-vue-next'
 
 const props = defineProps<{

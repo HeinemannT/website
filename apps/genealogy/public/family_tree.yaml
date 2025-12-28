@@ -149,7 +149,7 @@ people:
     name_en: "Wanfang"
     generation: 9
     page_ref: "img_14"
-    children: ["gen10_zhongxi"]
+    children: ["gen10_zhongxi", "gen10_yingxi"]
 
   - id: "gen9_wanshi"
     name_zh: "萬石"
@@ -200,6 +200,7 @@ people:
     name_en: "Hanzhang"
     generation: 10
     page_ref: "img_19"
+    children: ["gen11_dingquan", "gen11_dingzhen"]
 
   - id: "gen10_shi"
     name_zh: "時"
@@ -218,7 +219,8 @@ people:
     name_en: "Junxiu"
     generation: 10
     page_ref: "img_20"
-    children: ["gen11_zhaogui"]
+    children:
+      ["gen11_zhaogui", "gen11_menggui", "gen11_guifeng", "gen11_guigong"]
 
   - id: "gen11_shengshi"
     name_zh: "聖世"
@@ -226,7 +228,8 @@ people:
     title: "Mingyu"
     generation: 11
     page_ref: "img_21"
-    children: ["gen12_yanheng", "gen12_yanjun", "gen12_yanyuan", "gen12_yanzan"]
+    children:
+      ["gen12_tingheng", "gen12_tingjing", "gen12_tingyuan", "gen12_tingzan"]
 
   - id: "gen11_chanshi"
     name_zh: "禪世"
@@ -265,30 +268,32 @@ people:
 
   # Note: Generation numbering in the text has Yanjun as "11th Gen" title,
   # but he is the son of 11th Gen Shengshi. We align to logical generation 12.
-  - id: "gen12_yanjun"
+  # Corrected name from Yanjun/Yanheng to Tingjing/Tingheng based on char 'Ting' (廷)
+  - id: "gen12_tingjing"
     name_zh: "廷驚"
-    name_en: "Yanjun"
+    name_en: "Tingjing"
     title: "Quan'an"
     generation: 12
     page_ref: "img_22"
     children: ["gen13_linju"]
 
-  - id: "gen12_yanheng"
+  - id: "gen12_tingheng"
     name_zh: "廷衡"
-    name_en: "Yanheng"
+    name_en: "Tingheng"
     generation: 12
     page_ref: "img_22"
     children: ["gen13_wenhan", "gen13_wenen", "gen13_yigui"]
 
-  - id: "gen12_yanyuan"
+  - id: "gen12_tingyuan"
     name_zh: "廷瑗"
-    name_en: "Yanyuan"
+    name_en: "Tingyuan"
     generation: 12
     page_ref: "img_24"
+    children: ["gen13_wenyue_adopted"]
 
-  - id: "gen12_yanzan"
+  - id: "gen12_tingzan"
     name_zh: "廷瓚"
-    name_en: "Yanzan"
+    name_en: "Tingzan"
     generation: 12
     page_ref: "img_24"
     children: ["gen13_hui", "gen13_huicheng"]
@@ -324,6 +329,12 @@ people:
   - id: "gen13_huicheng"
     name_zh: "輝晟"
     name_en: "Huicheng"
+    generation: 13
+
+  - id: "gen13_wenyue_adopted"
+    name_zh: "文曜"
+    name_en: "Wenyue"
+    title: "Heir to Tingyuan"
     generation: 13
 
   - id: "gen14_dianqu"

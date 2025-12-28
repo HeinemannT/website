@@ -13,6 +13,8 @@ export function useSvgTuner() {
     const paddingVal = ref(0)
     const activeTab = ref<'tune' | 'code'>('tune')
 
+    const exportName = ref('tuned svg')
+
     const analyzeSVG = () => {
         const parser = new DOMParser()
         const doc = parser.parseFromString(svgCode.value, "image/svg+xml")
@@ -167,7 +169,8 @@ export function useSvgTuner() {
             // Try to deduce name from URL
             const parts = url.split('/')
             const last = parts[parts.length - 1]
-            return last?.split('.')[0] || 'imported-svg'
+            exportName.value = last?.split('.')[0] || 'imported-svg'
+            return exportName.value
         } catch (e: any) {
             toast(e.message, 'error')
             return null
@@ -213,6 +216,49 @@ export function useSvgTuner() {
         }
     }
 
+    const downloadSVGFn = () => {
+        const blob = new Blob([svgCode.value], { type: 'image/svg+xml;charset=utf-8' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `${exportName.value || 'tuned svg'}.svg`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+    }
+
+    const downloadPNGFn = () => {
+        const svgBlob = new Blob([svgCode.value], { type: 'image/svg+xml;charset=utf-8' })
+        const url = URL.createObjectURL(svgBlob)
+        const img = new Image()
+        img.onload = () => {
+            const canvas = document.createElement('canvas')
+            let w = parseFloat(dimensions.value.width)
+            let h = parseFloat(dimensions.value.height)
+
+            if (!w || !h) w = 800
+            if (!h) h = 800
+
+            canvas.width = w
+            canvas.height = h
+            const ctx = canvas.getContext('2d')
+            if (ctx) {
+                ctx.drawImage(img, 0, 0, w, h)
+                const pngUrl = canvas.toDataURL('image/png')
+                const link = document.createElement('a')
+                link.href = pngUrl
+                link.download = `${exportName.value || 'tuned svg'}.png`
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+            }
+            URL.revokeObjectURL(url)
+            toast('PNG Downloaded', 'success')
+        }
+        img.src = url
+    }
+
     return {
         svgCode,
         colors,
@@ -221,12 +267,15 @@ export function useSvgTuner() {
         optimizationStats,
         paddingVal,
         activeTab,
+        exportName,
         analyzeSVG,
         updateColor,
         optimizeSVG,
         updateDimensions,
         autoCrop,
         applyPadding,
-        importFromUrl
+        importFromUrl,
+        downloadSVGFn,
+        downloadPNGFn
     }
 }

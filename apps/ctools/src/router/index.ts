@@ -1,14 +1,14 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import MainLayout from '../layouts/MainLayout.vue'
 
-import SvgTuner from '../views/SvgTuner.vue'
+const SvgTuner = () => import('../views/SvgTuner.vue')
 
-import ProcessTool from '../views/ProcessTool.vue'
-import ImageUpload from '../views/ImageUpload.vue'
-import ColorsetBuilder from '../views/ColorsetBuilder.vue'
-import LayoutBuilder from '../views/LayoutBuilder.vue'
-import TableBuilder from '../views/TableBuilder.vue'
-import CdrawTool from '../views/CdrawTool.vue'
+const ProcessTool = () => import('../views/ProcessTool.vue')
+const ImageUpload = () => import('../views/ImageUpload.vue')
+const ColorsetBuilder = () => import('../views/ColorsetBuilder.vue')
+const LayoutBuilder = () => import('../views/LayoutBuilder.vue')
+const TableBuilder = () => import('../views/TableBuilder.vue')
+const CdrawTool = () => import('../views/CdrawTool.vue')
 
 import Dashboard from '../views/Dashboard.vue'
 

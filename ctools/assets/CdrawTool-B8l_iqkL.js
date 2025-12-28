@@ -1,0 +1,1 @@
+import{k as l,l as a,z as s,q as r}from"./core-vendor-rJyK4pSc.js";const t={class:"w-full h-full flex flex-col bg-slate-50 dark:bg-slate-950"},f=l({__name:"CdrawTool",setup(o){return(n,e)=>(r(),a("div",t,[...e[0]||(e[0]=[s("iframe",{src:"/cdraw/",class:"w-full h-full border-0",title:"Cdraw Visual IDE"},null,-1)])]))}});export{f as default};

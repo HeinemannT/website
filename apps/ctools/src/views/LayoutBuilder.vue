@@ -1,359 +1,199 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
+import draggable from 'vuedraggable'
 import { 
     Folder, Trash2, Plus, X, Minimize2, Maximize2, 
     Monitor, Smartphone, Layout, Layers,
-    HelpCircle
+    HelpCircle, GripVertical, LayoutTemplate
 } from 'lucide-vue-next'
 import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
-import { ScriptBuilder } from '../utils/ScriptBuilder'
 import ToolLayout from '../components/layout/ToolLayout.vue'
-import { usePersistentState } from '../composables/usePersistentState'
+import ToolHeader from '../components/layout/ToolHeader.vue'
+import { useLayoutBuilder } from '../composables/useLayoutBuilder'
 
-
-// --- Types ---
-interface Col {
-    id: string
-    type: 'Col'
-    name: string
-    varName: string
-    width: number
-}
-
-interface Row {
-    id: string
-    type: 'Row'
-    name: string
-    varName: string
-    children: Col[]
-}
-
-interface Tab {
-    id: string
-    type: 'Tab'
-    name: string
-    varName: string
-    children: Row[]
-}
-
-interface TabSet {
-    id: string
-    type: 'TabSet'
-    name: string
-    varName: string
-    children: Tab[]
-}
-
-
-
-// --- State ---
-const rootParentId = usePersistentState('layout:rootParentId', 'swi_folder')
-const mobileStrategy = usePersistentState<'mirror' | 'stack' | 'grid'>('layout:mobileStrategy', 'mirror')
-const data = usePersistentState<TabSet[]>('layout:data', [])
+const {
+    // State
+    rootParentId,
+    mobileStrategy,
+    data,
+    
+    // Actions
+    addTabSet,
+    addTab,
+    addRow,
+    addCol,
+    
+    removeTabSet,
+    removeTab,
+    removeRow,
+    removeCol,
+    
+    resizeCol,
+    
+    // Output
+    scriptOutput,
+    init
+} = useLayoutBuilder()
 
 const showMobileHelp = ref(false)
 
-import { createId } from '../utils/common'
-
-// --- Actions ---
-// --- Actions ---
-
-
-const addTabSet = () => {
-    const tsIdx = data.value.length
-    const ts: TabSet = {
-        id: createId(),
-        type: 'TabSet',
-        name: 'Tab Set',
-        varName: 'ts_' + (tsIdx + 1),
-        children: []
-    }
-    data.value.push(ts)
-    addTab(ts)
-}
-
-const addTab = (ts: TabSet) => {
-    const tIdx = ts.children.length
-    const tab: Tab = {
-        id: createId(),
-        type: 'Tab',
-        name: 'Tab ' + (tIdx + 1),
-        varName: 'tab_' + (tIdx + 1),
-        children: []
-    }
-    ts.children.push(tab)
-    addRow(tab)
-}
-
-const addRow = (tab: Tab) => {
-    const rIdx = tab.children.length
-    const row: Row = {
-        id: createId(),
-        type: 'Row',
-        name: 'Row ' + (rIdx + 1),
-        varName: 'row_' + (rIdx + 1),
-        children: []
-    }
-    tab.children.push(row)
-}
-
-const addCol = (row: Row) => {
-    const used = row.children.reduce((acc, c) => acc + c.width, 0)
-    const available = 6 - used
-    
-    if (available < 1) return
-
-    // Default width is 2, or whatever is left if < 2
-    const width = available > 2 ? 2 : available
-    
-    const cIdx = row.children.length
-    row.children.push({
-        id: createId(),
-        type: 'Col',
-        name: `[W${width}]Container`,
-        varName: 'col_' + (cIdx + 1),
-        width: width
-    })
-}
-
-// --- Resize Logic ---
-const resizeCol = (row: Row, colIndex: number, delta: number) => {
-    const col = row.children[colIndex]
-    if (!col) return
-    const oldWidth = col.width
-    let newWidth = oldWidth
-
-    const currentTotal = row.children.reduce((acc, c) => acc + c.width, 0)
-    const spaceLeft = 6 - currentTotal
-
-    if (delta > 0) {
-        // Growing
-        if (spaceLeft >= delta) {
-            newWidth += delta
-        } else {
-            // Try stealing from neighbors (simple implementation: right neighbor only)
-            const rightNeighbor = row.children[colIndex + 1]
-            if (rightNeighbor && rightNeighbor.width > 1) {
-                updateNameOnResize(rightNeighbor, rightNeighbor.width - delta)
-                rightNeighbor.width -= delta
-                newWidth += delta
-            } else {
-                // Try left neighbor
-                 const leftNeighbor = row.children[colIndex - 1]
-                 if (leftNeighbor && leftNeighbor.width > 1) {
-                    updateNameOnResize(leftNeighbor, leftNeighbor.width - delta)
-                    leftNeighbor.width -= delta
-                    newWidth += delta
-                 }
-            }
-        }
-    } else {
-        // Shrinking
-        if (col.width > 1) {
-            newWidth += delta
-        }
-    }
-
-    if (newWidth !== oldWidth) {
-        col.width = newWidth
-        updateNameOnResize(col, newWidth)
-    }
-}
-
-const updateNameOnResize = (col: Col, newWidth: number) => {
-    const prefixRegex = /^\[W\d+\]/
-    if (prefixRegex.test(col.name)) {
-        col.name = col.name.replace(prefixRegex, `[W${newWidth}]`)
-    }
-}
-
-// --- Deletion ---
-const removeTabSet = (idx: number) => data.value.splice(idx, 1)
-const removeTab = (ts: TabSet, idx: number) => ts.children.splice(idx, 1)
-const removeRow = (tab: Tab, idx: number) => tab.children.splice(idx, 1)
-const removeCol = (row: Row, idx: number) => row.children.splice(idx, 1)
-
-
-// --- Code Generation ---
-const scriptOutput = computed(() => {
-    let vRootVal = rootParentId.value || 'swi_folder'
-    if (!vRootVal.startsWith('t.') && !vRootVal.startsWith('root.') && !vRootVal.startsWith('this.')) {
-        vRootVal = 't.' + vRootVal
-    }
-
-    const sb = new ScriptBuilder('LAYOUT GENERATED BY CORA')
-    sb.addNewLine() // Explicit separation
-    sb.assign('vRoot', vRootVal)
-    sb.addNewLine()
-
-    data.value.forEach((ts) => {
-        sb.addComment(`--- TabSet: ${ts.name} ---`)
-        sb.assignAdd(ts.varName, 'vRoot', 'TabSet', { name: ts.name })
-        
-        ts.children.forEach((tab) => {
-             sb.addNewLine()
-             sb.indent()
-             sb.addComment(`Tab: ${tab.name}`)
-             sb.assignAdd(tab.varName, ts.varName, 'Tab', { name: tab.name })
-            
-             tab.children.forEach((row) => {
-                sb.indent()
-                sb.assignAdd(row.varName, tab.varName, 'Container', { 
-                    name: row.name, 
-                    columnsLargeScreen: 6, 
-                    columnsMediumScreen: 6, 
-                    columnsSmallScreen: 6 
-                })
-                
-                row.children.forEach((col) => {
-                    let wLarge = col.width
-                    let wMedium = wLarge
-                    let wSmall = 6
-
-                    if (mobileStrategy.value === 'grid') wSmall = (wLarge <= 3) ? 3 : 6
-                    else if (mobileStrategy.value === 'mirror') wSmall = wLarge
-                    
-                    sb.indent()
-                    sb.assignAdd(col.varName, row.varName, 'Container', {
-                        name: col.name,
-                        columnsLargeScreen: wLarge,
-                        columnsMediumScreen: wMedium,
-                        columnsSmallScreen: wSmall
-                    })
-                    sb.outdent()
-                })
-                sb.outdent()
-             })
-             sb.outdent()
-        })
-        sb.addNewLine()
-    })
-
-    return sb.toString()
-})
-
-// Initialize with one tabset if empty
-if (data.value.length === 0) addTabSet()
+// Initialize
+init()
 
 </script>
 
 <template>
-    <ToolLayout sidebarClass="w-80">
+    <ToolLayout sidebarClass="w-full lg:w-80">
         
         <!-- Main Canvas -->
         <template #main>
-            <!-- Navbar Sub-header for tool settings -->
+            <!-- Standard Tool Header -->
+            <ToolHeader title="Layout Builder" :icon="LayoutTemplate" icon-color="text-indigo-600 dark:text-indigo-400">
+                <template #center>
+                    <div class="hidden lg:flex items-center gap-6">
+                        <div class="flex flex-col relative">
+                             <div class="flex items-center gap-1 mb-1">
+                                 <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mobile Strategy</label>
+                                 <button @click="showMobileHelp = !showMobileHelp" class="text-slate-400 hover:text-indigo-500 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors p-0.5"><HelpCircle class="w-3 h-3" /></button>
+                                 
+                                 <div v-if="showMobileHelp" class="absolute top-0 left-full ml-2 w-64 p-4 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-50 text-xs">
+                                     <h4 class="font-bold text-slate-700 dark:text-slate-200 mb-2">Strategy Guide</h4>
+                                     <ul class="space-y-2 text-slate-500">
+                                         <li><strong class="text-indigo-500">Mirror:</strong> Mobile layout exactly matches desktop widths.</li>
+                                         <li><strong class="text-indigo-500">Stack:</strong> All items become full width (12 cols) on mobile.</li>
+                                         <li><strong class="text-indigo-500">Grid:</strong> Items smaller than 50% become 50% width, others full width.</li>
+                                     </ul>
+                                     <button @click="showMobileHelp = false" class="mt-3 text-[10px] font-bold text-slate-400 hover:text-slate-600 underline">Close</button>
+                                 </div>
+                             </div>
+                             <div class="flex items-center gap-2 text-xs font-bold bg-slate-100 dark:bg-slate-800 rounded p-1">
+                                 <button @click="mobileStrategy = 'mirror'" :class="mobileStrategy === 'mirror' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300' : 'text-slate-400'" class="px-3 py-1 rounded transition-colors flex items-center gap-1"><Monitor class="w-3 h-3" /> Mirror</button>
+                                 <button @click="mobileStrategy = 'stack'" :class="mobileStrategy === 'stack' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300' : 'text-slate-400'" class="px-3 py-1 rounded transition-colors flex items-center gap-1"><Smartphone class="w-3 h-3" /> Stack</button>
+                                 <button @click="mobileStrategy = 'grid'" :class="mobileStrategy === 'grid' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300' : 'text-slate-400'" class="px-3 py-1 rounded transition-colors flex items-center gap-1"><Layout class="w-3 h-3" /> Grid</button>
+                             </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template #actions>
+                    <div class="flex items-center gap-3">
+                         <span class="text-xs font-bold text-slate-400 uppercase">Context: t.</span>
+                         <input v-model="rootParentId" class="bg-transparent border-b border-slate-300 dark:border-slate-700 w-32 text-xs font-mono font-medium focus:outline-none focus:border-indigo-500" />
+                    </div>
+                </template>
+            </ToolHeader>
+
+            <!-- Navbar Sub-header for tool settings (Mobile only backup) -->
             <div class="md:hidden border-b border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-slate-900 overflow-x-auto whitespace-nowrap">
                  <!-- Mobile View Controls -->
             </div>
 
-             <!-- Settings Bar (Desktop) -->
-            <div class="absolute top-0 left-0 right-0 z-20 px-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                <div class="flex items-center gap-6">
-                    <div class="flex flex-col relative">
-                         <div class="flex items-center gap-1 mb-1">
-                             <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mobile Strategy</label>
-                             <button @click="showMobileHelp = !showMobileHelp" class="text-slate-400 hover:text-indigo-500 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors p-0.5"><HelpCircle class="w-3 h-3" /></button>
-                             
-                             <div v-if="showMobileHelp" class="absolute top-0 left-full ml-2 w-64 p-4 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-50 text-xs">
-                                 <h4 class="font-bold text-slate-700 dark:text-slate-200 mb-2">Strategy Guide</h4>
-                                 <ul class="space-y-2 text-slate-500">
-                                     <li><strong class="text-indigo-500">Mirror:</strong> Mobile layout exactly matches desktop widths.</li>
-                                     <li><strong class="text-indigo-500">Stack:</strong> All items become full width (12 cols) on mobile.</li>
-                                     <li><strong class="text-indigo-500">Grid:</strong> Items smaller than 50% become 50% width, others full width.</li>
-                                 </ul>
-                                 <button @click="showMobileHelp = false" class="mt-3 text-[10px] font-bold text-slate-400 hover:text-slate-600 underline">Close</button>
-                             </div>
-                         </div>
-                         <div class="flex items-center gap-2 text-xs font-bold bg-slate-100 dark:bg-slate-800 rounded p-1">
-                             <button @click="mobileStrategy = 'mirror'" :class="mobileStrategy === 'mirror' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300' : 'text-slate-400'" class="px-3 py-1 rounded transition-colors flex items-center gap-1"><Monitor class="w-3 h-3" /> Mirror</button>
-                             <button @click="mobileStrategy = 'stack'" :class="mobileStrategy === 'stack' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300' : 'text-slate-400'" class="px-3 py-1 rounded transition-colors flex items-center gap-1"><Smartphone class="w-3 h-3" /> Stack</button>
-                             <button @click="mobileStrategy = 'grid'" :class="mobileStrategy === 'grid' ? 'bg-white dark:bg-slate-600 shadow-sm text-indigo-600 dark:text-indigo-300' : 'text-slate-400'" class="px-3 py-1 rounded transition-colors flex items-center gap-1"><Layout class="w-3 h-3" /> Grid</button>
-                         </div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-3">
-                     <span class="text-xs font-bold text-slate-400 uppercase">Context: t.</span>
-                     <input v-model="rootParentId" class="bg-transparent border-b border-slate-300 dark:border-slate-700 w-32 text-xs font-mono font-medium focus:outline-none focus:border-indigo-500" />
-                </div>
-            </div>
-
             <!-- Scrollable Workspace -->
-            <div class="flex-1 overflow-y-auto p-8 pt-28 pb-32 space-y-8">
+            <div class="flex-1 overflow-y-auto p-8 pb-32 space-y-8">
                 
-                <div v-for="(ts, tsIdx) in data" :key="ts.id" class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden ring-1 ring-black/5">
-                    
-                    <!-- TabSet Header -->
-                    <div class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center group/ts">
-                        <div class="flex items-center gap-3">
-                            <Folder class="w-4 h-4 text-indigo-500" />
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">TabSet</span>
-                            <input v-model="ts.name" class="bg-transparent text-sm font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 rounded px-2 -ml-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" />
-                        </div>
-                        <button @click="removeTabSet(tsIdx)" class="text-slate-300 hover:text-red-500 opacity-0 group-hover/ts:opacity-100 transition-opacity"><Trash2 class="w-4 h-4" /></button>
-                    </div>
-
-                    <!-- Tabs Container -->
-                    <div class="p-6 bg-slate-50/50 dark:bg-slate-900/30">
-                        <!-- Custom Tab Nav -->
-                        <div class="flex border-b border-slate-200 dark:border-slate-700 gap-1 mb-6">
-                            <div v-for="(tab, tIdx) in ts.children" :key="tab.id" class="relative group/tabbtn px-4 py-2 bg-white dark:bg-slate-800 rounded-t-lg border-t border-x border-slate-200 dark:border-slate-700 -mb-px flex items-center gap-2 shadow-sm">
-                                <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ tab.name }}</span>
-                                <button @click="removeTab(ts, tIdx)" class="opacity-0 group-hover/tabbtn:opacity-100 text-slate-300 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full p-0.5"><X class="w-3 h-3" /></button>
-                            </div>
-                            <button @click="addTab(ts)" class="px-3 py-2 text-slate-400 hover:text-indigo-500"><Plus class="w-4 h-4" /></button>
-                        </div>
-
-                        <!-- Tab Content -->
-                        <div class="space-y-8">
-                            <div v-for="tab in ts.children" :key="tab.id" class="pl-4 border-l-2 border-indigo-200 dark:border-indigo-900">
-                                <div class="flex items-center gap-2 mb-4">
-                                     <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Page:</span>
-                                     <input v-model="tab.name" class="bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-slate-700 rounded px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-indigo-500 w-full max-w-xs" />
+                <draggable 
+                    v-model="data" 
+                    item-key="id"
+                    handle=".ts-handle"
+                    class="space-y-8"
+                >
+                    <template #item="{ element: ts, index: tsIdx }">
+                        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden ring-1 ring-black/5 transition-all">
+                            
+                            <!-- TabSet Header -->
+                            <div class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center group/ts">
+                                <div class="flex items-center gap-3">
+                                    <div class="ts-handle cursor-move text-slate-300 hover:text-slate-500"><GripVertical class="w-4 h-4" /></div>
+                                    <Folder class="w-4 h-4 text-indigo-500" />
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">TabSet</span>
+                                    <input v-model="ts.name" class="bg-transparent text-sm font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 rounded px-2 -ml-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" />
                                 </div>
+                                <button @click="removeTabSet(tsIdx)" class="text-slate-300 hover:text-red-500 opacity-0 group-hover/ts:opacity-100 transition-opacity"><Trash2 class="w-4 h-4" /></button>
+                            </div>
 
-                                <!-- Rows -->
-                                <div class="space-y-4">
-                                    <div v-for="(row, rIdx) in tab.children" :key="row.id" class="group/row relative pl-8">
-                                        <!-- Delete Row Handle -->
-                                        <button @click="removeRow(tab, rIdx)" class="absolute left-0 top-1/2 -translate-y-1/2 p-1 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded opacity-0 group-hover/row:opacity-100 transition-opacity"><Trash2 class="w-4 h-4" /></button>
-
-                                        <!-- Row Track -->
-                                        <div class="h-20 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm flex overflow-hidden">
-                                            <div v-for="(col, cIdx) in row.children" :key="col.id" :style="{ flex: `${col.width} 1 0%` }" 
-                                                 class="relative border-r border-slate-100 dark:border-slate-700 group/col hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors flex flex-col justify-center items-center p-2">
-                                                 
-                                                 <!-- Resize Handles -->
-                                                 <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover/col:opacity-100 transition-opacity z-10 bg-white dark:bg-slate-800 rounded shadow-sm border border-slate-200 dark:border-slate-700 p-0.5">
-                                                     <button @click="resizeCol(row, cIdx, -1)" class="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"><Minimize2 class="w-3 h-3" /></button>
-                                                     <button @click="resizeCol(row, cIdx, 1)" class="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"><Maximize2 class="w-3 h-3" /></button>
-                                                     <button @click="removeCol(row, cIdx)" class="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"><Trash2 class="w-3 h-3" /></button>
-                                                 </div>
-
-                                                 <span class="text-2xl font-black text-slate-500 dark:text-slate-600 group-hover/col:text-indigo-200 dark:group-hover/col:text-indigo-800 select-none">{{ col.width }}</span>
-                                                 <input v-model="col.name" class="w-full text-center bg-transparent text-[10px] font-bold text-slate-500 border-none p-0 focus:ring-0" />
-                                            </div>
-
-                                            <!-- Add Column Zone -->
-                                            <button v-if="row.children.reduce((a,c) => a + c.width, 0) < 6" 
-                                                    :style="{ flex: `${6 - row.children.reduce((a,c) => a + c.width, 0)} 1 0%` }"
-                                                    @click="addCol(row)"
-                                                    class="border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 flex flex-col items-center justify-center text-slate-300 hover:text-indigo-500 transition-all group/add">
-                                                <Plus class="w-6 h-6 mb-1 group-hover/add:scale-110 transition-transform" />
-                                                <span class="text-[9px] uppercase font-bold tracking-widest opacity-0 group-hover/add:opacity-100">Add</span>
-                                            </button>
+                            <!-- Tabs Container -->
+                            <div class="p-6 bg-slate-50/50 dark:bg-slate-900/30">
+                                <!-- Custom Tab Nav (Draggable) -->
+                                <draggable 
+                                    v-model="ts.children" 
+                                    item-key="id" 
+                                    class="flex flex-wrap border-b border-slate-200 dark:border-slate-700 gap-1 mb-6"
+                                    handle=".tab-handle"
+                                >
+                                    <template #item="{ element: tab, index: tIdx }">
+                                        <div class="relative group/tabbtn px-4 py-2 bg-white dark:bg-slate-800 rounded-t-lg border-t border-x border-slate-200 dark:border-slate-700 -mb-px flex items-center gap-2 shadow-sm">
+                                            <div class="tab-handle cursor-move text-slate-300 hover:text-slate-500 -ml-1"><GripVertical class="w-3 h-3" /></div>
+                                            <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ tab.name }}</span>
+                                            <button @click="removeTab(ts, tIdx)" class="opacity-0 group-hover/tabbtn:opacity-100 text-slate-300 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full p-0.5"><X class="w-3 h-3" /></button>
                                         </div>
+                                    </template>
+                                    <template #footer>
+                                        <button @click="addTab(ts)" class="px-3 py-2 text-slate-400 hover:text-indigo-500"><Plus class="w-4 h-4" /></button>
+                                    </template>
+                                </draggable>
+
+                                <!-- Tab Content -->
+                                <div class="space-y-8">
+                                    <div v-for="(tab, _) in ts.children" :key="tab.id" class="pl-4 border-l-2 border-indigo-200 dark:border-indigo-900">
+                                        <div class="flex items-center gap-2 mb-4">
+                                             <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Page:</span>
+                                             <input v-model="tab.name" class="bg-transparent border border-transparent hover:border-slate-200 dark:hover:border-slate-700 rounded px-2 py-0.5 text-xs font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-indigo-500 w-full max-w-xs" />
+                                        </div>
+
+                                        <!-- Rows -->
+                                        <!-- Note: Rows are kept as v-for for now as vertical DND inside a tab is less common, but could be upgraded easily -->
+                                        <draggable 
+                                            v-model="tab.children" 
+                                            item-key="id" 
+                                            handle=".row-handle"
+                                            class="space-y-4"
+                                        >
+                                            <template #item="{ element: row, index: rIdx }">
+                                                <div class="group/row relative pl-8">
+                                                    <!-- Row Handle -->
+                                                    <div class="absolute left-0 top-1/2 -translate-y-1/2 -mt-4 row-handle cursor-move text-slate-300 hover:text-slate-500 opacity-0 group-hover/row:opacity-100 transition-opacity p-1"><GripVertical class="w-4 h-4" /></div>
+
+                                                    <!-- Delete Row Handle -->
+                                                    <button @click="removeRow(tab, rIdx)" class="absolute left-0 top-1/2 -translate-y-1/2 mt-4 p-1 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded opacity-0 group-hover/row:opacity-100 transition-opacity"><Trash2 class="w-4 h-4" /></button>
+
+                                                    <!-- Row Track -->
+                                                    <div class="h-20 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm flex overflow-hidden">
+                                                        <div v-for="(col, cIdx) in row.children" :key="col.id" :style="{ flex: `${col.width} 1 0%` }" 
+                                                             class="relative border-r border-slate-100 dark:border-slate-700 group/col hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors flex flex-col justify-center items-center p-2">
+                                                             
+                                                             <!-- Resize Handles -->
+                                                             <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover/col:opacity-100 transition-opacity z-10 bg-white dark:bg-slate-800 rounded shadow-sm border border-slate-200 dark:border-slate-700 p-0.5">
+                                                                 <button @click="resizeCol(row, cIdx as number, -1)" class="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"><Minimize2 class="w-3 h-3" /></button>
+                                                                 <button @click="resizeCol(row, cIdx as number, 1)" class="w-5 h-5 flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"><Maximize2 class="w-3 h-3" /></button>
+                                                                 <button @click="removeCol(row, cIdx as number)" class="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"><Trash2 class="w-3 h-3" /></button>
+                                                             </div>
+
+                                                             <span class="text-2xl font-black text-slate-500 dark:text-slate-600 group-hover/col:text-indigo-200 dark:group-hover/col:text-indigo-800 select-none">{{ col.width }}</span>
+                                                             <input v-model="col.name" class="w-full text-center bg-transparent text-[10px] font-bold text-slate-500 border-none p-0 focus:ring-0" />
+                                                        </div>
+
+                                                        <!-- Add Column Zone -->
+                                                        <button v-if="row.children.reduce((a: number, c: any) => a + c.width, 0) < 6" 
+                                                                :style="{ flex: `${6 - row.children.reduce((a: number, c: any) => a + c.width, 0)} 1 0%` }"
+                                                                @click="addCol(row)"
+                                                                class="border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 flex flex-col items-center justify-center text-slate-300 hover:text-indigo-500 transition-all group/add">
+                                                            <Plus class="w-6 h-6 mb-1 group-hover/add:scale-110 transition-transform" />
+                                                            <span class="text-[10px] uppercase font-bold tracking-widest opacity-0 group-hover/add:opacity-100">Add</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </draggable>
+                                        
+                                        <button @click="addRow(tab)" class="text-xs font-bold text-slate-400 hover:text-indigo-500 flex items-center gap-2 pl-8 py-2">
+                                            <Layers class="w-4 h-4" /> Add Row
+                                        </button>
                                     </div>
-                                    
-                                    <button @click="addRow(tab)" class="text-xs font-bold text-slate-400 hover:text-indigo-500 flex items-center gap-2 pl-8 py-2">
-                                        <Layers class="w-4 h-4" /> Add Row
-                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </template>
+                </draggable>
 
                 <div class="h-20"></div> <!-- Spacer for FAB -->
             </div>
@@ -368,9 +208,7 @@ if (data.value.length === 0) addTabSet()
 
         <!-- Right Panel: Output -->
         <template #sidebar>
-             <CodeOutputPanel title="Extended Code" :code="scriptOutput">
-
-             </CodeOutputPanel>
+<CodeOutputPanel title="Extended Code" :code="scriptOutput" />
         </template>
 
 

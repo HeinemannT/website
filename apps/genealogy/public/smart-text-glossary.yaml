@@ -1,7 +1,7 @@
 terms:
   - term: "Jinshi"
     zh: "進士"
-    definition: "The highest and final degree in the imperial examination system. Passing this exam allowed entry into the high-level bureaucracy."
+    definition: "Imperial Scholar / Presented Scholar. The highest and final degree in the imperial examination system. Passing this exam allowed entry into the high-level bureaucracy."
 
   - term: "Zhuanshu"
     zh: "篆書"
@@ -9,7 +9,7 @@ terms:
 
   - term: "Feng Shui"
     zh: "風水"
-    definition: "Chinese geomancy. The practice of arranging buildings and graves to harmonize with the 'earth veins' (Qi) of the natural environment. Very prominent in this geneaology."
+    definition: "Chinese geomancy. The practice of arranging buildings and graves to harmonize with the 'earth veins' (Qi) of the natural environment. Very prominent in this genealogy."
 
   - term: "Earth Veins"
     zh: "地脉"
@@ -93,7 +93,7 @@ terms:
 
   - term: "Juren"
     zh: "舉人"
-    definition: "Provincial Graduate. A candidate who passed the triennial provincial examination."
+    definition: "Provincial Graduate. A candidate who passed the triennial provincial examination. Qualifies one for lower-level official posts, unlike the Xiangsheng (County Student)."
 
   - term: "Guozijian"
     zh: "國子監"
@@ -190,3 +190,67 @@ terms:
   - term: "Concubine"
     zh: "妾"
     definition: "Secondary wife. A recognized union in historical Chinese society, often taken to ensure male heirs."
+
+  - term: "Bazong"
+    zh: "把總"
+    definition: "Squad Leader (Rank 7 Military). Commanded approx. 10-15 soldiers."
+
+  - term: "Qianzong"
+    zh: "千總"
+    definition: "Company Commander (Rank 6 Military). Commanded approx. 100 soldiers."
+
+  - term: "Shoubei"
+    zh: "守備"
+    definition: "Garrison Commandant (Rank 5 Military). Independent command of a battalion."
+
+  - term: "Dusi"
+    zh: "都司"
+    definition: "Priority Commander or Major (Rank 4 Military). Second-in-command of a Brigade."
+
+  - term: "Zhaowu Duwei"
+    zh: "昭武都尉"
+    definition: "Commandant of Manifest Martiality. A prestige title for Rank 4 officers, allowing the wearing of the Blue Plume."
+
+  - term: "Blue Plume"
+    zh: "藍翎"
+    definition: "Lanling. A dyed feather attached to the official hat, awarded for bravery in combat."
+
+  - term: "Gongren"
+    zh: "恭人"
+    definition: "Lady of Respect. Title for the wife of a Rank 4 official."
+
+  - term: "Yiren"
+    zh: "宜人"
+    definition: "Lady of Suitability. Title for the wife of a Rank 5 official."
+
+  - term: "Anren"
+    zh: "安人"
+    definition: "Lady of Peace. Title for the wife of a Rank 6 official."
+
+  - term: "Ruren"
+    zh: "孺人"
+    definition: "Child Nurturer. Title for the wife of a Rank 7 official."
+
+  - term: "Xiedou"
+    zh: "械鬥"
+    definition: "Armed Feuds. Inter-clan warfare involving hired mercenaries and artillery, common in 19th-century Guangdong."
+
+  - term: "Ancestral Tablet"
+    zh: "神主"
+    definition: "Spirit Tablet. A wooden plaque embodying the spirit of an ancestor, worshipped in temples."
+
+  - term: "Longmai"
+    zh: "龍脈"
+    definition: "Dragon Veins. The channels of Qi in the earth; central to the Feng Shui of burial sites."
+
+  - term: "Wooden Chicken"
+    zh: "木鷄"
+    definition: "Muji. A Daoist metaphor for perfect spiritual composure (from Zhuangzi)."
+
+  - term: "Red Turban Rebellion"
+    zh: "紅巾起義"
+    definition: "A massive anti-Qing uprising in 1854 that devastated the Pearl River Delta."
+
+  - term: "Taiping Rebellion"
+    zh: "太平天國"
+    definition: "A massive civil war (1850-1864). Western historical records suggest Gen 18 fought in the naval campaigns of this war."

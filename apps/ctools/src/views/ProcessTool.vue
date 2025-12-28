@@ -15,6 +15,7 @@ import { useDownload } from '../composables/useDownload'
 import { base64AndGunzip, gzipAndBase64, chunkString } from '../utils/gzip'
 import { ScriptBuilder } from '../utils/ScriptBuilder'
 import ToolLayout from '../components/layout/ToolLayout.vue'
+import ToolHeader from '../components/layout/ToolHeader.vue'
 import { usePersistentState } from '../composables/usePersistentState'
 import { camundaModdleDescriptor } from '../config/camundaModdle'
 
@@ -369,6 +370,7 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
 <template>
   <ToolLayout 
       :sidebarStyle="{ width: sidebarWidth + 'px' }" 
+      sidebarClass="resize-sidebar"
       @mousemove="handleResize" 
       @mouseup="stopResize"
       class="select-none"
@@ -376,10 +378,34 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
     
     <!-- Canvas -->
     <template #main>
+        <ToolHeader title="Process Modeler" :icon="LayoutTemplate" icon-color="text-blue-600 dark:text-blue-400">
+            <template #center>
+                <div class="flex items-center gap-3" v-if="hasDiagram">
+                     <div class="flex items-center gap-2">
+                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Name</span>
+                         <input v-model="filename" class="w-32 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 text-xs font-bold text-slate-700 dark:text-slate-200 outline-none transition-colors" placeholder="filename" />
+                     </div>
+                     <div class="flex items-center gap-2">
+                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Target</span>
+                         <input v-model="targetObject" class="w-32 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 text-xs font-mono text-purple-600 dark:text-purple-400 outline-none transition-colors" placeholder="t.obj" />
+                     </div>
+                </div>
+            </template>
+            <template #actions>
+                <div class="flex items-center gap-2" v-if="hasDiagram">
+                    <BaseButton size="sm" variant="outline" @click="downloadSVG" title="Export SVG"><Download class="w-4 h-4" /></BaseButton>
+                    <BaseButton size="sm" variant="outline" @click="downloadXML" title="Export XML"><FileCode class="w-4 h-4" /></BaseButton>
+                    <BaseButton size="sm" @click="copyAsExtendedScript" title="Copy Extended Script"><Code class="w-4 h-4 mr-2" /> Script</BaseButton>
+                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+                    <button @click="clearAll" class="text-slate-400 hover:text-red-500 transition-colors" title="Reset"><RotateCcw class="w-4 h-4" /></button>
+                </div>
+            </template>
+        </ToolHeader>
+
         <div id="canvas" class="w-full h-full bg-slate-50 dark:bg-slate-900 bg-grid-pattern relative"></div>
 
         <!-- Empty State -->
-        <div v-if="!hasDiagram" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+        <div v-if="!hasDiagram" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
             <div class="w-16 h-16 mb-4 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
                 <LayoutTemplate class="w-8 h-8 text-slate-400" />
             </div>
@@ -397,26 +423,26 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
              @mousedown="startResize"></div>
 
         <div class="h-full flex flex-col relative">
-            <div class="flex border-b border-slate-700">
-                <button @click="activeTab = 'input'" :class="activeTab === 'input' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-slate-200'" class="flex-1 py-3 text-xs font-semibold uppercase border-b-2 transition-colors">Input</button>
-                <button @click="activeTab = 'xml'" :class="activeTab === 'xml' ? 'text-indigo-400 border-indigo-500' : 'text-slate-400 border-transparent hover:text-slate-200'" class="flex-1 py-3 text-xs font-semibold uppercase border-b-2 transition-colors">XML Editor</button>
+            <div class="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                <button @click="activeTab = 'input'" :class="activeTab === 'input' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-600'" class="flex-1 py-3 text-[10px] font-bold uppercase tracking-wider border-b-2 transition-colors">Input</button>
+                <button @click="activeTab = 'xml'" :class="activeTab === 'xml' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-600'" class="flex-1 py-3 text-[10px] font-bold uppercase tracking-wider border-b-2 transition-colors">XML Editor</button>
             </div>
 
             <!-- Input Tab -->
             <div v-show="activeTab === 'input'" class="flex-grow flex flex-col p-4">
                  <div class="relative flex-grow flex flex-col">
                     <textarea v-model="inputString" @input="processInput"
-                      class="w-full h-full p-3 text-xs font-mono bg-slate-900 border border-slate-700 rounded text-slate-300 focus:ring-1 focus:ring-indigo-500 outline-none resize-none placeholder-slate-600"
+                      class="w-full h-full p-3 text-xs font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-600 dark:text-slate-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none resize-none placeholder-slate-400"
                       placeholder="Paste extended script or gzip content..."></textarea>
                     <div class="absolute bottom-2 right-2" v-if="statusMsg === 'Decoded successfully'">
                         <CheckCircle class="w-4 h-4 text-emerald-500" />
                     </div>
                  </div>
-                 <div class="mt-2 text-xs h-4" :class="statusType === 'error' ? 'text-pink-400' : 'text-emerald-400'">{{ statusMsg }}</div>
+                 <div class="mt-2 text-xs h-4" :class="statusType === 'error' ? 'text-pink-500' : 'text-emerald-500'">{{ statusMsg }}</div>
             </div>
 
             <!-- XML Tab -->
-            <div v-show="activeTab === 'xml'" class="flex-grow flex flex-col relative border-t border-slate-700">
+            <div v-show="activeTab === 'xml'" class="flex-grow flex flex-col relative border-t border-slate-200 dark:border-slate-700">
                  <CodeOutputPanel 
                     title="XML Editor" 
                     :code="xmlContent" 
@@ -428,7 +454,7 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
 
             <!-- Inspector (Overlay inside sidebar for now, or just replace content?) -->
             <!-- If inspector is visible, we overlay the input/xml tabs in the sidebar -->
-            <div v-if="inspectorVisible" class="absolute inset-0 bg-slate-50 dark:bg-slate-900 z-20 flex flex-col">
+            <div v-if="inspectorVisible" class="absolute inset-0 bg-slate-50 dark:bg-slate-900 z-20 flex flex-col animate-in slide-in-from-right duration-200">
                  <InspectorPanel :title="inspectorTitle" :subtitle="inspectorType">
                     <template #header-actions>
                          <button @click="inspectorVisible = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
@@ -475,27 +501,6 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
                             </div>
                          </div>
                      </div>
-
-                     <div class="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
-                         <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Export / Controls</h4>
-                         <div class="space-y-2">
-                             <div class="flex gap-2">
-                                <BaseInput v-model="filename" placeholder="Filename" mono />
-                                <div class="flex items-center text-xs text-slate-400">.bpmn</div>
-                             </div>
-                             <div class="flex gap-2">
-                                 <BaseButton size="sm" class="flex-1" @click="downloadSVG"><Download class="w-3 h-3 mr-2" /> SVG</BaseButton>
-                                 <BaseButton size="sm" variant="outline" class="flex-1" @click="downloadXML"><FileCode class="w-3 h-3 mr-2" /> XML</BaseButton>
-                             </div>
-                             <BaseInput v-model="targetObject" label="Target Object" mono />
-                             <BaseButton size="sm" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-600" @click="copyAsExtendedScript">
-                                 <Code class="w-3 h-3 mr-2" /> Copy Script
-                             </BaseButton>
-                             <BaseButton size="sm" variant="ghost" class="w-full text-slate-400" @click="clearAll">
-                                 <RotateCcw class="w-3 h-3 mr-2" /> Reset All
-                             </BaseButton>
-                         </div>
-                     </div>
                  </InspectorPanel>
             </div>
         </div>
@@ -504,18 +509,19 @@ const stopResize = () => { isResizing.value = false; document.body.style.cursor 
 </template>
 
 <style scoped>
+@media (max-width: 1023px) {
+    .resize-sidebar {
+        width: 85vw !important;
+    }
+}
+
+:deep(.djs-palette) {
+    width: 48px !important;
+}
+
 /* Scoped styles mainly for ensuring bpmn-js canvas is clean */
 #canvas {
     height: 100%;
     width: 100%;
 }
-
-/* Dark Mode Support for BPMN.js */
-/* Inverts the black lines/text to white-ish, preserves hues roughly via rotation */
-/*
-:global(html.dark) #canvas :deep(svg) {
-    filter: invert(0.9) hue-rotate(180deg);
-    background-color: transparent !important;
-}
-*/
 </style>

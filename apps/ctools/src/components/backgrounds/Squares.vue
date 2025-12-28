@@ -22,7 +22,7 @@ const containerRef = ref<HTMLElement | null>(null)
 let ctx: CanvasRenderingContext2D | null = null
 let animationId = 0
 let gridOffset = { x: 0, y: 0 }
-let mousePos = { x: -1, y: -1 }
+let mousePos = { x: -9999, y: -9999 }
 const isDark = ref(false)
 
 // Animation state
@@ -119,7 +119,7 @@ const handleMouseMove = (e: MouseEvent) => {
 }
 
 const handleMouseLeave = () => {
-    mousePos = { x: -1, y: -1 }
+    mousePos = { x: -9999, y: -9999 }
 }
 
 onMounted(() => {

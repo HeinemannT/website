@@ -2,9 +2,10 @@
 import { ref, computed } from 'vue'
 import { Trash2, Image as ImageIcon, CheckCircle, AlertCircle } from 'lucide-vue-next'
 import FileDropZone from '../components/ui/FileDropZone.vue'
-// BaseButton unused
+
 import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
 import ToolLayout from '../components/layout/ToolLayout.vue'
+import ToolHeader from '../components/layout/ToolHeader.vue'
 import { useToast } from '../composables/useToast'
 import { gzipAndBase64Async, chunkString } from '../utils/gzip'
 import { ScriptBuilder } from '../utils/ScriptBuilder'
@@ -27,8 +28,7 @@ interface ImageItem {
 
 const items = ref<ImageItem[]>([])
 const folderName = ref('vFolder')
-const urlInput = ref('')
-// isProcessing unused
+const bulkUrls = ref('') 
 
 const PROXY_TEMPLATES = [
     (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
@@ -77,7 +77,7 @@ const processItemContent = async (item: ImageItem) => {
         contentCache.set(item.id, contentStr)
         
         item.status = 'done'
-        console.log('ImageUpload: Item processed', item.name, item.status)
+
     } catch (e) {
         console.error('Processing failed for', item.name, e)
         item.status = 'error'
@@ -98,10 +98,10 @@ const createItem = (id: string, url: string, baseName: string): ImageItem => {
 }
 
 const importFromUrl = async () => {
-    if (!urlInput.value) return
+    if (!bulkUrls.value) return
     
     // Parse Lines
-    const rawLines = urlInput.value.trim().split(/\r?\n/).filter(line => line.trim() !== '')
+    const rawLines = bulkUrls.value.trim().split(/\r?\n/).filter(line => line.trim() !== '')
     const uniqueUrls = [...new Set(rawLines.map(l => l.trim()))]
     
     if (uniqueUrls.length === 0) return
@@ -119,7 +119,7 @@ const importFromUrl = async () => {
 
     // Add to list immediately
     items.value.push(...newItems)
-    urlInput.value = ''
+    bulkUrls.value = ''
 
     // Process in background
     let success = 0
@@ -236,9 +236,10 @@ const isAnyProcessing = computed(() => items.value.some(i => i.status === 'proce
 <template>
     <ToolLayout sidebarClass="w-full md:w-1/3">
         <template #main>
-             <div class="flex flex-col h-full bg-grid-pattern overflow-hidden">
+             <div class="flex flex-col h-full overflow-hidden">
+                <ToolHeader title="Image Upload" :icon="ImageIcon" icon-color="text-violet-600 dark:text-violet-400" />
+                
                 <div class="p-6 overflow-y-auto">
-                    <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 mb-6">Image Upload</h2>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                         <!-- Left: Drop Zone -->
@@ -271,18 +272,18 @@ const isAnyProcessing = computed(() => items.value.some(i => i.status === 'proce
 
                             <!-- Smart Import -->
                             <div class="flex-1 flex flex-col">
-                                <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-2 flex justify-between">
-                                    <span>Smart Import</span>
-                                    <span class="text-indigo-400 text-[9px] normal-case">Paste URLs (one per line)</span>
-                                </label>
-                                <textarea 
-                                    v-model="urlInput" 
+                                <div class="bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/50 rounded-lg p-3">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase tracking-wider">Bulk Import</span>
+                                    <span class="text-indigo-400 text-xs normal-case">Paste URLs (one per line)</span>
+                                </div>
+                                <textarea v-model="bulkUrls" rows="3" 
+                                    class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-xs font-mono resize-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none mb-3"
                                     placeholder="https://example.com/image.png&#10;https://othersite.com/logo.svg" 
-                                    class="flex-1 w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-xs font-mono resize-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none mb-3"
                                 ></textarea>
                                 
                                 <div class="flex gap-2">
-                                     <button @click="importFromUrl" :disabled="!urlInput" class="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold py-2 rounded-lg transition-colors shadow-lg shadow-indigo-500/20">
+                                     <button @click="importFromUrl" :disabled="!bulkUrls" class="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold py-2 rounded-lg transition-colors shadow-lg shadow-indigo-500/20">
                                          Fetch Images
                                      </button>
                                      <button @click="clearAll" v-if="items.length" class="px-3 bg-red-50 hover:bg-red-100 text-red-500 hover:text-red-600 rounded-lg transition-colors">
@@ -291,6 +292,7 @@ const isAnyProcessing = computed(() => items.value.some(i => i.status === 'proce
                                 </div>
                             </div>
                         </div>
+                    </div>
                     </div>
 
                     <!-- Staging List -->

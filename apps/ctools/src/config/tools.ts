@@ -5,8 +5,7 @@ import {
     Table,
     Image as ImageIcon,
     Wand2,
-    PenTool,
-    LayoutDashboard
+    PenTool
 } from 'lucide-vue-next'
 
 export interface ToolConfig {
@@ -21,15 +20,7 @@ export interface ToolConfig {
 }
 
 export const TOOLS: ToolConfig[] = [
-    {
-        id: 'dashboard',
-        name: 'Dashboard',
-        description: 'Central Hub',
-        path: '/',
-        icon: LayoutDashboard,
-        color: 'text-slate-500',
-        sidebarColor: 'text-slate-500'
-    },
+
     {
         id: 'layout',
         name: 'Layout Builder',

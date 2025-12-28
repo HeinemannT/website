@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import {
   Sun,
   Moon,
@@ -20,8 +20,6 @@ const navigation = TOOLS.map(t => ({
   icon: t.icon,
   color: t.sidebarColor || t.color // Fallback if sidebarColor not set
 }))
-
-const currentTool = computed(() => navigation.find(n => n.path === route.path))
 </script>
 
 <template>
@@ -31,9 +29,9 @@ const currentTool = computed(() => navigation.find(n => n.path === route.path))
     <!-- Sidebar (Collapsed) -->
     <aside class="w-16 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col items-center py-4 z-20 shrink-0">
       <router-link to="/" class="mb-8 block group relative">
-        <div class="flex flex-col items-center justify-center">
+        <div class="flex flex-col items-center justify-center transition-transform duration-200 group-hover:scale-110">
             <!-- Creative Logo -->
-            <div class="text-2xl font-black tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-br from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-300">
+            <div class="text-2xl font-black tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-br from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-300 transition-all">
                 c
             </div>
             <div class="text-[0.6rem] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 transition-colors">
@@ -74,20 +72,7 @@ const currentTool = computed(() => navigation.find(n => n.path === route.path))
     <!-- Main Content -->
     <div class="flex-1 flex flex-col min-w-0">
       <!-- Header -->
-      <header class="h-14 bg-white/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-800 shrink-0 px-6 flex items-center justify-between z-10 transition-colors duration-300">
-        <div class="flex items-center gap-3">
-          <h1 v-if="currentTool" class="text-lg font-semibold tracking-tight flex items-center gap-2">
-            <component :is="currentTool.icon" class="w-5 h-5" :class="currentTool.color" />
-            {{ currentTool.name }}
-          </h1>
-          <h1 v-else class="text-lg font-semibold tracking-tight text-slate-500">Dashboard</h1>
-        </div>
-        
-        <div class="flex items-center gap-4">
-           <!-- Global Actions will be injected here via Teleport if needed -->
-           <div id="header-actions"></div>
-        </div>
-      </header>
+
       
       <!-- Workspace -->
       <main class="flex-1 overflow-hidden relative">

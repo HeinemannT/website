@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { Plus, Trash2, Palette, ExternalLink, ArrowRight } from 'lucide-vue-next'
+import { Plus, Trash2, Palette, ExternalLink, ArrowRight, Wand2 } from 'lucide-vue-next'
 import tinycolor from 'tinycolor2'
 import { ScriptBuilder } from '../utils/ScriptBuilder'
 import BaseButton from '../components/ui/BaseButton.vue'
@@ -8,6 +8,7 @@ import BaseInput from '../components/ui/BaseInput.vue'
 import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue'
 import ColorMatrix from '../components/colors/ColorMatrix.vue'
 import ToolLayout from '../components/layout/ToolLayout.vue'
+import ToolHeader from '../components/layout/ToolHeader.vue'
 import { generateScale, generatePastel, generateShades, generateInterpolate } from '../utils/ColorGenerators'
 import { useToast } from '../composables/useToast'
 import { usePersistentState } from '../composables/usePersistentState'
@@ -32,9 +33,9 @@ const setName = usePersistentState('colorset:setName', 'New Palette')
 const setId = usePersistentState('colorset:setId', '')
 
 const palette = usePersistentState<ColorStart[]>('colorset:palette', [
-    { id: '', name: 'Color Name', hex: '#EF4444' },
-    { id: '', name: 'Color Name', hex: '#EAB308' },
-    { id: '', name: 'Color Name', hex: '#22C55E' }
+    { id: '', name: 'Red', hex: '#EF4444' },
+    { id: '', name: 'Yellow', hex: '#EAB308' },
+    { id: '', name: 'Green', hex: '#22C55E' }
 ])
 
 const activeTab = ref<'studio' | 'generate' | 'import' | 'script'>('studio')
@@ -257,22 +258,28 @@ const processPaste = () => {
     <ToolLayout sidebarClass="lg:w-[45%]">
         
         <!-- Main: Palette Grid -->
+        <!-- Main: Palette Grid -->
         <template #main>
-            <!-- Header Actions -->
-            <div class="p-6 bg-white/90 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-10 sticky top-0">
-                <div class="flex items-start justify-between gap-6">
-                    <div class="flex-1 space-y-3">
-                         <input v-model="setName" class="text-3xl font-extrabold bg-transparent border-b border-dashed border-slate-300 hover:border-slate-400 focus:border-indigo-500 focus:border-solid outline-none placeholder-slate-400 w-full transition-colors" placeholder="Palette Name" />
-                         <div class="flex items-center gap-2">
-                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID</span>
-                             <input v-model="setId" class="text-sm font-mono text-purple-600 dark:text-purple-400 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-400 focus:border-indigo-500 focus:border-solid outline-none transition-colors" />
+            <!-- Tool Header -->
+            <ToolHeader title="Colorset Builder" :icon="Palette" icon-color="text-rose-600 dark:text-rose-400">
+                <template #center>
+                    <div class="flex items-center gap-4 w-full max-w-md">
+                         <div class="flex-1">
+                             <input v-model="setName" class="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 font-bold text-slate-700 dark:text-slate-200 text-sm py-1 transition-colors outline-none placeholder-slate-400" placeholder="Palette Name" />
+                         </div>
+                         <div class="flex items-center gap-2 shrink-0">
+                             <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">ID</span>
+                             <input v-model="setId" class="w-24 text-xs font-mono text-purple-600 dark:text-purple-400 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-400 focus:border-indigo-500 focus:border-solid outline-none transition-colors py-1" />
                          </div>
                     </div>
+                </template>
+
+                <template #actions>
                     <button @click="addColor" class="flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-full font-bold text-xs shadow-lg hover:scale-105 transition-transform">
                         <Plus class="w-4 h-4" /> New Color
                     </button>
-                </div>
-            </div>
+                </template>
+            </ToolHeader>
 
             <!-- Grid -->
             <div class="flex-1 overflow-y-auto p-6">
@@ -365,15 +372,15 @@ const processPaste = () => {
                                 </div>
                                 <div class="flex gap-2 text-xs font-mono">
                                     <div class="flex-1 bg-slate-50 dark:bg-slate-900 rounded px-2 py-1 border border-slate-200 dark:border-slate-700">
-                                        <label class="block text-[8px] font-bold text-slate-400">R</label>
+                                        <label class="block text-[10px] font-bold text-slate-400">R</label>
                                         <input v-model.number="currentRgb.r" @input="updateColorFromRgb" class="w-full bg-transparent border-none p-0 focus:ring-0" type="number" min="0" max="255"/>
                                     </div>
                                     <div class="flex-1 bg-slate-50 dark:bg-slate-900 rounded px-2 py-1 border border-slate-200 dark:border-slate-700">
-                                        <label class="block text-[8px] font-bold text-slate-400">G</label>
+                                        <label class="block text-[10px] font-bold text-slate-400">G</label>
                                         <input v-model.number="currentRgb.g" @input="updateColorFromRgb" class="w-full bg-transparent border-none p-0 focus:ring-0" type="number" min="0" max="255"/>
                                     </div>
                                     <div class="flex-1 bg-slate-50 dark:bg-slate-900 rounded px-2 py-1 border border-slate-200 dark:border-slate-700">
-                                        <label class="block text-[8px] font-bold text-slate-400">B</label>
+                                        <label class="block text-[10px] font-bold text-slate-400">B</label>
                                         <input v-model.number="currentRgb.b" @input="updateColorFromRgb" class="w-full bg-transparent border-none p-0 focus:ring-0" type="number" min="0" max="255"/>
                                     </div>
                                 </div>

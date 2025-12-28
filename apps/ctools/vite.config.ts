@@ -36,5 +36,14 @@ export default defineConfig({
   build: {
     outDir: '../../ctools', // Build directly to the output directory
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'bpmn-vendor': ['bpmn-js'],
+          'core-vendor': ['vue', 'vue-router', 'pinia'],
+          'ui-vendor': ['lucide-vue-next', '@vueuse/core']
+        }
+      }
+    }
   }
 })

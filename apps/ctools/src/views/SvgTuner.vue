@@ -1,11 +1,10 @@
 ```vue
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue' // Added onMounted back, removed from original snippet
+import { ref, onMounted } from 'vue' // Added onMounted back, removed from original snippet
 import ToolLayout from '../components/layout/ToolLayout.vue'
 import ToolHeader from '../components/layout/ToolHeader.vue'
 import SvgTunerControls from '../components/tools/svg-tuner/SvgTunerControls.vue'
 import SvgTunerCanvas from '../components/tools/svg-tuner/SvgTunerCanvas.vue'
-import CodeOutputPanel from '../components/ui/CodeOutputPanel.vue' // New import
 import { useSvgTuner } from '../composables/useSvgTuner'
 import { TOOLS } from '../config/tools' // New import
 import { Upload, Download, Code, Image } from 'lucide-vue-next' // Kept existing import
@@ -35,10 +34,7 @@ const {
 
 const canvasRef = ref<InstanceType<typeof SvgTunerCanvas> | null>(null)
 
-// Also need script output for consistency
-const scriptOutput = computed(() => {
-    return svgCode.value // For now just showing raw SVG
-})
+// Actions orchestrated by parent
 
 // Actions orchestrated by parent
 const handleFileUploaded = () => {

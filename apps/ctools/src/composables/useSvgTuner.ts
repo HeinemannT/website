@@ -11,7 +11,7 @@ export function useSvgTuner() {
     const optimizationStats = ref('')
     const baseViewBox = ref<{ x: number, y: number, w: number, h: number } | null>(null)
     const paddingVal = ref(0)
-    const activeTab = ref<'tune' | 'code'>('tune')
+    const activeTab = ref<'tune' | 'code' | 'svg' | 'extended'>('tune')
 
     const exportName = ref('tuned svg')
 

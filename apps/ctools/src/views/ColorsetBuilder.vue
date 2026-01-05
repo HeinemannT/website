@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { Plus, Trash2, Palette, ExternalLink, ArrowRight, Wand2 } from 'lucide-vue-next'
+import { Plus, Trash2, Palette, ExternalLink, ArrowRight, Wand2, Folder } from 'lucide-vue-next'
 import tinycolor from 'tinycolor2'
 import { ScriptBuilder } from '../utils/ScriptBuilder'
 import BaseButton from '../components/ui/BaseButton.vue'
@@ -214,15 +214,24 @@ const scriptOutput = computed(() => {
     const parent = rootParentId.value || 't'
     const sb = new ScriptBuilder(`Set: ${setName.value}`)
     
+    // 1. Define parent/target folder variable
+    sb.assign('targetFolder', parent)
+    sb.addNewLine()
+
+    // 2. Create the colorset object (Category -> CorpoColorSet)
     const finalSetId = setId.value ? (setId.value.startsWith('t.') ? setId.value : 't.' + setId.value) : ''
-    sb.createObjectVar('targetFolder', parent, 'Category', { 
+    
+    // We create a variable for the set so we can add colors to IT, not the parent folder
+    // vSet := targetFolder.add(CorpoColorSet, ...)
+    sb.assignAdd('vSet', 'targetFolder', 'CorpoColorSet', { 
         id: finalSetId, 
         name: setName.value 
     })
     sb.addNewLine()
     
+    // 3. Add colors to the set (Color -> CorpoColor)
     palette.value.forEach(col => {
-        sb.createObject('targetFolder', 'Color', { 
+        sb.createObject('vSet', 'CorpoColor', { 
             id: col.id, 
             name: col.name, 
             color: col.hex 
@@ -264,14 +273,30 @@ const processPaste = () => {
             <!-- Tool Header -->
             <ToolHeader title="Colorset Builder" :icon="Palette" icon-color="text-rose-600 dark:text-rose-400">
                 <template #center>
-                    <div class="flex items-center gap-4 w-full max-w-md">
-                         <div class="flex-1">
-                             <input v-model="setName" class="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 font-bold text-slate-700 dark:text-slate-200 text-sm py-1 transition-colors outline-none placeholder-slate-400" placeholder="Palette Name" />
-                         </div>
-                         <div class="flex items-center gap-2 shrink-0">
-                             <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">ID</span>
-                             <input v-model="setId" class="w-24 text-xs font-mono text-purple-600 dark:text-purple-400 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-400 focus:border-indigo-500 focus:border-solid outline-none transition-colors py-1" />
-                         </div>
+                    <div class="flex items-center bg-slate-50 dark:bg-slate-900 rounded-lg p-1 border border-slate-200 dark:border-slate-700 shadow-sm mx-4">
+                        <!-- Section 1: Name -->
+                        <div class="group relative px-4 py-1 border-r border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 transition-colors rounded-l-md">
+                           <label class="text-[9px] font-bold text-slate-400 absolute top-1 left-4 uppercase tracking-wider pointer-events-none">Palette Name</label>
+                           <input v-model="setName" class="mt-3 bg-transparent font-bold text-sm text-slate-700 dark:text-slate-200 w-48 focus:outline-none placeholder-slate-300 border-none p-0 focus:ring-0" placeholder="My Colors" />
+                        </div>
+
+                        <!-- Section 2: ID -->
+                        <div class="group relative px-4 py-1 border-r border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 transition-colors">
+                           <label class="text-[9px] font-bold text-slate-400 absolute top-1 left-4 uppercase tracking-wider pointer-events-none">ID</label>
+                           <div class="flex items-center mt-3 gap-0.5">
+                               <span class="text-[10px] text-slate-400 font-mono select-none">#</span>
+                               <input v-model="setId" class="bg-transparent font-mono text-xs font-medium text-purple-600 dark:text-purple-400 w-24 focus:outline-none placeholder-slate-300 border-none p-0 focus:ring-0" placeholder="auto" />
+                           </div>
+                        </div>
+
+                        <!-- Section 3: Context -->
+                        <div class="group relative px-4 py-1 hover:bg-white dark:hover:bg-slate-800 transition-colors rounded-r-md">
+                           <label class="text-[9px] font-bold text-slate-400 absolute top-1 left-4 uppercase tracking-wider pointer-events-none">Target Folder</label>
+                            <div class="flex items-center mt-3 gap-1.5">
+                               <Folder class="w-3 h-3 text-indigo-400" />
+                               <input v-model="rootParentId" class="bg-transparent font-mono text-xs font-medium text-slate-600 dark:text-slate-300 w-32 focus:outline-none placeholder-slate-300 border-none p-0 focus:ring-0" placeholder="t.dashboards" />
+                           </div>
+                        </div>
                     </div>
                 </template>
 
@@ -475,13 +500,7 @@ const processPaste = () => {
 
                 <!-- SCRIPT -->
                 <div v-if="activeTab === 'script'" class="h-full flex flex-col">
-                     <CodeOutputPanel title="Extended Code" :code="scriptOutput">
-                         <template #actions>
-                             <div class="w-40">
-                                 <input v-model="rootParentId" placeholder="Context Folder" class="w-full text-xs border-b border-slate-200 dark:border-slate-700 bg-transparent focus:border-indigo-500 outline-none pb-1 placeholder-slate-400" />
-                             </div>
-                         </template>
-                     </CodeOutputPanel>
+                     <CodeOutputPanel title="Extended Code" :code="scriptOutput" />
                 </div>
             </div>
         </template>

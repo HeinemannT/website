@@ -85,12 +85,7 @@ const removeLevel = (idx: number) => {
     levels.value.splice(idx, 1)
 }
 
-// Auto-update header for Simple Mode
-const updateHeader = (col: Column) => {
-    if (method.value === 1 && col.prop) {
-        col.header = `[${col.prop}.name]`
-    }
-}
+
 
 // ... Helpers ...
 
@@ -177,7 +172,7 @@ const scriptOutput = computed(() => {
 const buildStyleChain = (col: Column) => {
     let chain = ''
     if (col.width) chain += `.width(${col.width})`
-    if (col.align && col.align !== 'left') chain += `.align(alignment.${col.align.toUpperCase()})`
+    if (col.align && col.align !== 'left') chain += `.align(${col.align.toUpperCase()})`
 
     let args: string[] = []
     let methods: string[] = []
@@ -326,7 +321,7 @@ const toggleStyle = (col: Column, style: string) => {
                                                 
                                                 <div class="flex-1 grid grid-cols-1 gap-1.5">
                                                     <input v-model="col.header" placeholder="Header" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-bold focus:ring-1 focus:ring-indigo-100 focus:outline-none" />
-                                                    <input v-model="col.prop" placeholder="Property" @input="updateHeader(col)" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-[10px] font-mono text-slate-600 dark:text-slate-400 focus:ring-1 focus:ring-indigo-100 focus:outline-none" />
+                                                    <input v-model="col.prop" placeholder="Property" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-[10px] font-mono text-slate-600 dark:text-slate-400 focus:ring-1 focus:ring-indigo-100 focus:outline-none" />
                                                 </div>
                                                 
                                                 <div class="flex flex-col border-l border-slate-100 dark:border-slate-700 pl-2 gap-1">

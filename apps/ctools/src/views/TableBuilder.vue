@@ -143,9 +143,9 @@ const scriptOutput = computed(() => {
         columns.value.forEach(col => {
             let line = ''
             if (m === 1) {
-                line = `${tableVar.value}.add(${(sourceList.value.startsWith('v') || sourceList.value.startsWith('l')) ? 'item' : 'item'}.${col.prop})`
+                line = `${tableVar.value}.addColumn(${col.prop})`
             } else {
-                line = `${tableVar.value}.addColumn("${escapeString(col.header)}", item.${col.prop})`
+                line = `${tableVar.value}.addColumn("${escapeString(col.header)}", ${col.prop})`
             }
             line += buildStyleChain(col)
             sb.add(line)
@@ -159,10 +159,8 @@ const scriptOutput = computed(() => {
     if (m === 3) {
         sb.add(`${sourceList.value}.foreach(item:`)
         sb.indent()
-        sb.add(`${tableVar.value}.addRow()`)
-        columns.value.forEach(col => {
-             sb.add(`.addCell(item.${col.prop})`)
-        })
+        const cellArgs = columns.value.map(col => `item.${col.prop}`).join(', ')
+        sb.add(`${tableVar.value}.addRow(item, ${cellArgs})`)
         sb.outdent()
         sb.add(')')
     } else if (m === 4) {
@@ -189,7 +187,7 @@ const buildStyleChain = (col: Column) => {
         else if (st === 'readonly') methods.push('.readonly()')
         else if (st === 'separator') args.push("'separator'")
         else if (st === 'wrapped') args.push("'wrapped'")
-        else if (st === 'bold') args.push("style.bold")
+        else if (st === 'bold') args.push("'bold'")
         else args.push(`'${st}'`)
     })
 

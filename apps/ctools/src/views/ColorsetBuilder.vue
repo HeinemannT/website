@@ -28,7 +28,7 @@ interface GeneratorOutput {
 }
 
 // --- State ---
-const rootParentId = usePersistentState('colorset:rootParentId', 'dashboards_colors_folder')
+const rootParentId = usePersistentState('colorset:rootParentId', 't.color_folder')
 const setName = usePersistentState('colorset:setName', 'New Palette')
 const setId = usePersistentState('colorset:setId', '')
 
@@ -214,8 +214,9 @@ const scriptOutput = computed(() => {
     const parent = rootParentId.value || 't'
     const sb = new ScriptBuilder(`Set: ${setName.value}`)
     
-    sb.createObjectVar('targetFolder', parent, 'Folder', { 
-        id: setId.value, 
+    const finalSetId = setId.value ? (setId.value.startsWith('t.') ? setId.value : 't.' + setId.value) : ''
+    sb.createObjectVar('targetFolder', parent, 'Category', { 
+        id: finalSetId, 
         name: setName.value 
     })
     sb.addNewLine()

@@ -178,7 +178,7 @@ export function useLayoutBuilder() {
 
         data.value.forEach((ts) => {
             sb.addComment(`--- TabSet: ${ts.name} ---`)
-            sb.assignAdd(ts.varName, 'vRoot', 'TabSet', { name: ts.name })
+            sb.assignAdd(ts.varName, 'targetFolder', 'TabSet', { name: ts.name })
 
             ts.children.forEach((tab) => {
                 sb.addNewLine()

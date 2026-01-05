@@ -273,34 +273,21 @@ const processPaste = () => {
             <!-- Tool Header -->
             <ToolHeader title="Colorset Builder" :icon="Palette" icon-color="text-rose-600 dark:text-rose-400">
                 <template #center>
-                    <div class="flex items-center gap-3 w-full max-w-2xl px-4">
-                        <!-- Name -->
-                        <div class="flex-1 min-w-[140px] relative group">
-                            <label class="absolute -top-2.5 left-2 px-1 bg-white/90 dark:bg-slate-900 text-[9px] font-bold text-slate-400 uppercase tracking-wider transition-colors group-focus-within:text-indigo-500">Palette Name</label>
-                            <input v-model="setName" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 outline-none transition-all placeholder-slate-300" placeholder="My Colors" />
+                    <div class="flex items-center gap-4 w-full max-w-xl px-4">
+                        <div class="flex-1 flex items-center h-8">
+                             <input v-model="setName" class="w-full bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 font-bold text-slate-700 dark:text-slate-200 text-sm h-full transition-colors outline-none placeholder-slate-400 text-center md:text-left" placeholder="Palette Name" />
                         </div>
-
-                        <!-- ID -->
-                        <div class="w-24 shrink-0 relative group">
-                            <label class="absolute -top-2.5 left-2 px-1 bg-white/90 dark:bg-slate-900 text-[9px] font-bold text-slate-400 uppercase tracking-wider transition-colors group-focus-within:text-indigo-500">ID</label>
-                            <div class="relative">
-                                <span class="absolute left-2 top-1.5 text-xs text-slate-400 font-mono select-none">#</span>
-                                <input v-model="setId" class="w-full pl-5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-purple-600 dark:text-purple-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 outline-none transition-all placeholder-slate-300" placeholder="auto" />
-                            </div>
+                        <div class="flex items-center gap-2 shrink-0 border-l border-slate-200 dark:border-slate-700 pl-4 h-8">
+                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider pt-0.5">ID</span>
+                             <div class="relative h-full flex items-center">
+                                 <span class="text-xs text-slate-400 font-mono hidden md:block mr-0.5">#</span>
+                                 <input v-model="setId" class="w-24 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-400 focus:border-indigo-500 focus:border-solid outline-none text-xs font-mono font-medium text-purple-600 dark:text-purple-400 h-full transition-colors placeholder-slate-300" placeholder="auto" />
+                             </div>
                         </div>
                     </div>
                 </template>
 
                 <template #actions>
-                    <!-- Target Folder (Hidden on small mobile) -->
-                    <div class="hidden md:block relative group mr-4">
-                        <label class="absolute -top-2.5 left-2 px-1 bg-white/90 dark:bg-slate-900 text-[9px] font-bold text-slate-400 uppercase tracking-wider transition-colors group-focus-within:text-indigo-500">Target Folder</label>
-                        <div class="relative">
-                            <Folder class="absolute left-2.5 top-2 w-3.5 h-3.5 text-indigo-400" />
-                            <input v-model="rootParentId" class="w-36 pl-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono font-medium text-slate-600 dark:text-slate-300 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 outline-none transition-all placeholder-slate-300" placeholder="t.dashboards" />
-                        </div>
-                    </div>
-                    
                     <button @click="addColor" class="flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-full font-bold text-xs shadow-lg hover:scale-105 hover:shadow-indigo-500/20 transition-all">
                         <Plus class="w-4 h-4" /> <span class="hidden sm:inline">New Color</span>
                     </button>
@@ -500,7 +487,18 @@ const processPaste = () => {
 
                 <!-- SCRIPT -->
                 <div v-if="activeTab === 'script'" class="h-full flex flex-col">
-                     <CodeOutputPanel title="Extended Code" :code="scriptOutput" />
+                     <CodeOutputPanel title="Extended Code" :code="scriptOutput">
+                         <template #actions>
+                             <div class="w-48 pl-4 border-l border-slate-700/50">
+                                 <div class="flex flex-col gap-1">
+                                     <label class="text-[9px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                         <Folder class="w-3 h-3" /> Target Folder
+                                     </label>
+                                     <input v-model="rootParentId" placeholder="t.dashboards" class="w-full text-xs font-mono border-b border-slate-200 dark:border-slate-700 bg-transparent focus:border-indigo-500 outline-none pb-1 placeholder-slate-400 text-slate-600 dark:text-slate-300" />
+                                 </div>
+                             </div>
+                         </template>
+                     </CodeOutputPanel>
                 </div>
             </div>
         </template>

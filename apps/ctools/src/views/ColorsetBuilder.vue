@@ -212,7 +212,6 @@ const commitGenerated = () => {
 
 // --- Script Generation ---
 const scriptOutput = computed(() => {
-    const parent = rootParentId.value || 't'
     const sb = new ScriptBuilder(`Set: ${setName.value}`)
     
     // 1. Define parent/target folder variable

@@ -12,6 +12,7 @@ import ToolHeader from '../components/layout/ToolHeader.vue'
 import { generateScale, generatePastel, generateShades, generateInterpolate } from '../utils/ColorGenerators'
 import { useToast } from '../composables/useToast'
 import { usePersistentState } from '../composables/usePersistentState'
+import { extractColors } from '../utils/ColorExtractor'
 
 const { add: toast } = useToast()
 
@@ -248,23 +249,25 @@ const scriptOutput = computed(() => {
 // --- Import ---
 const importContent = ref('')
 const processPaste = () => {
-    const lines = importContent.value.split('\n')
+    const extracted = extractColors(importContent.value)
+    
     let count = 0
-    lines.forEach(line => {
-        const match = line.match(/#[a-fA-F0-9]{6}/)
-        if (match && match[0]) {
-            const hex = match[0].toUpperCase()
-            palette.value.push({
-                id: 'color_' + hex.replace('#', '').toLowerCase(),
-                name: hex,
-                hex
-            })
-            count++
-        }
+    extracted.forEach(c => {
+        palette.value.push({
+            id: 'color_' + c.hex.replace('#', '').toLowerCase(),
+            name: c.name, // Will use 'Red', '#FF0000', or 'rgb(..)' as name
+            hex: c.hex
+        })
+        count++
     })
-    toast(`Imported ${count} colors`, 'info')
-    importContent.value = ''
-    activeTab.value = 'studio'
+
+    if (count > 0) {
+        toast(`Imported ${count} colors`, 'success')
+        importContent.value = ''
+        activeTab.value = 'studio'
+    } else {
+        toast('No valid colors found', 'error')
+    }
 }
 
 </script>

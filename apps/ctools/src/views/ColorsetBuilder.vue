@@ -215,13 +215,18 @@ const scriptOutput = computed(() => {
     const sb = new ScriptBuilder(`Set: ${setName.value}`)
     
     // 1. Define parent/target folder variable
-    sb.assign('targetFolder', parent)
+    // Ensure parent starts with t. if it's not simply 't'
+    let parentRef = rootParentId.value || 't'
+    if (parentRef !== 't' && !parentRef.startsWith('t.')) {
+        parentRef = 't.' + parentRef
+    }
+    sb.assign('targetFolder', parentRef)
     sb.addNewLine()
 
     // 2. Create the colorset object (Category -> CorpoColorSet)
-    const finalSetId = setId.value ? (setId.value.startsWith('t.') ? setId.value : 't.' + setId.value) : ''
+    // ID is just a string now, no t. prefix
+    const finalSetId = setId.value || ''
     
-    // We create a variable for the set so we can add colors to IT, not the parent folder
     // vSet := targetFolder.add(CorpoColorSet, ...)
     sb.assignAdd('vSet', 'targetFolder', 'CorpoColorSet', { 
         id: finalSetId, 

@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
     "@vueuse/core": "^14.1.0",
     "bpmn-js": "^18.9.1",
     "lucide-vue-next": "^0.562.0",

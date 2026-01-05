@@ -273,36 +273,36 @@ const processPaste = () => {
             <!-- Tool Header -->
             <ToolHeader title="Colorset Builder" :icon="Palette" icon-color="text-rose-600 dark:text-rose-400">
                 <template #center>
-                    <div class="flex items-center bg-slate-50 dark:bg-slate-900 rounded-lg p-1 border border-slate-200 dark:border-slate-700 shadow-sm mx-4">
-                        <!-- Section 1: Name -->
-                        <div class="group relative px-4 py-1 border-r border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 transition-colors rounded-l-md">
-                           <label class="text-[9px] font-bold text-slate-400 absolute top-1 left-4 uppercase tracking-wider pointer-events-none">Palette Name</label>
-                           <input v-model="setName" class="mt-3 bg-transparent font-bold text-sm text-slate-700 dark:text-slate-200 w-48 focus:outline-none placeholder-slate-300 border-none p-0 focus:ring-0" placeholder="My Colors" />
+                    <div class="flex items-center gap-3 w-full max-w-2xl px-4">
+                        <!-- Name -->
+                        <div class="flex-1 min-w-[140px] relative group">
+                            <label class="absolute -top-2.5 left-2 px-1 bg-white/90 dark:bg-slate-900 text-[9px] font-bold text-slate-400 uppercase tracking-wider transition-colors group-focus-within:text-indigo-500">Palette Name</label>
+                            <input v-model="setName" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 outline-none transition-all placeholder-slate-300" placeholder="My Colors" />
                         </div>
 
-                        <!-- Section 2: ID -->
-                        <div class="group relative px-4 py-1 border-r border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 transition-colors">
-                           <label class="text-[9px] font-bold text-slate-400 absolute top-1 left-4 uppercase tracking-wider pointer-events-none">ID</label>
-                           <div class="flex items-center mt-3 gap-0.5">
-                               <span class="text-[10px] text-slate-400 font-mono select-none">#</span>
-                               <input v-model="setId" class="bg-transparent font-mono text-xs font-medium text-purple-600 dark:text-purple-400 w-24 focus:outline-none placeholder-slate-300 border-none p-0 focus:ring-0" placeholder="auto" />
-                           </div>
-                        </div>
-
-                        <!-- Section 3: Context -->
-                        <div class="group relative px-4 py-1 hover:bg-white dark:hover:bg-slate-800 transition-colors rounded-r-md">
-                           <label class="text-[9px] font-bold text-slate-400 absolute top-1 left-4 uppercase tracking-wider pointer-events-none">Target Folder</label>
-                            <div class="flex items-center mt-3 gap-1.5">
-                               <Folder class="w-3 h-3 text-indigo-400" />
-                               <input v-model="rootParentId" class="bg-transparent font-mono text-xs font-medium text-slate-600 dark:text-slate-300 w-32 focus:outline-none placeholder-slate-300 border-none p-0 focus:ring-0" placeholder="t.dashboards" />
-                           </div>
+                        <!-- ID -->
+                        <div class="w-24 shrink-0 relative group">
+                            <label class="absolute -top-2.5 left-2 px-1 bg-white/90 dark:bg-slate-900 text-[9px] font-bold text-slate-400 uppercase tracking-wider transition-colors group-focus-within:text-indigo-500">ID</label>
+                            <div class="relative">
+                                <span class="absolute left-2 top-1.5 text-xs text-slate-400 font-mono select-none">#</span>
+                                <input v-model="setId" class="w-full pl-5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-purple-600 dark:text-purple-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 outline-none transition-all placeholder-slate-300" placeholder="auto" />
+                            </div>
                         </div>
                     </div>
                 </template>
 
                 <template #actions>
-                    <button @click="addColor" class="flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-full font-bold text-xs shadow-lg hover:scale-105 transition-transform">
-                        <Plus class="w-4 h-4" /> New Color
+                    <!-- Target Folder (Hidden on small mobile) -->
+                    <div class="hidden md:block relative group mr-4">
+                        <label class="absolute -top-2.5 left-2 px-1 bg-white/90 dark:bg-slate-900 text-[9px] font-bold text-slate-400 uppercase tracking-wider transition-colors group-focus-within:text-indigo-500">Target Folder</label>
+                        <div class="relative">
+                            <Folder class="absolute left-2.5 top-2 w-3.5 h-3.5 text-indigo-400" />
+                            <input v-model="rootParentId" class="w-36 pl-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono font-medium text-slate-600 dark:text-slate-300 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-400 outline-none transition-all placeholder-slate-300" placeholder="t.dashboards" />
+                        </div>
+                    </div>
+                    
+                    <button @click="addColor" class="flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-full font-bold text-xs shadow-lg hover:scale-105 hover:shadow-indigo-500/20 transition-all">
+                        <Plus class="w-4 h-4" /> <span class="hidden sm:inline">New Color</span>
                     </button>
                 </template>
             </ToolHeader>

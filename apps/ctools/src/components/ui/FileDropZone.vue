@@ -29,20 +29,20 @@ function onDragLeave(e: DragEvent) {
     @drop="onDrop" 
     @dragover="onDragOver" 
     @dragleave="onDragLeave"
-    class="relative border-2 border-dashed rounded-xl flex flex-col items-center justify-center p-8 transition-colors cursor-pointer"
+    class="relative border-2 border-dashed rounded-none flex flex-col items-center justify-center p-8 transition-colors cursor-pointer"
     :class="[
       isDragging 
-        ? 'border-cora-500 bg-cora-50 dark:bg-cora-500/10' 
-        : 'border-slate-200 dark:border-slate-700 hover:border-cora-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+        ? 'border-interactive-01 bg-layer-02' 
+        : 'border-border-strong hover:border-interactive-01 hover:bg-layer-02'
     ]"
   >
-    <div class="p-3 bg-slate-100 dark:bg-slate-800 rounded-full mb-3">
-      <UploadCloud class="w-6 h-6 text-slate-400" :class="{ 'text-cora-500': isDragging }" />
+    <div class="p-3 bg-layer-01 rounded-full mb-3 hidden">
+      <UploadCloud class="w-6 h-6 text-text-secondary" :class="{ 'text-interactive-01': isDragging }" />
     </div>
-    <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
+    <p class="text-sm font-medium text-text-primary">
       Drag & Drop files here
     </p>
-    <p class="text-xs text-slate-500 mt-1">
+    <p class="text-xs text-text-secondary mt-1">
       or click to browse
     </p>
     

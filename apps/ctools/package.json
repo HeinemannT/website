@@ -9,8 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@types/pako": "^2.0.4",
-    "@types/tinycolor2": "^1.4.6",
     "@vueuse/core": "^14.1.0",
     "bpmn-js": "^18.9.1",
     "lucide-vue-next": "^0.562.0",
@@ -23,6 +21,8 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "@types/pako": "^2.0.4",
+    "@types/tinycolor2": "^1.4.6",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.8.1",
     "autoprefixer": "^10.4.23",

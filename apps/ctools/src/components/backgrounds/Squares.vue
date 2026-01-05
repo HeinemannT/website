@@ -6,15 +6,15 @@ const props = withDefaults(defineProps<{
     speed?: number
     direction?: 'diagonal' | 'up' | 'right' | 'down' | 'left'
     borderColor?: string
-    borderColorDark?: string
+    borderColorDark?: string // Deprecated if using CSS variables in borderColor
     hoverFillColor?: string
 }>(), {
     squareSize: 22,
     speed: 0.5,
     direction: 'diagonal',
-    borderColor: '#e2e8f0', // Slate-200
-    hoverFillColor: '#9333ea', // Purple-600
-    borderColorDark: '#1e293b' // Slate-800
+    borderColor: '#e2e8f0', 
+    hoverFillColor: 'var(--interactive-01)',
+    borderColorDark: '' 
 })
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -25,13 +25,24 @@ let gridOffset = { x: 0, y: 0 }
 let mousePos = { x: -9999, y: -9999 }
 const isDark = ref(false)
 
+// Helper to resolve CSS variable
+const resolveColor = (color: string) => {
+    if (!color) return '#000000'
+    if (color.startsWith('var(--')) {
+        // Remove var( and )
+        const varName = color.substring(4, color.length - 1)
+        const computed = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+        return computed || color
+    }
+    return color
+}
+
 // Animation state
 const resizeCanvas = () => {
     if (!canvasRef.value || !containerRef.value) return
     const { offsetWidth, offsetHeight } = containerRef.value
     canvasRef.value.width = offsetWidth
     canvasRef.value.height = offsetHeight
-    // Redraw immediately on resize
     draw()
 }
 
@@ -51,12 +62,13 @@ const draw = () => {
     const rows = Math.ceil(height / props.squareSize) + 2
 
     ctx.lineWidth = 1 
-    // Use dark border color if dark mode is active
-    ctx.strokeStyle = isDark.value ? props.borderColorDark : props.borderColor
+    
+    // Resolve color dynamically (in case theme changed)
+    // If props.borderColor is a variable, it handles dark/light automatically via getComputedStyle
+    ctx.strokeStyle = resolveColor(props.borderColor)
 
     for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
-            // Compute animated position
             const x = (startX + i) * props.squareSize - gridOffset.x
             const y = (startY + j) * props.squareSize - gridOffset.y
             
@@ -67,18 +79,8 @@ const draw = () => {
             if (mousePos.x >= x && mousePos.x < x + props.squareSize &&
                 mousePos.y >= y && mousePos.y < y + props.squareSize) {
                 
-                // Create Gradient for Hover (Adjust lighter for dark mode?)
-                const gradient = ctx.createLinearGradient(x, y, x + props.squareSize, y + props.squareSize)
-                if (isDark.value) {
-                     gradient.addColorStop(0, '#c084fc') // Purple-400
-                     gradient.addColorStop(1, '#818cf8') // Indigo-400
-                } else {
-                     gradient.addColorStop(0, '#9333ea')
-                     gradient.addColorStop(1, '#4f46e5')
-                }
-                
-                ctx.fillStyle = gradient
-                ctx.globalAlpha = 1 // Hover is solid
+                ctx.fillStyle = resolveColor(props.hoverFillColor)
+                ctx.globalAlpha = 1 
                 ctx.fillRect(x, y, props.squareSize, props.squareSize)
                 ctx.globalAlpha = 1
             }
@@ -123,21 +125,19 @@ const handleMouseLeave = () => {
 }
 
 onMounted(() => {
-    // Initial Dark Mode Check
     isDark.value = document.documentElement.classList.contains('dark')
 
-    // Mutation Observer for Theme Changes
     const themeObserver = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             if (mutation.attributeName === 'class') {
                 isDark.value = document.documentElement.classList.contains('dark')
+                // Force redraw to catch new CSS variable values
                 draw()
             }
         })
     })
     themeObserver.observe(document.documentElement, { attributes: true })
 
-    // Resize Observer for container size changes
     const resizeObserver = new ResizeObserver(() => {
         resizeCanvas()
     })
@@ -149,12 +149,9 @@ onMounted(() => {
     if (canvasRef.value) {
         ctx = canvasRef.value.getContext('2d')
         resizeCanvas()
-        
-        // Start animation
         animationId = requestAnimationFrame(update)
     }
 
-    // Cleanup on unmount
     onUnmounted(() => {
         themeObserver.disconnect()
         resizeObserver.disconnect()
@@ -163,19 +160,18 @@ onMounted(() => {
 })
 
  // Re-draw/init on props change
-watch(() => [props.squareSize, props.speed, props.direction, props.borderColor, props.borderColorDark], () => {
-    // No full reset needed, update loop catches new props
+watch(() => [props.squareSize, props.speed, props.direction, props.borderColor], () => {
+    // No full reset needed
 })
 </script>
 
 <template>
     <div ref="containerRef" 
-         class="squares-container w-full h-full absolute inset-0 -z-0 bg-slate-50 dark:bg-[#0B1120] overflow-hidden"
+         class="squares-container w-full h-full absolute inset-0 -z-0 bg-background overflow-hidden"
          @mousemove="handleMouseMove"
          @mouseleave="handleMouseLeave"
     >
         <canvas ref="canvasRef" class="w-full h-full block"></canvas>
-        <div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-slate-50/90 dark:to-[#0B1120]/90"></div>
     </div>
 </template>
 

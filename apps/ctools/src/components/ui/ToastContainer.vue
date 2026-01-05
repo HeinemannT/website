@@ -11,9 +11,9 @@ const icons = {
 }
 
 const classes = {
-  success: 'bg-slate-800 text-emerald-400 border-l-4 border-emerald-500',
-  error: 'bg-slate-800 text-red-400 border-l-4 border-red-500',
-  info: 'bg-slate-800 text-blue-400 border-l-4 border-blue-500'
+  success: 'border-l-4 border-l-support-success',
+  error: 'border-l-4 border-l-support-error',
+  info: 'border-l-4 border-l-interactive-01'
 }
 </script>
 
@@ -23,14 +23,16 @@ const classes = {
       <div 
         v-for="toast in toasts" 
         :key="toast.id" 
-        class="pointer-events-auto px-4 py-3 rounded shadow-lg shadow-black/20 flex items-center gap-3 min-w-[300px] max-w-sm backdrop-blur-sm"
-        :class="classes[toast.type]"
+        class="pointer-events-auto px-4 py-3 bg-layer-01 border border-border-subtle shadow-xl flex items-center gap-3 min-w-[300px] max-w-md"
+        :class="[classes[toast.type]]"
       >
-        <component :is="icons[toast.type]" class="w-5 h-5 shrink-0" />
-        <span class="text-sm font-medium text-slate-100 flex-1">{{ toast.message }}</span>
-        <button @click="remove(toast.id)" class="text-slate-500 hover:text-white transition-colors">
+        <component :is="icons[toast.type]" class="w-4 h-4 shrink-0" />
+        <span class="text-xs font-bold text-text-primary flex-1 leading-relaxed">{{ toast.message }}</span>
+        <button @click="remove(toast.id)" class="text-text-disabled hover:text-text-primary transition-colors">
           <X class="w-4 h-4" />
         </button>
+        
+        <!-- Loading bar for auto-dismiss could be here, but simpler is better for now -->
       </div>
     </transition-group>
   </div>
@@ -39,16 +41,16 @@ const classes = {
 <style scoped>
 .toast-enter-active,
 .toast-leave-active {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
 .toast-enter-from {
   opacity: 0;
-  transform: translateY(20px) scale(0.95);
+  transform: translateY(10px);
 }
 
 .toast-leave-to {
   opacity: 0;
-  transform: translateX(100%);
+  transform: translateX(20px);
 }
 </style>

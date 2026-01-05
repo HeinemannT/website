@@ -10,9 +10,9 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden flex flex-col">
-    <div v-if="title" class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-between items-center shrink-0">
-      <h3 class="font-semibold text-sm text-slate-700 dark:text-slate-200">{{ title }}</h3>
+  <div class="bg-layer-01 border border-border-subtle flex flex-col overflow-hidden">
+    <div v-if="title" class="px-4 py-2 border-b border-border-subtle bg-layer-02 flex justify-between items-center shrink-0 min-h-[48px]">
+      <h3 class="font-semibold text-sm text-text-primary tracking-wide">{{ title }}</h3>
       <div class="flex items-center gap-2">
         <slot name="actions" />
       </div>

@@ -27,21 +27,21 @@ const onInput = (e: Event) => {
 </script>
 
 <template>
-    <div class="flex flex-col h-full bg-slate-100 dark:bg-slate-950/50 border-l border-slate-200 dark:border-slate-800">
+    <div class="flex flex-col h-full bg-layer-01 border-l border-border-subtle">
         <!-- Header -->
-        <div class="px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center shrink-0">
+        <div class="px-6 py-4 bg-layer-01 border-b border-border-subtle flex justify-between items-center shrink-0">
              <div class="flex items-center gap-2">
                  <slot name="icon">
-                     <Code class="w-4 h-4 text-slate-400" />
+                     <Code class="w-4 h-4 text-text-secondary" />
                  </slot>
-                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                 <span class="text-xs font-bold text-text-secondary uppercase tracking-wider">
                      {{ title || 'Generated Code' }}
                  </span>
              </div>
              
              <div class="flex items-center gap-4">
                 <slot name="actions"></slot>
-                <button @click="copyCode" class="text-indigo-500 hover:text-indigo-400 text-xs font-bold flex items-center gap-1 transition-colors">
+                <button @click="copyCode" class="text-interactive-01 hover:text-interactive-01-hover text-xs font-bold flex items-center gap-1 transition-colors">
                     <Copy class="w-3 h-3" /> Copy
                 </button>
              </div>
@@ -53,8 +53,8 @@ const onInput = (e: Event) => {
                 :value="code"
                 @input="onInput"
                 :readonly="!editable" 
-                class="w-full h-full bg-slate-50 dark:bg-[#0d1117] p-4 font-mono text-[10px] text-emerald-600 dark:text-emerald-400 resize-none outline-none leading-relaxed custom-scroll"
-                :class="{ 'focus:ring-1 focus:ring-indigo-500/50': editable }"
+                class="w-full h-full bg-layer-02 p-4 font-mono text-[10px] text-text-primary resize-none outline-none leading-relaxed custom-scroll border-none focus:ring-0"
+                :class="{ 'focus:ring-1 focus:ring-interactive-01': editable }"
                 spellcheck="false"
             ></textarea>
         </div>
@@ -70,7 +70,10 @@ const onInput = (e: Event) => {
   background: transparent;
 }
 .custom-scroll::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full border-[3px] border-solid border-transparent bg-clip-content;
+  background-color: var(--layer-03);
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
 }
 .custom-scroll::-webkit-scrollbar-corner {
   background: transparent;

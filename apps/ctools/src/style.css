@@ -1,40 +1,121 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Carbon Light Theme (White) */
+    --layer-01: #ffffff;
+    --layer-02: #f4f4f4;
+    /* Gray 10 */
+    --layer-03: #e0e0e0;
+    /* Gray 20 */
+
+    --text-primary: #161616;
+    /* Gray 100 */
+    --text-secondary: #525252;
+    /* Gray 60 */
+    --text-on-color: #ffffff;
+    --text-disabled: #a8a8a8;
+    /* Gray 40 - Subtle icons */
+
+    --border-subtle: #e0e0e0;
+    /* Gray 20 */
+    --border-strong: #8d8d8d;
+    /* Gray 50 */
+
+    --interactive-01: #8a3ffc;
+    /* Purple 60 */
+    --interactive-01-hover: #6929c4;
+    /* Purple 70 */
+    --focus: #8a3ffc;
+
+    --background: #f4f4f4;
+    /* App Background */
+  }
+
+  .dark {
+    /* Carbon Dark Theme (Gray 100) */
+    --background: #161616;
+    /* App Background identity (Gray 100) */
+
+    --layer-01: #262626;
+    /* Gray 90 - Cards/Content */
+    --layer-02: #393939;
+    /* Gray 80 - Elevated */
+    --layer-03: #525252;
+    /* Gray 70 */
+
+    --text-primary: #f4f4f4;
+    /* Gray 10 */
+    --text-secondary: #c6c6c6;
+    /* Gray 60 */
+    --text-on-color: #ffffff;
+
+    --border-subtle: #393939;
+    /* Gray 80 */
+    --border-strong: #6f6f6f;
+    /* Gray 60 */
+    --text-disabled: #6f6f6f;
+    /* Gray 60 - Subtle icons */
+
+    --interactive-01: #8a3ffc;
+    /* Purple 60 */
+    --interactive-01-hover: #a56eff;
+    /* Purple 50 */
+    --focus: #ffffff;
+    /* High contrast focus in dark mode */
+  }
+
   html {
-    font-family: 'Inter', sans-serif;
+    font-family: 'IBM Plex Sans', sans-serif;
+    @apply bg-background text-text-primary;
   }
 }
 
-/* Custom Scrollbar for "Developer" feel */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 dark:bg-slate-700 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-300 dark:bg-slate-600;
-}
 
 @layer utilities {
-  .bg-grid-pattern {
-    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+
+  .type-ui-control {
+    @apply text-[11px] font-bold uppercase tracking-wider;
+  }
+
+  .type-ui-label {
+    @apply text-[10px] font-bold uppercase tracking-widest text-text-secondary;
+  }
+
+  .bg-pattern-dots {
+    background-image: radial-gradient(var(--border-subtle) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .bg-pattern-dots-light {
+    background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .bg-pattern-dots-dark {
+    background-image: radial-gradient(#393939 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .bg-checkerboard {
+    background-color: #ffffff;
+    background-image: conic-gradient(#e5e5e5 0.25turn, transparent 0.25turn 0.5turn, #e5e5e5 0.5turn 0.75turn, transparent 0.75turn);
     background-size: 20px 20px;
   }
 
-  .dark .bg-grid-pattern {
-    background-image: radial-gradient(#334155 1px, transparent 1px);
+  /* Technical Canvas: Strict White/Black for drawing surfaces, overriding standard themes */
+  .bg-canvas {
+    @apply bg-white text-black bg-pattern-dots-light;
+  }
+
+  .dark .bg-canvas {
+    @apply bg-[#161616] text-white bg-pattern-dots-dark;
   }
 }

@@ -1,4 +1,5 @@
-import { computed } from 'vue'
+import { computed, shallowRef, watch } from 'vue'
+import { useStorage, debounceFilter, useDebounceFn } from '@vueuse/core'
 // using native crypto
 const uuidv4 = () => crypto.randomUUID()
 import { usePersistentState } from './usePersistentState'
@@ -165,7 +166,10 @@ export function useLayoutBuilder() {
     const removeCol = (row: Row, idx: number) => row.children.splice(idx, 1)
 
     // --- Code Generation ---
-    const scriptOutput = computed(() => {
+    // --- Code Generation ---
+    const scriptOutput = shallowRef('')
+
+    const generateScript = () => {
         let vRootVal = rootParentId.value || 'swi_folder'
         if (!vRootVal.startsWith('t.') && !vRootVal.startsWith('root.') && !vRootVal.startsWith('this.')) {
             vRootVal = 't.' + vRootVal
@@ -182,12 +186,12 @@ export function useLayoutBuilder() {
 
             ts.children.forEach((tab) => {
                 sb.addNewLine()
-                sb.indent()
+                // Removed indent
                 sb.addComment(`Tab: ${tab.name}`)
                 sb.assignAdd(tab.varName, ts.varName, 'Tab', { name: tab.name })
 
                 tab.children.forEach((row) => {
-                    sb.indent()
+                    // Removed indent
                     sb.assignAdd(row.varName, tab.varName, 'Container', {
                         name: row.name,
                         columnsLargeScreen: 6,
@@ -203,28 +207,42 @@ export function useLayoutBuilder() {
                         if (mobileStrategy.value === 'grid') wSmall = (wLarge <= 3) ? 3 : 6
                         else if (mobileStrategy.value === 'mirror') wSmall = wLarge
 
-                        sb.indent()
+                        // Removed indent
                         sb.assignAdd(col.varName, row.varName, 'Container', {
                             name: col.name,
                             columnsLargeScreen: wLarge,
                             columnsMediumScreen: wMedium,
                             columnsSmallScreen: wSmall
                         })
-                        sb.outdent()
+                        // Removed outdent
                     })
-                    sb.outdent()
+                    // Removed outdent
                 })
-                sb.outdent()
+                // Removed outdent
             })
             sb.addNewLine()
         })
 
-        return sb.toString()
+        scriptOutput.value = sb.toString()
+    }
+
+    // Debounce to improve performance during drag operations
+    const debouncedGenerate = useDebounceFn(generateScript, 500)
+
+    watch(data, () => {
+        debouncedGenerate()
+    }, { deep: true })
+
+    // Also watch settings that affect output
+    watch([rootParentId, mobileStrategy], () => {
+        debouncedGenerate()
     })
 
     // Initialize logic
     const init = () => {
         if (data.value.length === 0) addTabSet()
+        // Generate immediately (but defer slightly to allow UI mount)
+        setTimeout(generateScript, 100)
     }
 
     return {

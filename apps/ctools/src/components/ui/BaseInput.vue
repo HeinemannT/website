@@ -22,11 +22,12 @@ const emit = defineEmits(['update:modelValue'])
 
 const inputClasses = computed(() => {
   return [
-    'w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm transition-all text-slate-900 dark:text-slate-100 placeholder-slate-400',
-    'focus:outline-none focus:ring-2 focus:ring-cora-500/20 focus:border-cora-500',
-    'disabled:opacity-50 disabled:pointer-events-none',
+    'w-full bg-layer-02 border-b border-border-strong px-4 py-2.5 text-sm transition-all text-text-primary placeholder-text-secondary',
+    'focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent', // High contrast focus ring
+    'disabled:opacity-50 disabled:pointer-events-none disabled:bg-layer-02 cursor-text',
+    'rounded-t-sm rounded-b-none', // Slight rounding top, flat bottom (Carbon Style)
     props.mono ? 'font-mono text-xs' : 'font-sans',
-    props.icon ? 'pl-9' : ''
+    props.icon ? 'pl-10' : ''
   ].join(' ')
 })
 </script>

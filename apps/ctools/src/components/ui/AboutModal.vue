@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { X, Mail } from 'lucide-vue-next'
+import { X } from 'lucide-vue-next'
 
 defineProps<{
     isOpen: boolean
@@ -11,57 +11,52 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <div v-if="isOpen" class="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
+    <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none p-4">
         
-        <!-- Backdrop (Click to close) -->
-        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm pointer-events-auto transition-opacity duration-300" @click="emit('close')"></div>
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-background/80 backdrop-blur-sm pointer-events-auto transition-opacity duration-300" @click="emit('close')"></div>
 
-        <!-- Modal Content (Lower Third) -->
-        <div class="w-full max-w-4xl max-h-[40vh] bg-white dark:bg-slate-900 border-t border-x border-slate-200 dark:border-slate-700 rounded-t-2xl shadow-2xl transform transition-transform duration-300 pointer-events-auto flex flex-col overflow-hidden">
+        <!-- Modal Content (Datasheet Style) -->
+        <div class="w-full max-w-md bg-layer-01 border border-border-strong rounded-none shadow-2xl pointer-events-auto transform transition-all duration-300 relative">
             
+            <!-- Decorative Grid Lines -->
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-interactive-01 to-purple-600"></div>
+            <div class="absolute bottom-4 right-4 text-[100px] leading-none font-bold text-text-primary opacity-[0.03] select-none pointer-events-none">CT</div>
+
             <!-- Header -->
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 backdrop-blur">
-                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-gradient-to-br from-purple-600 to-indigo-600 rounded text-[10px] text-white flex items-center justify-center font-bold">CT</span>
-                    About CTools
-                </h3>
-                <button @click="emit('close')" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500">
-                    <X class="w-5 h-5" />
+            <div class="flex items-start justify-between p-6 pb-2">
+                <div>
+                    <h2 class="text-2xl font-sans font-bold text-text-primary tracking-tight">Information</h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="px-1.5 py-0.5 bg-interactive-01/10 text-interactive-01 text-[10px] font-bold font-mono uppercase tracking-widest border border-interactive-01/20">v1.02</span>
+                    </div>
+                </div>
+
+                <button @click="emit('close')" class="group p-2 -mr-2 -mt-2 hover:bg-layer-02 transition-colors">
+                    <X class="w-6 h-6 text-text-secondary group-hover:text-interactive-01" />
                 </button>
             </div>
 
-            <!-- Content -->
-            <div class="flex-1 overflow-y-auto p-6 prose dark:prose-invert prose-sm max-w-none">
-                <p class="text-sm text-slate-600 dark:text-slate-300 mb-4">
-                    CTools is a specialized suite of utilities designed to streamline the workflow for Corporater implementation consultants and developers.
-                </p>
+            <!-- Data Content -->
+            <div class="p-6 pt-2 space-y-6">
                 
-                <div class="mt-4 space-y-4">
-                    <div>
-                        <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2">Changelog</h4>
-                        <div class="space-y-4">
-                            <div class="border-l-2 border-indigo-500 pl-3">
-                                <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">v2.0.0 (Suite Edition)</span>
-                                <p class="text-xs text-slate-500 mt-1">Consolidated individual tools into a single unified application suite.</p>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Description -->
+                <div class="font-sans text-sm leading-relaxed text-text-secondary">
+                    <p>CTools is a specialized suite of utilities designed to streamline the workflow for Corporater implementation consultants and developers.</p>
+                </div>
 
-                    <div>
-                         <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2">Contact</h4>
-                         <a href="mailto:tassiloDheinemann@gmail.com" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline">
-                             <Mail class="w-4 h-4" /> tassiloDheinemann@gmail.com
-                         </a>
+                <!-- Footer Info -->
+                <div class="space-y-3 pt-4 border-t border-border-subtle">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-text-secondary">Contact</span>
+                        <a href="mailto:tassiloDheinemann@gmail.com" class="text-interactive-01 hover:underline">tassiloDheinemann@gmail.com</a>
                     </div>
-
-                    <div class="pt-6 border-t border-slate-200 dark:border-slate-800">
-                        <p class="text-[10px] text-slate-400 leading-relaxed italic">
-                            Disclaimer: This tool is an independent utility and is not affiliated with, endorsed by, or connected to Corporater AS.
-                        </p>
-                    </div>
+                    
+                    <p class="text-[10px] text-text-disabled uppercase tracking-wider text-center pt-4 opacity-70">
+                        Independent Utility • Not Affiliated with Corporater AS
+                    </p>
                 </div>
             </div>
-
         </div>
     </div>
 </template>

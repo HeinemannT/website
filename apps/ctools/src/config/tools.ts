@@ -1,12 +1,12 @@
 import {
-    Palette,
-    LayoutTemplate,
-    Activity,
-    Table,
-    Image as ImageIcon,
-    Wand2,
-    PenTool
-} from 'lucide-vue-next'
+    IconLayout,
+    IconTable,
+    IconColor,
+    IconImage,
+    IconSvg,
+    IconProcess,
+    IconCDraw
+} from '../components/icons'
 
 export interface ToolConfig {
     id: string
@@ -14,9 +14,67 @@ export interface ToolConfig {
     description?: string
     path: string
     icon: any
-    color: string         // Text color class (e.g. 'text-indigo-600')
-    bgColor?: string      // Background color class for dashboard (optional if not used in sidebar)
-    sidebarColor?: string // Color for sidebar active state (usually same as color but maybe different lightness)
+    color: string           // Icon color class
+    borderClass: string     // Hover border color class
+    activeClass: string     // Active state class for sidebar
+    headerTheme?: string    // Colored header theme
+    themeColors?: {         // Override for CSS variables (interactive-01)
+        primary: string
+        hover: string
+    }
+}
+
+// Pre-defined themes to ensure Tailwind scans the full class strings
+const THEMES = {
+    blue: {
+        color: 'text-blue-600 dark:text-blue-400',
+        borderClass: 'hover:border-blue-600 dark:hover:border-blue-400',
+        activeClass: 'border-blue-600 text-blue-600 dark:text-blue-400 bg-layer-02',
+        headerTheme: 'bg-blue-600 dark:bg-blue-600 text-white border-blue-700',
+        themeColors: { primary: '#2563EB', hover: '#1D4ED8' }
+    },
+    teal: {
+        color: 'text-teal-600 dark:text-teal-400',
+        borderClass: 'hover:border-teal-600 dark:hover:border-teal-400',
+        activeClass: 'border-teal-600 text-teal-600 dark:text-teal-400 bg-layer-02',
+        headerTheme: 'bg-teal-600 dark:bg-teal-600 text-white border-teal-700',
+        themeColors: { primary: '#0D9488', hover: '#0F766E' }
+    },
+    indigo: {
+        color: 'text-indigo-600 dark:text-indigo-400',
+        borderClass: 'hover:border-indigo-600 dark:hover:border-indigo-400',
+        activeClass: 'border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-layer-02',
+        headerTheme: 'bg-indigo-600 dark:bg-indigo-600 text-white border-indigo-700',
+        themeColors: { primary: '#4F46E5', hover: '#4338CA' }
+    },
+    pink: {
+        color: 'text-pink-600 dark:text-pink-400',
+        borderClass: 'hover:border-pink-600 dark:hover:border-pink-400',
+        activeClass: 'border-pink-600 text-pink-600 dark:text-pink-400 bg-layer-02',
+        headerTheme: 'bg-pink-600 dark:bg-pink-600 text-white border-pink-700',
+        themeColors: { primary: '#DB2777', hover: '#BE185D' }
+    },
+    orange: {
+        color: 'text-orange-600 dark:text-orange-400',
+        borderClass: 'hover:border-orange-600 dark:hover:border-orange-400',
+        activeClass: 'border-orange-600 text-orange-600 dark:text-orange-400 bg-layer-02',
+        headerTheme: 'bg-orange-600 dark:bg-orange-600 text-white border-orange-700',
+        themeColors: { primary: '#EA580C', hover: '#C2410C' }
+    },
+    cyan: {
+        color: 'text-cyan-600 dark:text-cyan-400',
+        borderClass: 'hover:border-cyan-600 dark:hover:border-cyan-400',
+        activeClass: 'border-cyan-600 text-cyan-600 dark:text-cyan-400 bg-layer-02',
+        headerTheme: 'bg-cyan-600 dark:bg-cyan-600 text-white border-cyan-700',
+        themeColors: { primary: '#0891B2', hover: '#0E7490' }
+    },
+    red: {
+        color: 'text-red-600 dark:text-red-400',
+        borderClass: 'hover:border-red-600 dark:hover:border-red-400',
+        activeClass: 'border-red-600 text-red-600 dark:text-red-400 bg-layer-02',
+        headerTheme: 'bg-red-600 dark:bg-red-600 text-white border-red-700',
+        themeColors: { primary: '#DC2626', hover: '#B91C1C' }
+    }
 }
 
 export const TOOLS: ToolConfig[] = [
@@ -26,70 +84,56 @@ export const TOOLS: ToolConfig[] = [
         name: 'Layout Builder',
         description: 'Design layouts with visual editor.',
         path: '/layout',
-        icon: LayoutTemplate,
-        bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
-        color: 'text-indigo-600 dark:text-indigo-400',
-        sidebarColor: 'text-indigo-500'
+        icon: IconLayout,
+        ...THEMES.blue
     },
     {
         id: 'table',
         name: 'Table Builder',
         description: 'Configure Extended Table properties.',
         path: '/table',
-        icon: Table,
-        bgColor: 'bg-emerald-50 dark:bg-emerald-900/20',
-        color: 'text-emerald-600 dark:text-emerald-400',
-        sidebarColor: 'text-emerald-500'
+        icon: IconTable,
+        ...THEMES.teal
     },
     {
         id: 'colorset',
         name: 'Colorset Builder',
         description: 'Create, manage, and export palettes.',
         path: '/colorset',
-        icon: Palette,
-        bgColor: 'bg-rose-50 dark:bg-rose-900/20',
-        color: 'text-rose-600 dark:text-rose-400',
-        sidebarColor: 'text-rose-500'
+        icon: IconColor,
+        ...THEMES.indigo // Changed from Purple to Indigo to avoid conflict with suite theme
     },
     {
         id: 'image',
         name: 'Image Upload',
         description: 'Convert images to Base64 scripts.',
         path: '/image',
-        icon: ImageIcon,
-        bgColor: 'bg-violet-50 dark:bg-violet-900/20',
-        color: 'text-violet-600 dark:text-violet-400',
-        sidebarColor: 'text-violet-500'
+        icon: IconImage,
+        ...THEMES.pink
     },
     {
         id: 'tuner',
         name: 'SVG Tuner',
         description: 'Clean and optimize SVG files.',
         path: '/tuner',
-        icon: Wand2,
-        bgColor: 'bg-amber-50 dark:bg-amber-900/20',
-        color: 'text-amber-600 dark:text-amber-400',
-        sidebarColor: 'text-amber-500'
+        icon: IconSvg,
+        ...THEMES.indigo
     },
     {
         id: 'process',
         name: 'Process Tool',
         description: 'BPMN modeling with specific extensions.',
         path: '/process',
-        icon: Activity,
-        bgColor: 'bg-blue-50 dark:bg-blue-900/20',
-        color: 'text-blue-600 dark:text-blue-400',
-        sidebarColor: 'text-blue-500'
+        icon: IconProcess,
+        ...THEMES.cyan
     },
     {
         id: 'cdraw',
         name: 'cDraw',
         description: 'Diagramming and GRC modeling tool.',
         path: '/cdraw',
-        icon: PenTool,
-        bgColor: 'bg-cyan-50 dark:bg-cyan-900/20',
-        color: 'text-cyan-600 dark:text-cyan-400',
-        sidebarColor: 'text-cyan-500'
+        icon: IconCDraw,
+        ...THEMES.red
     }
 ]
 

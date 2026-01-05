@@ -18,20 +18,28 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const classes = computed(() => {
-  const base = "inline-flex items-center justify-center rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]"
+  const base = "inline-flex items-center justify-center font-medium transition-all focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]"
   
+  // Carbon sizes: compact(32), default(40), lg(48)
   const sizes = {
-    sm: "px-2.5 py-1.5 text-xs",
-    md: "px-4 py-2 text-sm",
-    lg: "px-6 py-3 text-base",
-    icon: "h-9 w-9 p-0"
+    sm: "px-3 py-1.5 text-xs h-8",
+    md: "px-4 py-2 text-sm h-10",
+    lg: "px-6 py-3 text-base h-12",
+    icon: "h-10 w-10 p-0"
   }
 
   const variants = {
-    solid: "bg-cora-600 hover:bg-cora-500 text-white shadow-sm shadow-cora-500/20 ring-cora-500",
-    outline: "border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 ring-slate-200",
-    ghost: "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
-    danger: "bg-red-500 hover:bg-red-600 text-white shadow-sm shadow-red-500/20 ring-red-500"
+    // Carbon Primary: Interactive-01
+    solid: "bg-interactive-01 hover:bg-interactive-01-hover text-white rounded-none",
+    
+    // Carbon Secondary/Outline
+    outline: "border border-interactive-01 text-interactive-01 bg-transparent hover:bg-layer-02 rounded-none",
+    
+    // Carbon Ghost
+    ghost: "hover:bg-layer-02 text-text-primary hover:text-interactive-01 rounded-none",
+    
+    // Danger
+    danger: "bg-red-600 hover:bg-red-700 text-white rounded-none"
   }
 
   return `${base} ${sizes[props.size]} ${variants[props.variant]}`

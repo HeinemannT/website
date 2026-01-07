@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, provide } from 'vue'
-import { Folder, FileText, Book, Download, AlertCircle, CheckCircle, Upload, Activity } from 'lucide-vue-next'
+import { Folder, FileText, Book, Download, Upload, Activity } from 'lucide-vue-next'
 import MonacoEditor from '@components/ui/MonacoEditor.vue'
 import ToolHeader from '../../../components/layout/ToolHeader.vue'
 import BaseButton from '../../../components/ui/BaseButton.vue'

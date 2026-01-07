@@ -100,7 +100,7 @@ const getSortedItems = (category: keyof Vocabulary) => {
 
                 <!-- List -->
                 <div class="flex-1 overflow-y-auto p-2 space-y-1">
-                    <div v-for="(item, i) in getSortedItems(cat)" :key="`${item}-${i}`" 
+                    <div v-for="item in getSortedItems(cat)" :key="item" 
                          class="flex justify-between items-center text-sm p-2 bg-layer-01 hover:bg-interactive-01/10 border-l-2 border-transparent hover:border-interactive-01 group transition-colors rounded-r-sm">
                         <span class="font-mono text-text-secondary truncate" :title="item">{{ item }}</span>
                         <button @click="removeItem(cat, item)" class="text-text-disabled hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1">

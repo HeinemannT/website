@@ -52,10 +52,6 @@ const saveEdit = () => {
     }
 }
 
-const cancelEdit = () => {
-    emit('stop-rename')
-}
-
 // -- Drag & Drop --
 const dragOverPosition = ref<'before' | 'after' | 'inside' | null>(null)
 
@@ -156,7 +152,7 @@ const onDrop = (e: DragEvent) => {
                     class="h-5 text-xs py-0 px-1 w-full bg-layer-03 text-text-primary border border-interactive-01 focus:outline-none rounded-sm -ml-1"
                     @blur="saveEdit"
                     @keydown.enter="saveEdit"
-                    @keydown.esc="cancelEdit"
+                    @keydown.esc="$emit('stop-rename')"
                 />
             </div>
 

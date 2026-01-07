@@ -146,7 +146,7 @@ const onDrop = (e: DragEvent) => {
             <FileText v-else class="w-3.5 h-3.5 text-text-tertiary" />
 
             <!-- Label / Editor -->
-            <div class="flex-1 truncate min-w-0" v-if="!isEditing">
+            <div class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap" v-if="!isEditing">
                 {{ item.name }}
             </div>
             <div v-else class="flex-1 min-w-0" @click.stop>

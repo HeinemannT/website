@@ -89,7 +89,7 @@ const getSortedItems = (category: keyof Vocabulary) => {
                             v-model="inputs[cat]" 
                             class="flex-1" 
                             size="sm"
-                            :placeholder="cat === 'roles' ? 'e.g. role:auditor' : cat === 'types' ? 'e.g. CeDepartment' : 'e.g. resource.department'"
+                            :placeholder="cat === 'roles' ? 'e.g. role:auditor' : cat === 'types' ? 'e.g. CeIncident' : 'e.g. resource.name'"
                             @keydown.enter="addItem(cat)"
                         />
                         <BaseButton size="sm" variant="solid" class="w-8 px-0" @click="addItem(cat)">

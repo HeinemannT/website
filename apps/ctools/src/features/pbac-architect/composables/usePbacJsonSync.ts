@@ -7,14 +7,21 @@ import type { FileSystemItem } from '../types'
  * 
  * Includes debouncing to prevent parsing errors on every keystroke.
  */
-export function usePbacJsonSync(items: Ref<FileSystemItem[]>) {
-    const jsonCode = ref(JSON.stringify(items.value, null, 2))
+/**
+ * Manages bidirectional synchronization between the FileSystem state (tree)
+ * and the Monaco Editor JSON text.
+ * 
+ * Optimized: Only synchronizes when isActive is true to prevent
+ * excessive JSON.stringify on the main thread during normal editing.
+ */
+export function usePbacJsonSync(items: Ref<FileSystemItem[]>, isActive: Ref<boolean>) {
+    const jsonCode = ref('')
     const jsonError = ref<string | null>(null)
     const isSyncing = ref(false)
 
-    // Sync State -> JSON (One way, effectively)
-    // We only update JSON if the state changed externally (not by the editor itself)
+    // Sync State -> JSON (Lazily or when active)
     watch(items, (newVal) => {
+        if (!isActive.value) return // Skip if tab not active
         if (isSyncing.value) return
 
         const currentStr = JSON.stringify(newVal, null, 2)
@@ -22,6 +29,13 @@ export function usePbacJsonSync(items: Ref<FileSystemItem[]>) {
             jsonCode.value = currentStr
         }
     }, { deep: true })
+
+    // When becoming active, force a refresh
+    watch(isActive, (val) => {
+        if (val) {
+            jsonCode.value = JSON.stringify(items.value, null, 2)
+        }
+    }, { immediate: true })
 
     // Validates and Applies JSON -> State
     const applyJsonToState = (val: string) => {

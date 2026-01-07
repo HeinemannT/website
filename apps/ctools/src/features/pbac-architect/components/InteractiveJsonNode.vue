@@ -18,30 +18,12 @@ const context = inject<{
     vocab: Ref<Vocabulary>
 }>('interactiveJson')!
 
+// Inject Global Vocab Logic
+const { getOptionsForPath } = inject<{ getOptionsForPath: (path: string) => string[] }>('pbacVocab')!
+
 const isEditing = computed(() => context.editPath.value === props.path)
 
 const isPrimitive = (v: any) => typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'
-
-const getOptionsForPath = (path: string): string[] => {
-    if (path.includes('Subject')) return context.vocab.value.roles
-    if (path.includes('Effect')) return ['Allow', 'Deny']
-    if (path.includes('Action')) return ['Read', 'Update', 'Create', 'Delete']
-    if (path.includes('Comparison')) return ['=', '!=', 'Contains', '!~', 'ContainsAny', 'NotContainsAny']
-    
-    if (path.includes('Left') || path.includes('Reference')) return context.vocab.value.properties
-    
-    if (path.includes('Right')) {
-        return [
-            ...context.vocab.value.types,
-            ...context.vocab.value.properties,
-            'true', 'false', '0', '1'
-        ]
-    }
-    
-    if (path.endsWith('type')) return context.vocab.value.types
-    
-    return []
-}
 
 // Check for Atomic Arrays
 const keyName = computed(() => props.path.split('.').pop())
@@ -52,7 +34,15 @@ const isAtomicArray = computed(() => Array.isArray(props.data) && (
 ))
 
 // Editing Logic
-const options = computed(() => getOptionsForPath(props.path))
+const options = computed(() => getOptionsForPath(props.path)) 
+
+const isMultiAllowed = computed(() => {
+    const k = keyName.value
+    // Right (Value) can be multi (array).
+    // Subject/Action are usually arrays, so if they appear as primitive, expanding to multi is consistent.
+    // Effect, Comparison, and others (Left, Reference) are STRICTLY single.
+    return ['Right', 'Subject', 'Action'].includes(k || '')
+})
 
 // Indentation
 const style = computed(() => ({ paddingLeft: `${props.level * 2}ch` }))
@@ -64,7 +54,11 @@ const startEdit = (e: MouseEvent) => {
 
 const onUpdate = (val: any) => {
     context.handleUpdate(props.path, val)
-    // context.setEditPath(null) // Optional: keep open or close? Legacy behavior closed on blur usually.
+    context.setEditPath(null) // FIX: Close on update
+}
+
+const cancelEdit = () => {
+    context.setEditPath(null)
 }
 
 </script>
@@ -147,7 +141,7 @@ const onUpdate = (val: any) => {
                 :model-value="data" 
                 @update:model-value="onUpdate"
                 :options="options"
-                isMulti
+                :is-multi="isMultiAllowed"
                 displayMode="text"
                 class="bg-[#252526] border border-[#404040] rounded-sm min-h-[24px]"
                 inputClassName="text-[#ce9178]"

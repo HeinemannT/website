@@ -74,7 +74,7 @@ provide('interactiveJson', {
 </script>
 
 <template>
-    <div class="font-mono text-[13px] leading-6 text-[#d4d4d4] select-text p-2 bg-[#1e1e1e] flex min-h-0 h-full overflow-auto custom-scrollbar">
+    <div class="font-mono text-[13px] leading-6 text-[#d4d4d4] select-text p-2 bg-[#1e1e1e] flex min-h-0 h-full overflow-auto custom-scrollbar whitespace-nowrap">
         <!-- Line Numbers (Static for now) -->
         <div class="text-[#858585] text-right pr-4 select-none opacity-50 border-r border-[#404040] mr-4 h-full shrink-0">
              <div v-for="i in 30" :key="i">{{ i }}</div>

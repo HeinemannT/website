@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Trash } from 'lucide-vue-next'
+import { Trash, Plus, MoreVertical } from 'lucide-vue-next'
 import SmartGhostSelect from './SmartGhostSelect.vue'
 import type { ResourceNode, Vocabulary } from '../types'
 
@@ -110,24 +110,37 @@ const rightOptions = computed(() => {
 </script>
 
 <template>
-    <div class="border border-border-subtle rounded-sm p-3 bg-layer-02 relative group">
+    <div class="relative group transition-all" 
+        :class="[
+            node.type === 'Condition' ? 'py-2' : 'border border-border-subtle p-4 bg-layer-01',
+            node.type === 'HasAccessTo' ? 'border-dashed' : ''
+        ]"
+    >
         
-        <!-- Header / Type Switcher -->
-        <div class="flex items-center justify-between mb-2">
-            
-            <!-- Logic Type Dropdown (Standardized) -->
-             <div class="w-[180px] h-8">
-                <SmartGhostSelect 
-                    :model-value="node.type" 
-                    @update:model-value="updateType"
-                    :options="['Condition', 'All', 'Any', 'HasAccessTo']"
-                    class="h-full w-full"
-                    inputClassName="font-bold text-sm tracking-wide"
-                />
+        <!-- Carbon Header -->
+        <div class="flex items-center justify-between mb-4 pb-2 border-b border-border-strong">
+             <div class="relative flex items-center gap-4">
+                <span class="text-[12px] text-text-secondary font-normal uppercase tracking-wider">Logic Type</span>
+                <div class="relative group/switcher cursor-pointer hover:bg-layer-03 px-2 py-1 transition-colors">
+                     <span class="text-sm font-bold text-text-primary flex items-center gap-2">
+                        {{ node.type === 'All' || node.type === 'Any' ? 'Group Match' : node.type === 'HasAccessTo' ? 'Inheritance' : 'Condition' }}
+                        <MoreVertical class="w-4 h-4 text-text-tertiary" />
+                    </span>
+                    <select 
+                        :value="node.type"
+                        @change="updateType(($event.target as HTMLSelectElement).value)"
+                        class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    >
+                        <option value="Condition">Condition (Field Check)</option>
+                        <option value="All">Group (Match ALL)</option>
+                        <option value="Any">Group (Match ANY)</option>
+                        <option value="HasAccessTo">Inheritance (Reference)</option>
+                    </select>
+                </div>
              </div>
-            
-            <button v-if="level !== 0" @click="emit('remove')" class="text-text-tertiary hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Trash class="w-3 h-3" />
+             
+             <button v-if="level !== 0" @click="emit('remove')" class="text-text-tertiary hover:text-red-500 transition-colors p-1" title="Remove">
+                <Trash class="w-4 h-4" />
             </button>
         </div>
 
@@ -136,7 +149,18 @@ const rightOptions = computed(() => {
             
             <!-- Group Mode -->
             <template v-if="isGroup && node.children">
-                <div class="space-y-2 pl-4 border-l border-border-subtle">
+                <div class="mb-4 flex items-center gap-2 text-xs text-text-secondary font-medium select-none pl-1">
+                    <span>Match</span>
+                    <button 
+                        @click="updateType(node.type === 'All' ? 'Any' : 'All')"
+                        class="font-bold text-interactive-01 hover:text-text-primary hover:bg-layer-03 px-2 py-0.5 transition-colors uppercase tracking-wider border-b border-interactive-01 border-dashed"
+                    >
+                        {{ node.type === 'All' ? 'ALL (AND)' : 'ANY (OR)' }}
+                    </button>
+                    <span>of the following rules:</span>
+                </div>
+
+                <div class="space-y-4 pl-4 border-l border-border-subtle ml-2">
                     <ResourceNodeEditor 
                         v-for="(child, idx) in node.children" 
                         :key="child.id" 
@@ -147,49 +171,67 @@ const rightOptions = computed(() => {
                         @remove="removeChild(idx)"
                     />
                     
-                    <BaseButton size="sm" variant="ghost" class="w-full border border-dashed border-border-strong text-text-tertiary" @click="addChild">
-                        <Plus class="w-3 h-3 mr-1" /> Add Rule
+                    <BaseButton size="sm" variant="ghost" class="w-full border border-dashed border-border-strong text-text-tertiary hover:border-interactive-01 hover:text-interactive-01 rounded-none justify-start pl-4" @click="addChild">
+                        <Plus class="w-3 h-3 mr-2" /> Add Rule
                     </BaseButton>
                 </div>
             </template>
 
-            <!-- Condition Mode -->
+             <!-- Condition Mode -->
             <template v-else-if="node.type === 'Condition' && node.condition">
-                 <!-- Flex Row for alignment -->
-                 <div class="flex items-center gap-2 h-8">
-                     <!-- Property -->
-                     <div class="flex-1 h-full min-w-[120px] px-1 border-b border-transparent hover:border-border-subtle transition-colors">
-                         <SmartGhostSelect 
-                            :model-value="node.condition.Left" 
-                            @update:model-value="updateCondition('Left', $event)"
-                            placeholder="Property"
-                            :options="vocab?.properties || []"
-                            class="w-full h-full"
-                            allowCustom
-                         />
+                 <div class="flex flex-col gap-0 border border-border-subtle bg-layer-01 shadow-sm hover:shadow-md transition-shadow">
+                     
+                     <div class="p-4 grid grid-cols-[1.5fr_1fr] gap-4 items-start border-b border-border-subtle">
+                         <!-- Field (Property) -->
+                         <div class="flex flex-col gap-1">
+                             <label class="text-[12px] text-text-secondary font-normal">Property</label>
+                             <div class="w-full bg-layer-02 border-b border-border-strong h-[40px] flex items-center px-3 hover:bg-layer-03 transition-colors relative group/field">
+                                <SmartGhostSelect 
+                                    :model-value="node.condition.Left" 
+                                    @update:model-value="updateCondition('Left', $event)"
+                                    placeholder="Select Property"
+                                    :options="vocab?.properties || []"
+                                    class="w-full text-sm text-text-primary"
+                                    allowCustom
+                                />
+                                <div class="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-interactive-01 transform scale-x-0 group-focus-within/field:scale-x-100 transition-transform origin-center"></div>
+                             </div>
+                         </div>
+                         
+                         <!-- Operator (Expanded) -->
+                         <div class="flex flex-col gap-1">
+                             <label class="text-[12px] text-text-secondary font-normal">Operator</label>
+                             <div class="w-full bg-layer-02 border-b border-border-strong h-[40px] flex items-center px-3 hover:bg-layer-03 transition-colors relative group/op">
+                                <SmartGhostSelect 
+                                    :model-value="node.condition.Comparison" 
+                                    @update:model-value="updateCondition('Comparison', $event)" 
+                                    :options="comparisons" 
+                                    class="w-full text-sm font-bold text-interactive-01"
+                                    inputClassName="text-left"
+                                />
+                                <div class="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-interactive-01 transform scale-x-0 group-focus-within/op:scale-x-100 transition-transform origin-center"></div>
+                             </div>
+                         </div>
                      </div>
-                     <!-- Comparison -->
-                     <div class="w-[60px] h-full px-1 flex justify-center items-center">
-                         <SmartGhostSelect 
-                            :model-value="node.condition.Comparison" 
-                            @update:model-value="updateCondition('Comparison', $event)" 
-                            :options="comparisons" 
-                            class="w-full h-full text-center"
-                            inputClassName="text-center text-interactive-01 font-bold"
-                        />
-                     </div>
-                     <!-- Value -->
-                     <div class="flex-[1.5] h-full min-w-[150px] px-1 border-b border-transparent hover:border-border-subtle transition-colors">
-                         <SmartGhostSelect 
-                            :model-value="Array.isArray(node.condition.Right) && !isMultiValue(node.condition.Comparison) ? node.condition.Right[0] : node.condition.Right"
-                            @update:model-value="updateCondition('Right', $event)" 
-                            placeholder="Value" 
-                            :options="rightOptions"
-                            class="w-full h-full"
-                            :isMulti="isMultiValue(node.condition.Comparison)"
-                            displayMode="text"
-                            allowCustom
-                         />
+
+                     <!-- Row 2: Value (Full Width) -->
+                     <div class="p-4 bg-layer-01/50">
+                         <div class="flex flex-col gap-1">
+                             <label class="text-[12px] text-text-secondary font-normal">Value (Type)</label>
+                             <div class="w-full bg-layer-02 border-b border-border-strong min-h-[40px] flex items-center px-3 py-1 hover:bg-layer-03 transition-colors relative group/val">
+                                <SmartGhostSelect 
+                                    :model-value="Array.isArray(node.condition.Right) && !isMultiValue(node.condition.Comparison) ? node.condition.Right[0] : node.condition.Right"
+                                    @update:model-value="updateCondition('Right', $event)" 
+                                    placeholder="Enter Value" 
+                                    :options="rightOptions"
+                                    class="w-full text-sm font-mono text-text-primary"
+                                    :isMulti="isMultiValue(node.condition.Comparison)"
+                                    displayMode="chips"
+                                    allowCustom
+                                />
+                                <div class="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-interactive-01 transform scale-x-0 group-focus-within/val:scale-x-100 transition-transform origin-center"></div>
+                             </div>
+                         </div>
                      </div>
                 </div>
             </template>

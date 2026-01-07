@@ -76,8 +76,26 @@
     font-family: 'IBM Plex Sans', sans-serif;
     @apply bg-background text-text-primary;
   }
-}
 
+  /* Global Scrollbar (Carbon Style) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+  }
+}
 
 @layer utilities {
 

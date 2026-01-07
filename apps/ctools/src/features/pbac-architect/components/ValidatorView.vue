@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import type { Policy } from '../types'
 import { usePbacValidator, type IssueSeverity } from '../composables/usePbacValidator'
-import { AlertCircle, AlertTriangle, Info, CheckCircle, ArrowRight } from 'lucide-vue-next'
+import { CheckCircle, ArrowRight } from 'lucide-vue-next'
 
 const props = defineProps<{
     policy: Policy
@@ -30,14 +30,6 @@ const getBadgeColor = (severity: IssueSeverity) => {
         case 'Error': return 'bg-red-100 text-red-700 border-red-200'
         case 'Warning': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
         case 'Info': return 'bg-blue-50 text-blue-700 border-blue-200'
-    }
-}
-
-const getIcon = (severity: IssueSeverity) => {
-    switch(severity) {
-        case 'Error': return AlertCircle
-        case 'Warning': return AlertTriangle
-        case 'Info': return Info
     }
 }
 </script>

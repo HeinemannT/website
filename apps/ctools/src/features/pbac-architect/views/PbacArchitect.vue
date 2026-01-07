@@ -252,7 +252,7 @@ const handleImportPaste = async () => {
         
         // Select the last imported item if possible
         if (result.items.length > 0) {
-            selectedId.value = result.items[result.items.length - 1].id
+            selectedId.value = result.items[result.items.length - 1]!.id
         }
         
         // Reset
@@ -295,8 +295,9 @@ const handleReset = () => {
         }
         
         // Select new default policy
-        if (items.value[0]?.children?.[0]) {
-            selectedId.value = items.value[0].children[0].id
+        const first = items.value[0] as Category
+        if (first?.children?.[0]) {
+            selectedId.value = first.children[0].id
         }
         
         activeTab.value = 'editor'
@@ -479,10 +480,9 @@ const cmAction = (action: 'add-folder' | 'add-policy' | 'rename' | 'delete') => 
                 <ValidatorView 
                     v-else-if="activeTab === 'health' && selectedItem && selectedItem.itemType === 'Policy'"
                     :policy="(selectedItem as Policy)"
-                    @navigate="(stmtId) => {
+                    @navigate="() => {
                          // Switch to editor
                          activeTab = 'editor'
-                         // TODO: Scroll to stmtId
                     }"
                 />
 

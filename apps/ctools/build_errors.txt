@@ -1,0 +1,6 @@
+src/features/pbac-architect/components/InteractiveJsonNode.vue(60,7): error TS6133: 'cancelEdit' is declared but its value is never read.
+src/features/pbac-architect/components/PolicyEditor.vue(4,1): error TS6133: 'BaseInput' is declared but its value is never read.
+src/features/pbac-architect/components/PolicyEditor.vue(85,32): error TS6133: 'idx' is declared but its value is never read.
+src/features/pbac-architect/components/ValidatorView.vue(36,7): error TS6133: 'getIcon' is declared but its value is never read.
+src/features/pbac-architect/composables/usePbacVocabulary.ts(1,15): error TS6133: 'computed' is declared but its value is never read.
+src/features/pbac-architect/views/PbacArchitect.vue(255,32): error TS2532: Object is possibly 'undefined'.

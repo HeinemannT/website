@@ -57,10 +57,6 @@ const onUpdate = (val: any) => {
     context.setEditPath(null) // FIX: Close on update
 }
 
-const cancelEdit = () => {
-    context.setEditPath(null)
-}
-
 </script>
 
 <template>

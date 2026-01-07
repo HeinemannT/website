@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import type { Vocabulary } from '../types'
 
 // Shared state for vocabulary (could be global or provided)

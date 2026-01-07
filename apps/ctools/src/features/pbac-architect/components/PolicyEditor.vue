@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { Trash } from 'lucide-vue-next'
-import BaseInput from '@components/ui/BaseInput.vue'
 import SmartGhostSelect from './SmartGhostSelect.vue'
 import ResourceNodeEditor from './ResourceNodeEditor.vue'
 import type { Policy, Vocabulary } from '../types'
@@ -82,7 +81,7 @@ const actions = ['Read', 'Update', 'Create', 'Delete']
 
             <div class="p-6 max-w-5xl mx-auto space-y-8">
 
-            <div v-for="(stmt, idx) in localPolicy.Statements" :key="stmt.id" class="bg-layer-01 border border-border-subtle shadow-sm flex flex-col relative group rounded-sm overflow-hidden mb-6">
+            <div v-for="stmt in localPolicy.Statements" :key="stmt.id" class="bg-layer-01 border border-border-subtle shadow-sm flex flex-col relative group rounded-sm overflow-hidden mb-6">
                 
                 <!-- Statement Header: Effect Switch & Meta -->
                 <div class="flex h-10 border-b border-border-subtle">

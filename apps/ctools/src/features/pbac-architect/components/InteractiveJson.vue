@@ -33,7 +33,7 @@ const handleUpdate = (path: string, newValue: any) => {
     
     // Navigate to parent
     for (let i = 0; i < keys.length - 1; i++) {
-        const key = keys[i]
+        const key = keys[i] as string
         if (current[key] === undefined) return
         current = current[key]
     }
@@ -58,8 +58,8 @@ const handleUpdate = (path: string, newValue: any) => {
     }
 
     // Assign
-    const lastKey = keys[keys.length - 1]
-    if (current) {
+    const lastKey = keys[keys.length - 1] as string
+    if (current && lastKey) {
         current[lastKey] = finalValue
         emit('update:modelValue', newData)
     }

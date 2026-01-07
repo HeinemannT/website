@@ -4,7 +4,6 @@ import { Trash } from 'lucide-vue-next'
 import BaseInput from '@components/ui/BaseInput.vue'
 import SmartGhostSelect from './SmartGhostSelect.vue'
 import ResourceNodeEditor from './ResourceNodeEditor.vue'
-import { createDefaultStatement } from '../composables/usePbacUtils'
 import type { Policy, Vocabulary } from '../types'
 
 const props = defineProps<{
@@ -37,10 +36,10 @@ const emitChange = () => {
     emit('change', localPolicy.value)
 }
 
-const addStatement = () => {
-    localPolicy.value.Statements.push(createDefaultStatement())
-    emitChange()
-}
+// const addStatement = () => {
+//    localPolicy.value.Statements.push(createDefaultStatement())
+//    emitChange()
+// }
 
 const removeStatement = (id: string) => {
     localPolicy.value.Statements = localPolicy.value.Statements.filter(s => s.id !== id)

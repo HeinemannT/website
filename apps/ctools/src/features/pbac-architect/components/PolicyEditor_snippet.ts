@@ -1,1 +1,1 @@
-const actions = ['Read', 'Update', 'Create', 'Delete']
+export const actions = ['Read', 'Update', 'Create', 'Delete']

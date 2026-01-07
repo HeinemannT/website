@@ -25,11 +25,11 @@ export function usePbacFileSystem(initialItems: FileSystemItem[]) {
 
     const updateItem = (updated: FileSystemItem, list: FileSystemItem[] = items.value): boolean => {
         for (let i = 0; i < list.length; i++) {
-            if (list[i].id === updated.id) {
+            if (list[i]!.id === updated.id) {
                 list[i] = updated
                 return true
             }
-            if (list[i].itemType === 'Category') {
+            if (list[i]!.itemType === 'Category') {
                 if (updateItem(updated, (list[i] as Category).children)) return true
             }
         }
@@ -38,11 +38,11 @@ export function usePbacFileSystem(initialItems: FileSystemItem[]) {
 
     const deleteItem = (id: string, list: FileSystemItem[] = items.value): boolean => {
         for (let i = 0; i < list.length; i++) {
-            if (list[i].id === id) {
+            if (list[i]!.id === id) {
                 list.splice(i, 1)
                 return true
             }
-            if (list[i].itemType === 'Category') {
+            if (list[i]!.itemType === 'Category') {
                 if (deleteItem(id, (list[i] as Category).children)) return true
             }
         }
@@ -84,10 +84,10 @@ export function usePbacFileSystem(initialItems: FileSystemItem[]) {
     // Recursive helper to remove an item
     const removeItem = (id: string, list: FileSystemItem[]): FileSystemItem | null => {
         for (let i = 0; i < list.length; i++) {
-            if (list[i].id === id) {
-                return list.splice(i, 1)[0]
+            if (list[i]!.id === id) {
+                return list.splice(i, 1)[0] || null
             }
-            if (list[i].itemType === 'Category') {
+            if (list[i]!.itemType === 'Category') {
                 const res = removeItem(id, (list[i] as Category).children)
                 if (res) return res
             }
@@ -101,7 +101,7 @@ export function usePbacFileSystem(initialItems: FileSystemItem[]) {
         // Instead, we search for target
 
         for (let i = 0; i < list.length; i++) {
-            const current = list[i]
+            const current = list[i]!
 
             // Match Target
             if (current.id === targetId) {

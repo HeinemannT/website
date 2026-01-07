@@ -68,11 +68,6 @@ const removeChild = (idx: number) => {
 // Helpers for Rights
 const isMultiValue = (op: string) => ['Contains', '!~', 'ContainsAny', 'NotContainsAny'].includes(op)
 
-const getRights = () => {
-    if (!props.node.condition) return ''
-    return props.node.condition.Right
-}
-
 const updateCondition = (field: 'Left' | 'Right' | 'Comparison', val: any) => {
     if (!props.node.condition) return
     

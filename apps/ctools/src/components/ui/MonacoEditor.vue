@@ -1,3 +1,4 @@
+<script setup lang="ts">
 import { shallowRef } from 'vue'
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
 

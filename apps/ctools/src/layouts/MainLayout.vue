@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { ref } from 'vue'
-import { IconInformation, IconDarkmode, IconLightmode } from '../components/icons'
-import { useThemeStore } from '../stores/theme'
-import AboutModal from '../components/ui/AboutModal.vue'
-import { TOOLS } from '../config/tools'
+import { IconInformation, IconDarkmode, IconLightmode } from '@components/icons'
+import { useThemeStore } from '@stores/theme'
+import AboutModal from '@components/ui/AboutModal.vue'
+import { TOOLS } from '@config/tools'
 
 const route = useRoute()
 const themeStore = useThemeStore()

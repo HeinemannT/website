@@ -67,6 +67,19 @@ export class ScriptBuilder {
     }
 
     /**
+     * Sets the main target variable (standard pattern).
+     * Handles specific 't.' prefix logic.
+     */
+    assignTarget(varName: string, rawValue: string): ScriptBuilder {
+        let val = rawValue || 't'
+        if (val !== 't' && !val.startsWith('t.') && !val.includes('.')) {
+            val = 't.' + val
+        }
+        this.assign(varName, val)
+        return this
+    }
+
+    /**
      * Helper for .create() calls (Server-side object creation).
      * e.g. target.add(Type, loop:='...', ...)
      */
@@ -105,9 +118,7 @@ export class ScriptBuilder {
         type: string,
         props: Record<string, any>
     ): ScriptBuilder {
-        const propStr = this.formatProps(props)
-        this.add(`${targetVar} := ${parentVar}.add(${type}${propStr})`)
-        return this
+        return this.createObjectVar(targetVar, parentVar, type, props)
     }
 
     /**
@@ -154,10 +165,29 @@ export class ScriptBuilder {
         if (entries.length === 0) return ''
 
         return entries.map(([k, v]) => {
-            if (v instanceof RawValue) return `${k}:=${v.value}`
-            if (typeof v === 'string') return `${k}:='${v}'`
-            return `${k}:=${v}`
+            return `${k}:=${this.formatValue(v)}`
         }).join(', ')
+    }
+
+    private formatValue(v: any): string {
+        if (v instanceof RawValue) return v.value
+
+        if (typeof v === 'string') {
+            // Escape single quotes if any
+            return `'${v.replace(/'/g, "\\'")}'`
+        }
+
+        if (typeof v === 'boolean') {
+            return v ? 'true' : 'false'
+        }
+
+        if (Array.isArray(v)) {
+            // Recursive format for lists: LIST(item1, item2)
+            const items = v.map(item => this.formatValue(item)).join(', ')
+            return `LIST(${items})`
+        }
+
+        return `${v}`
     }
 
     toString(): string {

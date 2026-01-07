@@ -1,3 +1,4 @@
+```vue
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 
@@ -6,30 +7,36 @@ const props = withDefaults(defineProps<{
     speed?: number
     direction?: 'diagonal' | 'up' | 'right' | 'down' | 'left'
     borderColor?: string
-    borderColorDark?: string // Deprecated if using CSS variables in borderColor
     hoverFillColor?: string
+    gridMask?: string // Optional mask for the grid layer only
 }>(), {
-    squareSize: 22,
-    speed: 0.5,
+    squareSize: 80,
+    speed: 0.05,
     direction: 'diagonal',
-    borderColor: '#e2e8f0', 
+    borderColor: 'var(--border-subtle)', 
     hoverFillColor: 'var(--interactive-01)',
-    borderColorDark: '' 
+    gridMask: 'linear-gradient(to bottom, black 40%, transparent 100%)'
 })
 
-const canvasRef = ref<HTMLCanvasElement | null>(null)
+const gridCanvasRef = ref<HTMLCanvasElement | null>(null)
+const highlightCanvasRef = ref<HTMLCanvasElement | null>(null)
 const containerRef = ref<HTMLElement | null>(null)
-let ctx: CanvasRenderingContext2D | null = null
+
+let gridCtx: CanvasRenderingContext2D | null = null
+let highlightCtx: CanvasRenderingContext2D | null = null
+
 let animationId = 0
 let gridOffset = { x: 0, y: 0 }
 let mousePos = { x: -9999, y: -9999 }
 const isDark = ref(false)
 
-// Helper to resolve CSS variable
+// Cache resolved colors to avoid getComputedStyle in loop
+const effectiveBorderColor = ref('#000000')
+const effectiveHoverColor = ref('#000000')
+
 const resolveColor = (color: string) => {
     if (!color) return '#000000'
     if (color.startsWith('var(--')) {
-        // Remove var( and )
         const varName = color.substring(4, color.length - 1)
         const computed = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
         return computed || color
@@ -37,78 +44,90 @@ const resolveColor = (color: string) => {
     return color
 }
 
-// Animation state
-const resizeCanvas = () => {
-    if (!canvasRef.value || !containerRef.value) return
-    const { offsetWidth, offsetHeight } = containerRef.value
-    canvasRef.value.width = offsetWidth
-    canvasRef.value.height = offsetHeight
-    draw()
+const updateColors = () => {
+    effectiveBorderColor.value = resolveColor(props.borderColor)
+    effectiveHoverColor.value = resolveColor(props.hoverFillColor)
 }
 
-const draw = () => {
-    if (!ctx || !canvasRef.value) return
-
-    const width = canvasRef.value.width
-    const height = canvasRef.value.height
+const resizeCanvases = () => {
+    if (!containerRef.value || !gridCanvasRef.value || !highlightCanvasRef.value) return
+    const { offsetWidth, offsetHeight } = containerRef.value
     
-    // Clear
-    ctx.clearRect(0, 0, width, height)
+    gridCanvasRef.value.width = offsetWidth
+    gridCanvasRef.value.height = offsetHeight
     
-    // Calculate Grid
-    const startX = Math.floor(gridOffset.x / props.squareSize) - 1
-    const startY = Math.floor(gridOffset.y / props.squareSize) - 1
-    const cols = Math.ceil(width / props.squareSize) + 2
-    const rows = Math.ceil(height / props.squareSize) + 2
-
-    ctx.lineWidth = 1 
+    highlightCanvasRef.value.width = offsetWidth
+    highlightCanvasRef.value.height = offsetHeight
     
-    // Resolve color dynamically (in case theme changed)
-    // If props.borderColor is a variable, it handles dark/light automatically via getComputedStyle
-    ctx.strokeStyle = resolveColor(props.borderColor)
+    // Draw immediately after resize
+    drawGrid()
+}
 
-    for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-            const x = (startX + i) * props.squareSize - gridOffset.x
-            const y = (startY + j) * props.squareSize - gridOffset.y
-            
-            // Draw Border
-            ctx.strokeRect(x, y, props.squareSize, props.squareSize)
-            
-            // Check Hover
-            if (mousePos.x >= x && mousePos.x < x + props.squareSize &&
-                mousePos.y >= y && mousePos.y < y + props.squareSize) {
-                
-                ctx.fillStyle = resolveColor(props.hoverFillColor)
-                ctx.globalAlpha = 1 
-                ctx.fillRect(x, y, props.squareSize, props.squareSize)
-                ctx.globalAlpha = 1
-            }
+const drawGrid = () => {
+    if (!gridCtx || !gridCanvasRef.value) return
+
+    const width = gridCanvasRef.value.width
+    const height = gridCanvasRef.value.height
+    
+    gridCtx.clearRect(0, 0, width, height)
+    
+    const startX = Math.floor(gridOffset.x / props.squareSize) * props.squareSize
+    const startY = Math.floor(gridOffset.y / props.squareSize) * props.squareSize
+
+    gridCtx.lineWidth = 1 
+    gridCtx.strokeStyle = effectiveBorderColor.value
+    
+    for (let x = startX; x < width + props.squareSize; x += props.squareSize) {
+        for (let y = startY; y < height + props.squareSize; y += props.squareSize) {
+            const squareX = x - (gridOffset.x % props.squareSize)
+            const squareY = y - (gridOffset.y % props.squareSize)
+
+            gridCtx.strokeRect(squareX, squareY, props.squareSize, props.squareSize)
         }
     }
 }
 
-const update = () => {
+const updateGridOffset = () => {
+    const effectiveSpeed = Math.max(props.speed, 0.1)
     switch (props.direction) {
-        case 'diagonal':
-            gridOffset.x = (gridOffset.x + props.speed) % props.squareSize
-            gridOffset.y = (gridOffset.y + props.speed) % props.squareSize
-            break
         case 'right':
-            gridOffset.x = (gridOffset.x + props.speed) % props.squareSize
+            gridOffset.x = (gridOffset.x - effectiveSpeed + props.squareSize) % props.squareSize
             break
         case 'left':
-            gridOffset.x = (gridOffset.x - props.speed) % props.squareSize
+            gridOffset.x = (gridOffset.x + effectiveSpeed + props.squareSize) % props.squareSize
             break
         case 'up':
-            gridOffset.y = (gridOffset.y - props.speed) % props.squareSize
+            gridOffset.y = (gridOffset.y + effectiveSpeed + props.squareSize) % props.squareSize
             break
         case 'down':
-            gridOffset.y = (gridOffset.y + props.speed) % props.squareSize
+            gridOffset.y = (gridOffset.y - effectiveSpeed + props.squareSize) % props.squareSize
+            break
+        case 'diagonal':
+            gridOffset.x = (gridOffset.x - effectiveSpeed + props.squareSize) % props.squareSize
+            gridOffset.y = (gridOffset.y - effectiveSpeed + props.squareSize) % props.squareSize
             break
     }
-    draw()
-    animationId = requestAnimationFrame(update)
+}
+
+const drawHighlight = () => {
+    if (!highlightCtx || !highlightCanvasRef.value) return
+    
+    const width = highlightCanvasRef.value.width
+    const height = highlightCanvasRef.value.height
+
+    highlightCtx.clearRect(0, 0, width, height)
+
+    if (mousePos.x === -9999 && mousePos.y === -9999) return
+
+    // Calculate grid snap relative to the moving grid offset
+    const xOffset = gridOffset.x % props.squareSize
+    const yOffset = gridOffset.y % props.squareSize
+    
+    const squareX = (Math.floor((mousePos.x + xOffset) / props.squareSize) * props.squareSize) - xOffset
+    const squareY = (Math.floor((mousePos.y + yOffset) / props.squareSize) * props.squareSize) - yOffset
+
+    highlightCtx.fillStyle = effectiveHoverColor.value
+    highlightCtx.fillRect(squareX, squareY, props.squareSize, props.squareSize)
 }
 
 const handleMouseMove = (e: MouseEvent) => {
@@ -120,58 +139,78 @@ const handleMouseMove = (e: MouseEvent) => {
     }
 }
 
-const handleMouseLeave = () => {
-    mousePos = { x: -9999, y: -9999 }
-}
-
 onMounted(() => {
     isDark.value = document.documentElement.classList.contains('dark')
+    updateColors()
 
     const themeObserver = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             if (mutation.attributeName === 'class') {
                 isDark.value = document.documentElement.classList.contains('dark')
-                // Force redraw to catch new CSS variable values
-                draw()
+                updateColors()
             }
         })
     })
     themeObserver.observe(document.documentElement, { attributes: true })
 
     const resizeObserver = new ResizeObserver(() => {
-        resizeCanvas()
+        resizeCanvases()
     })
 
     if (containerRef.value) {
         resizeObserver.observe(containerRef.value)
     }
+    
+    window.addEventListener('mousemove', handleMouseMove)
 
-    if (canvasRef.value) {
-        ctx = canvasRef.value.getContext('2d')
-        resizeCanvas()
-        animationId = requestAnimationFrame(update)
+    if (gridCanvasRef.value && highlightCanvasRef.value) {
+        gridCtx = gridCanvasRef.value.getContext('2d')
+        highlightCtx = highlightCanvasRef.value.getContext('2d')
+        resizeCanvases()
+        
+        
+        const animate = () => {
+            updateGridOffset()
+            drawGrid()
+            drawHighlight()
+            animationId = requestAnimationFrame(animate)
+        }
+        animate()
     }
 
     onUnmounted(() => {
         themeObserver.disconnect()
         resizeObserver.disconnect()
         cancelAnimationFrame(animationId)
+        window.removeEventListener('mousemove', handleMouseMove)
     })
 })
 
- // Re-draw/init on props change
-watch(() => [props.squareSize, props.speed, props.direction, props.borderColor], () => {
-    // No full reset needed
+watch(() => [props.squareSize, props.borderColor, props.speed, props.direction], () => {
+    updateColors()
+    drawGrid()
+})
+
+watch(() => props.hoverFillColor, () => {
+    updateColors()
+    // highlight drawn in loop
 })
 </script>
 
 <template>
     <div ref="containerRef" 
          class="squares-container w-full h-full absolute inset-0 -z-0 bg-background overflow-hidden"
-         @mousemove="handleMouseMove"
-         @mouseleave="handleMouseLeave"
     >
-        <canvas ref="canvasRef" class="w-full h-full block"></canvas>
+        <!-- Grid Layer (Masked) -->
+        <canvas ref="gridCanvasRef" 
+            class="absolute inset-0 w-full h-full block pointer-events-none"
+            :style="gridMask ? { maskImage: gridMask, WebkitMaskImage: gridMask } : {}"
+        ></canvas>
+        
+        <!-- Highlight Layer (Unmasked) -->
+        <canvas ref="highlightCanvasRef" 
+            class="absolute inset-0 w-full h-full block pointer-events-none"
+        ></canvas>
     </div>
 </template>
 

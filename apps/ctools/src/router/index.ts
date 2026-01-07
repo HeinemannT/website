@@ -1,16 +1,16 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import MainLayout from '../layouts/MainLayout.vue'
+import MainLayout from '@/layouts/MainLayout.vue'
 
-const SvgTuner = () => import('../views/SvgTuner.vue')
+const SvgTuner = () => import('@features/svg-tuner/views/SvgTuner.vue')
 
-const ProcessTool = () => import('../views/ProcessTool.vue')
-const ImageUpload = () => import('../views/ImageUpload.vue')
-const ColorsetBuilder = () => import('../views/ColorsetBuilder.vue')
-const LayoutBuilder = () => import('../views/LayoutBuilder.vue')
-const TableBuilder = () => import('../views/TableBuilder.vue')
-const CdrawTool = () => import('../views/CdrawTool.vue')
+const ProcessTool = () => import('@features/process-tool/views/ProcessTool.vue')
+const ImageUpload = () => import('@features/image-upload/views/ImageUpload.vue')
+const ColorsetBuilder = () => import('@features/colorset/views/ColorsetBuilder.vue')
+const LayoutBuilder = () => import('@features/layout-builder/views/LayoutBuilder.vue')
+const TableBuilder = () => import('@features/table-builder/views/TableBuilder.vue')
+const CdrawTool = () => import('@features/cdraw/views/CdrawTool.vue')
 
-import Dashboard from '../views/Dashboard.vue'
+import Dashboard from '@features/dashboard/views/Dashboard.vue'
 
 // const Placeholder = (name: string) => ({ template: `<div class="p-8"><h2 class="text-xl font-bold mb-4">${name}</h2><p class="text-slate-500">Coming soon...</p></div>` })
 
@@ -29,6 +29,7 @@ const router = createRouter({
                 { path: 'image', component: ImageUpload },
                 { path: 'tuner', component: SvgTuner },
                 { path: 'cdraw', component: CdrawTool },
+                { path: 'pbac', component: () => import('@features/pbac-architect/views/PbacArchitect.vue') },
                 { path: '/:pathMatch(.*)*', redirect: '/' }
             ]
         }

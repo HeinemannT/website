@@ -8,6 +8,8 @@ import IconCDraw from './IconCDraw.vue'
 import IconDarkmode from './IconDarkmode.vue'
 import IconLightmode from './IconLightmode.vue'
 import IconInformation from './IconInformation.vue'
+import IconRowExpand from './IconRowExpand.vue'
+import IconSecurity from './IconSecurity.vue'
 
 export {
     IconLayout,
@@ -17,7 +19,9 @@ export {
     IconSvg,
     IconProcess,
     IconCDraw,
+    IconRowExpand,
     IconDarkmode,
     IconLightmode,
-    IconInformation
+    IconInformation,
+    IconSecurity
 }

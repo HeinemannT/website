@@ -39,6 +39,11 @@ const onInput = (e: Event) => {
                  </span>
              </div>
              
+             <!-- Center Slot -->
+             <div class="flex-1 px-4 flex justify-center">
+                 <slot name="header-center"></slot>
+             </div>
+             
              <div class="flex items-center gap-4">
                 <slot name="actions"></slot>
                 <button @click="copyCode" class="text-interactive-01 hover:text-interactive-01-hover text-xs font-bold flex items-center gap-1 transition-colors">

@@ -1,4 +1,4 @@
-export type ActionType = string;
+export type ActionType = 'Read' | 'Update' | 'Create' | 'Delete' | (string & {});
 export type EffectType = 'Allow' | 'Deny';
 export type ComparisonType = '=' | '!=' | 'Contains' | '!~' | 'ContainsAny' | 'NotContainsAny';
 

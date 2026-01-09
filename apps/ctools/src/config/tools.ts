@@ -6,7 +6,8 @@ import {
     IconSvg,
     IconProcess,
     IconCDraw,
-    IconSecurity
+    IconSecurity,
+    IconWip
 } from '../components/icons'
 import { THEMES, type ThemeConfig } from './themes'
 
@@ -102,6 +103,15 @@ const REGISTRY: ToolDefinition[] = [
         icon: IconSecurity,
         category: 'System Builders',
         theme: 'emerald'
+    },
+    {
+        id: 'template',
+        name: 'WIP Template Builder',
+        description: 'Experimental layout builder.',
+        path: '/template',
+        icon: IconWip,
+        category: 'System Builders',
+        theme: 'slate'
     }
 ]
 
@@ -112,4 +122,4 @@ export const TOOLS: ToolConfig[] = REGISTRY.map(tool => ({
 }))
 
 // Helper to exclude dashboard from the tools list (for dashboard grid)
-export const DASHBOARD_TOOLS = TOOLS.filter(t => t.id !== 'dashboard')
+export const DASHBOARD_TOOLS = TOOLS.filter(t => t.id !== 'dashboard' && t.id !== 'template')

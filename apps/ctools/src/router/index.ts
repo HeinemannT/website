@@ -7,6 +7,7 @@ const ProcessTool = () => import('@features/process-tool/views/ProcessTool.vue')
 const ImageUpload = () => import('@features/image-upload/views/ImageUpload.vue')
 const ColorsetBuilder = () => import('@features/colorset/views/ColorsetBuilder.vue')
 const LayoutBuilder = () => import('@features/layout-builder/views/LayoutBuilder.vue')
+const TemplateBuilder = () => import('@features/template-builder/views/TemplateBuilder.vue')
 const TableBuilder = () => import('@features/table-builder/views/TableBuilder.vue')
 const CdrawTool = () => import('@features/cdraw/views/CdrawTool.vue')
 
@@ -24,6 +25,7 @@ const router = createRouter({
                 { path: '', component: Dashboard },
                 { path: 'colorset', component: ColorsetBuilder },
                 { path: 'layout', component: LayoutBuilder },
+                { path: 'template', component: TemplateBuilder },
                 { path: 'process', component: ProcessTool },
                 { path: 'table', component: TableBuilder },
                 { path: 'image', component: ImageUpload },

@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper-light: #fdfbf7;
+  --ink-light: #2D2D2D;
+  --paper-dark: #18181b;
+  --ink-dark: #E4E4E7;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--paper-light);
+  color: var(--ink-light);
+  -webkit-font-smoothing: antialiased;
+  /* Font size managed by App.tsx on the html element for rem scaling */
+}
+
+.dark body {
+  background-color: var(--paper-dark);
+  color: var(--ink-dark);
+}
+
+/* Texture Generation Classes */
+.bg-texture-paper {
+  background-color: #f5f2eb;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+.dark .bg-texture-paper {
+  background-color: #121212;
+  background-image: none;
+}
+
+.bg-texture-silk {
+  background-color: #e3e1da;
+  background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3h1v1H1V3zm2-2h1v1H3V1z' fill='%239c9283' fill-opacity='0.1'/%3E%3C/svg%3E");
+}
+
+.dark .bg-texture-silk {
+  background-color: #18181b;
+  background-image: none;
+}
+
+.font-serif-tc {
+  font-family: 'Noto Serif TC', serif;
+}
+
+.font-heading {
+  font-family: 'DM Serif Display', serif;
+}
+
+.font-body {
+  font-family: 'Source Serif 4', serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+}
+
+/* Leaflet Custom Overrides */
+.leaflet-container {
+  background: transparent !important;
+  font-family: 'Inter', sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0;
+}
+
+.leaflet-popup-tip {
+  background: white;
+}
+
+.dark .leaflet-popup-content-wrapper {
+  background: #27272a;
+  color: #e4e4e7;
+}
+
+.dark .leaflet-popup-tip {
+  background: #27272a;
+}
+
+/* Migration paths: soft halo + rounded caps. Draw-in animation is run inline
+   via stroke-dashoffset (see MigrationMap.tsx) when a polyline is first added. */
+.migration-path {
+  filter: drop-shadow(0 0 2px rgba(166, 52, 52, 0.35));
+}
+
+.dark .migration-path {
+  filter: drop-shadow(0 0 2px rgba(248, 113, 113, 0.35));
+}
+
+/* Pulsing ring on the newest revealed marker on the migration map. */
+@keyframes migration-pulse {
+  0%   { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1), 0 0 0 0   rgba(166, 52, 52, 0.55); }
+  70%  { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1), 0 0 0 16px rgba(166, 52, 52, 0); }
+  100% { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1), 0 0 0 0   rgba(166, 52, 52, 0); }
+}
+
+.migration-marker.is-latest {
+  animation: migration-pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Hover tooltip on migration markers — small pill, restrained styling. */
+.migration-tooltip {
+  background: rgba(255, 255, 255, 0.96);
+  color: #2D2D2D;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+}
+
+.migration-tooltip::before {
+  border-top-color: rgba(255, 255, 255, 0.96) !important;
+}
+
+.dark .migration-tooltip {
+  background: rgba(39, 39, 42, 0.96);
+  color: #e4e4e7;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .migration-tooltip::before {
+  border-top-color: rgba(39, 39, 42, 0.96) !important;
+}
+
+/* Markdown Styles */
+.prose h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.prose h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.prose code {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.dark .prose code {
+  background: rgba(255, 255, 255, 0.1);
+}

@@ -69,8 +69,8 @@ const Header: React.FC<HeaderProps> = ({
              leading-none
            ">
             <div className="w-[26px] h-[26px] border border-stone-50/30 rounded-[1px] absolute pointer-events-none"></div>
-            <span className="font-serif-tc font-bold text-[9px] transform translate-y-[1px]">小</span>
-            <span className="font-serif-tc font-bold text-sm transform -translate-y-[1px]">勞</span>
+            <span lang="zh-Hant" className="font-serif-tc font-bold text-[9px] transform translate-y-[1px]">小</span>
+            <span lang="zh-Hant" className="font-serif-tc font-bold text-sm transform -translate-y-[1px]">勞</span>
           </div>
           <div>
             <h1 className="text-base font-serif-tc font-bold text-stone-800 dark:text-zinc-100 leading-none tracking-tight">
@@ -83,6 +83,7 @@ const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-1">
           <button
             onClick={() => toggleDarkMode(!isDarkMode)}
+            aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             className="w-10 h-10 flex items-center justify-center rounded-full text-stone-500 active:bg-stone-100 dark:text-zinc-400 dark:active:bg-zinc-800 transition-all active:scale-90 duration-150"
           >
             <div className={`transition-transform duration-500 ${isDarkMode ? 'rotate-180' : 'rotate-0'}`}>
@@ -94,6 +95,8 @@ const Header: React.FC<HeaderProps> = ({
           <div className="relative" ref={mobileFontMenuRef}>
             <button
               onClick={() => setIsFontMenuOpen(!isFontMenuOpen)}
+              aria-label="Text size"
+              aria-expanded={isFontMenuOpen}
               className={`w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-95 duration-150 ${isFontMenuOpen ? 'bg-stone-100 dark:bg-zinc-800 text-cinnabar dark:text-red-400' : 'text-stone-500 active:bg-stone-100 dark:text-zinc-400 dark:active:bg-zinc-800'}`}
             >
               <Type size={20} />
@@ -136,6 +139,7 @@ const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onMenuToggle}
+            aria-label="Open menu"
             className="w-10 h-10 flex items-center justify-center text-stone-600 dark:text-zinc-300 active:bg-stone-100 dark:active:bg-zinc-800 rounded-full active:scale-95 transition-all duration-150"
           >
             <MenuIcon size={24} />
@@ -166,8 +170,8 @@ const Header: React.FC<HeaderProps> = ({
             leading-none
           ">
             <div className="absolute inset-0.5 border border-stone-50/30 rounded-[1px]"></div>
-            <span className="font-serif-tc font-bold text-[10px] transform translate-y-[1px]">小</span>
-            <span className="font-serif-tc font-bold text-base transform -translate-y-[1px]">勞</span>
+            <span lang="zh-Hant" className="font-serif-tc font-bold text-[10px] transform translate-y-[1px]">小</span>
+            <span lang="zh-Hant" className="font-serif-tc font-bold text-base transform -translate-y-[1px]">勞</span>
           </div>
         </button>
 

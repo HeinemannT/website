@@ -91,19 +91,26 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
                 {/* Node Card */}
                 <div
                     id={`node-${id}`}
+                    role={person.page_ref ? 'button' : undefined}
+                    tabIndex={person.page_ref ? 0 : undefined}
+                    aria-label={person.page_ref ? `${person.name_en} — open page` : undefined}
                     onClick={(e) => {
-                        // Prevent click propagation if we were dragging (simple check: if dragProps.isDragging usually blocks click, 
-                        // but here we just need to ensure click works if not dragging. 
-                        // The hook prevents click on drag, but let's be safe)
                         if (person.page_ref) {
                             e.stopPropagation();
+                            onNavigate(person.page_ref);
+                        }
+                    }}
+                    onKeyDown={(e) => {
+                        if (person.page_ref && (e.key === 'Enter' || e.key === ' ')) {
+                            e.preventDefault();
                             onNavigate(person.page_ref);
                         }
                     }}
                     className={`
                         relative p-5 rounded-sm border transition-all duration-300 group
                         ${person.page_ref ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1 hover:border-cinnabar/50 dark:hover:border-red-500/50' : 'cursor-default'}
-                        bg-white dark:bg-zinc-900 
+                        focus:outline-none focus-visible:ring-2 focus-visible:ring-cinnabar/60
+                        bg-white dark:bg-zinc-900
                         border-stone-200 dark:border-zinc-800
                         shadow-[0_2px_8px_rgba(0,0,0,0.04)]
                         min-w-[160px] max-w-[200px] text-center z-10
@@ -114,7 +121,7 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
                         Gen {person.generation}
                     </div>
 
-                    <div className="text-xl font-serif-tc text-ink dark:text-zinc-100 mt-2 mb-1 group-hover:text-cinnabar dark:group-hover:text-red-400 transition-colors">
+                    <div lang="zh-Hant" className="text-xl font-serif-tc text-ink dark:text-zinc-100 mt-2 mb-1 group-hover:text-cinnabar dark:group-hover:text-red-400 transition-colors">
                         {person.name_zh}
                     </div>
                     <div className="text-xs uppercase tracking-wider font-semibold text-stone-500 dark:text-zinc-500 mb-1">

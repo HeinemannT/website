@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import Header from './components/Header';
 import ViewerControls from './components/ViewerControls';
 import DigitalRecreation from './components/DigitalRecreation';
 import TranslationPanel from './components/TranslationPanel';
-import MigrationMap from './components/MigrationMap';
-import FamilyTree from './components/FamilyTree';
 import ContextGlossary from './components/ContextGlossary';
 import Menu from './components/Menu';
+
+// Lazy-loaded — these pull Leaflet (~150KB) and only render when the user picks Map / Tree.
+const MigrationMap = lazy(() => import('./components/MigrationMap'));
+const FamilyTree = lazy(() => import('./components/FamilyTree'));
 import { GenealogyData, GlossaryTerm, GlossaryData } from './types';
 import { BookOpen, Image as ImageIcon, ScrollText, Map, Loader2, AlertTriangle, RefreshCw, FileX, Network, BookA } from 'lucide-react';
 import jsyaml from 'js-yaml';
@@ -99,9 +101,28 @@ const GenealogyApp: React.FC = () => {
   const [mobileViewMode, setMobileViewMode] = useState<MobileViewMode>('read');
   const [hoveredColumnId, setHoveredColumnId] = useState<number | null>(null);
 
-  // Settings State
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-  const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md');
+  // Settings State — initialized from localStorage, with prefers-color-scheme fallback for dark mode.
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const saved = window.localStorage.getItem('genealogy.darkMode');
+    if (saved !== null) return saved === 'true';
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+  });
+  const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>(() => {
+    if (typeof window === 'undefined') return 'md';
+    const saved = window.localStorage.getItem('genealogy.fontSize');
+    return saved === 'sm' || saved === 'md' || saved === 'lg' ? saved : 'md';
+  });
+
+  // Apply dark class to <html> so both Tailwind dark:* and the .dark body rule in index.html fire.
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode);
+    window.localStorage.setItem('genealogy.darkMode', String(isDarkMode));
+  }, [isDarkMode]);
+
+  useEffect(() => {
+    window.localStorage.setItem('genealogy.fontSize', fontSize);
+  }, [fontSize]);
 
   // Menu/Sidebar State
   type Tab = 'toc' | 'search' | 'docs' | 'source' | 'glossary';
@@ -182,6 +203,40 @@ const GenealogyApp: React.FC = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Hash routing: keep currentPageIndex in sync with location.hash (e.g. #page=5).
+  // Reading: when data first loads, jump to the requested page if the hash is valid.
+  useEffect(() => {
+    if (!data) return;
+    const match = window.location.hash.match(/page=(\d+)/);
+    if (match) {
+      const idx = parseInt(match[1], 10) - 1;
+      if (idx >= 0 && idx < data.pages.length) setCurrentPageIndex(idx);
+    }
+  }, [data]);
+
+  // Reading: react to back/forward navigation.
+  useEffect(() => {
+    const onHashChange = () => {
+      if (!data) return;
+      const match = window.location.hash.match(/page=(\d+)/);
+      if (match) {
+        const idx = parseInt(match[1], 10) - 1;
+        if (idx >= 0 && idx < data.pages.length) setCurrentPageIndex(idx);
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, [data]);
+
+  // Writing: mirror currentPageIndex into the hash so links can deep-link to a specific page.
+  useEffect(() => {
+    if (!data) return;
+    const desired = `#page=${currentPageIndex + 1}`;
+    if (window.location.hash !== desired) {
+      window.history.replaceState(null, '', desired);
+    }
+  }, [currentPageIndex, data]);
 
   // Handle window resize
   useEffect(() => {
@@ -267,7 +322,7 @@ const GenealogyApp: React.FC = () => {
   const currentPage = data.pages[currentPageIndex];
 
   return (
-    <div className={`${isDarkMode ? 'dark' : ''} h-[100dvh] flex flex-col transition-colors duration-500 overflow-hidden`}>
+    <div className="h-[100dvh] flex flex-col transition-colors duration-500 overflow-hidden">
       <div className="flex flex-col h-full bg-paper dark:bg-zinc-950 text-ink dark:text-zinc-200 font-sans pt-16 lg:pt-0 lg:pl-16 transition-all duration-300">
 
         <Header
@@ -339,18 +394,22 @@ const GenealogyApp: React.FC = () => {
                 />
               )}
 
-              {/* VIEW 3: MIGRATION MAP */}
+              {/* VIEW 3: MIGRATION MAP — lazy-loaded (Leaflet only loads when opened) */}
               {((!isMobile && desktopViewMode === 'map') || (isMobile && mobileViewMode === 'map')) && (
-                <MigrationMap
-                  points={data.migration.points}
-                  paths={data.migration.paths}
-                  isDarkMode={isDarkMode}
-                />
+                <Suspense fallback={<div className="text-stone-400 text-sm tracking-widest uppercase">Loading map…</div>}>
+                  <MigrationMap
+                    points={data.migration.points}
+                    paths={data.migration.paths}
+                    isDarkMode={isDarkMode}
+                  />
+                </Suspense>
               )}
 
-              {/* VIEW 4: FAMILY TREE */}
+              {/* VIEW 4: FAMILY TREE — lazy-loaded */}
               {((!isMobile && desktopViewMode === 'tree') || (isMobile && mobileViewMode === 'tree')) && (
-                <FamilyTree onNavigate={handlePageIdNavigate} isDarkMode={isDarkMode} />
+                <Suspense fallback={<div className="text-stone-400 text-sm tracking-widest uppercase">Loading tree…</div>}>
+                  <FamilyTree onNavigate={handlePageIdNavigate} isDarkMode={isDarkMode} />
+                </Suspense>
               )}
 
               {/* VIEW 5: GLOSSARY (Desktop Only - Mobile puts it in 'read' slot equivalent or own slot) */}

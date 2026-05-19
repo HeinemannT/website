@@ -38,7 +38,7 @@ const ContextGlossary: React.FC<ContextGlossaryProps> = ({ terms, glossaryHtml }
                                 <div className="flex justify-between items-baseline mb-2">
                                     <h3 className="text-lg font-bold text-ink dark:text-zinc-100 font-serif-tc">
                                         {item.term}
-                                        <span className="ml-2 text-cinnabar font-normal text-base">{item.zh}</span>
+                                        <span lang="zh-Hant" className="ml-2 text-cinnabar font-normal text-base">{item.zh}</span>
                                     </h3>
                                 </div>
                                 <p className="text-stone-600 dark:text-zinc-400 leading-relaxed font-body">

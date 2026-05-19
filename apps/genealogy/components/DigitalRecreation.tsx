@@ -139,7 +139,7 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                             flex items-center justify-center text-lg shadow-sm bg-[#fdfbf7] dark:bg-zinc-900 transform rotate-12
                             ${m.text.length > 1 ? 'px-3 py-1 rounded-2xl min-w-[36px]' : 'w-9 h-9 rounded-full'}
                         `}>
-                    <span className="leading-none pb-0.5">{m.text}</span>
+                    <span lang="zh-Hant" className="leading-none pb-0.5">{m.text}</span>
                   </div>
                 </div>
               ))}
@@ -153,14 +153,25 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                 return (
                   <div
                     key={col.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={isActive}
+                    aria-label={`Column ${col.id}`}
                     onMouseEnter={() => !isMobile && onColumnHover(col.id)}
                     onMouseLeave={() => !isMobile && onColumnHover(null)}
                     onClick={() => handleColumnClick(col.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleColumnClick(col.id);
+                      }
+                    }}
                     className={`
                         relative group flex-shrink-0
                         px-2 md:px-3
                         transition-all duration-300 pointer-events-auto cursor-pointer z-10
-                        border-l border-stone-300/30 dark:border-zinc-700/50 dashed
+                        border-l border-stone-300/30 dark:border-zinc-700/50
+                        focus:outline-none focus-visible:ring-2 focus-visible:ring-cinnabar/60 rounded-sm
                         ${index === 0 ? 'border-r border-stone-300/30 dark:border-zinc-700/50' : ''}
                         pb-4
                         ${isActive ? 'bg-cinnabar/10 dark:bg-red-900/30' : ''}
@@ -170,6 +181,7 @@ const DigitalRecreation: React.FC<DigitalRecreationProps> = ({
                     }}
                   >
                     <div
+                      lang="zh-Hant"
                       className={`
                     font-serif-tc writing-vertical-rl text-justify tracking-[0.2em] leading-loose whitespace-nowrap
                     ${col.is_interlinear

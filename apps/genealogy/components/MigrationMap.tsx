@@ -230,7 +230,11 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
     });
 
     // --- CAMERA MOVEMENT ---
-    const latestVisible = points.filter(p => p.year <= currentYear).pop();
+    // Sort by year explicitly so the "latest" is correct regardless of array order in data.yaml.
+    const latestVisible = [...points]
+      .filter(p => p.year <= currentYear)
+      .sort((a, b) => a.year - b.year)
+      .pop();
 
     if (latestVisible && mapRef.current) {
       // Only fly if the target has definitely changed

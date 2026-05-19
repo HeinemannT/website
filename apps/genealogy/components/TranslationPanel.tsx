@@ -54,10 +54,19 @@ const TranslationParagraph = React.memo<{
   return (
     <div
       ref={(el) => registerRef(col.id, el)}
+      role="button"
+      tabIndex={0}
+      aria-pressed={isActive}
       onMouseEnter={() => !isMobile && onHover(col.id)}
       onMouseLeave={() => !isMobile && onHover(null)}
       onClick={(e) => onClick(e, col.id)}
-      className="relative cursor-pointer group"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick(e as unknown as React.MouseEvent, col.id);
+        }
+      }}
+      className="relative cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-cinnabar/60 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 rounded-sm"
     >
       <div className={`
           pl-6 border-l-4 transition-colors duration-300
@@ -343,7 +352,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
         >
           <div className="flex justify-between items-baseline mb-1 border-b border-stone-100 dark:border-zinc-700 pb-1">
             <span className="font-bold font-serif-tc text-ink dark:text-zinc-100">{tooltip.term.term}</span>
-            <span className="text-cinnabar text-xs opacity-80">{tooltip.term.zh}</span>
+            <span lang="zh-Hant" className="text-cinnabar text-xs opacity-80">{tooltip.term.zh}</span>
             {/* Visual Only X */}
             <div className="ml-2 -mr-1 p-1 text-stone-400">
               <X size={14} />
@@ -402,7 +411,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
                       if (!hasNote) {
                         return (
                           <div key={i} className="flex items-center gap-2 px-2 py-1 rounded-sm border border-cinnabar/30 bg-transparent text-cinnabar dark:text-red-400 opacity-80 cursor-default">
-                            <span className="font-serif-tc font-bold text-lg leading-none">{m.text}</span>
+                            <span lang="zh-Hant" className="font-serif-tc font-bold text-lg leading-none">{m.text}</span>
                           </div>
                         );
                       }
@@ -418,7 +427,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
                                 : 'bg-transparent text-cinnabar dark:text-red-400 border-cinnabar/30 hover:bg-cinnabar/5'}
                                      `}
                           >
-                            <span className="font-serif-tc font-bold text-lg leading-none">{m.text}</span>
+                            <span lang="zh-Hant" className="font-serif-tc font-bold text-lg leading-none">{m.text}</span>
                             <Info size={12} className={isSelected ? 'text-white/80' : 'text-cinnabar/60'} />
                           </button>
 
@@ -480,7 +489,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
             <button onClick={() => setSelectedMobileId(null)} className="absolute top-2 right-2 p-2 text-stone-400 hover:text-stone-600"><X size={20} /></button>
             <div className="pr-8">
               <span className="text-[10px] font-bold text-cinnabar dark:text-red-400 uppercase tracking-widest mb-2 block">Original Text</span>
-              <p className="font-serif-tc text-3xl text-ink dark:text-zinc-200 leading-relaxed">{selectedColumn.text_zh}</p>
+              <p lang="zh-Hant" className="font-serif-tc text-3xl text-ink dark:text-zinc-200 leading-relaxed">{selectedColumn.text_zh}</p>
             </div>
           </div>
         )}

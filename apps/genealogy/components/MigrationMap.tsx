@@ -82,6 +82,7 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const svgRendererRef = useRef<L.SVG | null>(null);
   const lastFlyTargetIdRef = useRef<string | null>(null);
   const playIntervalRef = useRef<number | null>(null);
   // Mirror of currentYear for the prep effect to consult without re-running on each tick.
@@ -116,10 +117,31 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
       attributionControl: false,
     });
 
+    // Explicit SVG renderer so we own the <svg> root and can inject arrow-marker <defs>.
+    const svgRenderer = L.svg();
+    svgRenderer.addTo(map);
+    const svgEl = (svgRenderer as unknown as { _container: SVGSVGElement })._container;
+    if (svgEl && !svgEl.querySelector('#mig-arrow-light')) {
+      const SVG_NS = 'http://www.w3.org/2000/svg';
+      const defs = document.createElementNS(SVG_NS, 'defs');
+      defs.innerHTML = `
+        <marker id="mig-arrow-light" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#A63434"/>
+        </marker>
+        <marker id="mig-arrow-dark" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#F87171"/>
+        </marker>
+      `;
+      svgEl.insertBefore(defs, svgEl.firstChild);
+    }
+
     const linesLayer = L.layerGroup().addTo(map);
     const markersLayer = L.layerGroup().addTo(map);
 
     mapRef.current = map;
+    svgRendererRef.current = svgRenderer;
     markersLayerRef.current = markersLayer;
     linesLayerRef.current = linesLayer;
 
@@ -191,6 +213,7 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
     });
 
     // --- PREPARE PATHS ---
+    const arrowId = isDarkMode ? 'mig-arrow-dark' : 'mig-arrow-light';
     paths.forEach((path) => {
       const from = points.find(p => p.id === path.fromId);
       const to = points.find(p => p.id === path.toId);
@@ -198,10 +221,34 @@ const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }
       const curvedPoints = getCurvedPathPoints(from.coordinates, to.coordinates);
       const polyline = L.polyline(curvedPoints, {
         color: isDarkMode ? '#F87171' : '#A63434',
-        weight: 2,
-        opacity: 0.8,
-        className: 'migration-line-anim',
+        weight: 2.5,
+        opacity: 0.9,
+        className: 'migration-path',
+        lineCap: 'round',
+        lineJoin: 'round',
+        renderer: svgRendererRef.current ?? undefined,
       });
+
+      // Decorate the underlying SVG path when added to the map:
+      //   - point a directional arrow at the destination (marker-end)
+      //   - run a one-shot draw-in animation via the Web Animations API
+      polyline.on('add', function () {
+        const pathEl = (this as unknown as { _path?: SVGPathElement })._path;
+        if (!pathEl) return;
+        pathEl.setAttribute('marker-end', `url(#${arrowId})`);
+        try {
+          const length = pathEl.getTotalLength();
+          if (!length || !pathEl.animate) return;
+          pathEl.style.strokeDasharray = String(length);
+          pathEl.animate(
+            [{ strokeDashoffset: length }, { strokeDashoffset: 0 }],
+            { duration: 1200, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
+          );
+        } catch {
+          // getTotalLength can throw on detached elements; skip animation.
+        }
+      });
+
       const pathYear = path.year || to.year;
       newStaticLayers[`l-${path.fromId}-${path.toId}`] = { layer: polyline, year: pathYear, type: 'path' };
     });

@@ -104,16 +104,14 @@ body {
   background: #27272a;
 }
 
-/* Migration Line Animation */
-@keyframes dash {
-  to {
-    stroke-dashoffset: -20;
-  }
+/* Migration paths: soft halo + rounded caps. Draw-in animation is run inline
+   via stroke-dashoffset (see MigrationMap.tsx) when a polyline is first added. */
+.migration-path {
+  filter: drop-shadow(0 0 2px rgba(166, 52, 52, 0.35));
 }
 
-.migration-line-anim {
-  animation: dash 3s linear infinite;
-  stroke-dasharray: 10, 10;
+.dark .migration-path {
+  filter: drop-shadow(0 0 2px rgba(248, 113, 113, 0.35));
 }
 
 /* Pulsing ring on the newest revealed marker on the migration map. */

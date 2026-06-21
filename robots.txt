@@ -11,6 +11,8 @@ Disallow: /
 # Standard rules for other web crawlers (like Google, Bing, etc.)
 User-agent: *
 Allow: /
+# Unlisted ERM course — reachable by direct link only, kept out of search indexes
+Disallow: /erm/
 
 # Sitemap location
 Sitemap: {{ "/sitemap.xml" | absolute_url }}

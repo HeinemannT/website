@@ -52,6 +52,12 @@ jobs:
           npm ci
           npm run build
 
+      - name: Build ERM Course App
+        run: |
+          cd apps/erm
+          npm ci
+          npm run build
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5

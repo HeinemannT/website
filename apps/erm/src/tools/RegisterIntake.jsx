@@ -4,7 +4,7 @@ import { useSaver } from '../components/useSaver.js';
 import { SaveBar } from '../components/SaveBar.jsx';
 import { SEED_REGISTER } from './riskmath.js';
 
-const CATEGORIES = ['Strategic', 'Financial', 'Operational', 'Compliance & conduct', 'Technology & cyber', 'Reputational'];
+const CATEGORIES = ['Strategic', 'Financial', 'Operational', 'Compliance & conduct', 'Technology & cyber', 'Climate & ESG', 'Model risk', 'Reputational'];
 
 // Richer register shared with the 2d evaluator (which reads name, p, i).
 const enrich = (r) => ({ cause: '', event: r.name, consequence: '', owner: '', category: 'Operational', ...r });

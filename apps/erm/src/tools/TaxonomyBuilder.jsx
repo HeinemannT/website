@@ -4,7 +4,7 @@ import { useSaver } from '../components/useSaver.js';
 import { SaveBar } from '../components/SaveBar.jsx';
 import { SEED_REGISTER } from './riskmath.js';
 
-const DEFAULT_FAMILIES = ['Strategic', 'Financial', 'Operational', 'Compliance & conduct', 'Technology & cyber', 'Reputational'];
+const DEFAULT_FAMILIES = ['Strategic', 'Financial', 'Operational', 'Compliance & conduct', 'Technology & cyber', 'Climate & ESG', 'Model risk', 'Reputational'];
 
 export function TaxonomyBuilder({ lessonId = '3.0', artifactId = 'A9' }) {
   const { getData, setData } = useStore();

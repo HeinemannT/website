@@ -73,7 +73,7 @@ export default function Lesson43() {
 
       <MathBlock>
         <p>An aggregate loss is a <em>compound</em> random variable: <span className="eq">S = X₁ + X₂ + … + X_N</span>, where the count <span className="eq">N</span> is itself random (often Poisson with rate <span className="eq">λ</span>) and each severity <span className="eq">Xᵢ</span> is drawn from the severity distribution.</p>
-        <p>Its mean follows <em>Wald’s identity</em>: <span className="eq">E[S] = E[N] · E[X]</span>. Its variance carries both sources of uncertainty: <span className="eq">Var[S] = E[N]·Var[X] + Var[N]·E[X]²</span>.</p>
+        <p>Its mean follows <em>Wald’s identity</em>: <span className="eq">E[S] = E[N] · E[X]</span> — the expected total is just the expected number of events times the expected size of one, which is why the severity’s <em>spread</em> never moves the expected loss (it only drives the tail, and so the capital).</p>
         <p>Expected loss is just <span className="eq">EL = E[S]</span>. Economic capital at confidence <span className="eq">α</span> is the quantile <span className="eq">qₐ(S)</span>, and unexpected loss is the gap <span className="eq">UL = qₐ(S) − EL</span>. There’s usually no closed form for the distribution of <span className="eq">S</span> — it’s a convolution — which is precisely why you simulate it rather than solve it.</p>
       </MathBlock>
 

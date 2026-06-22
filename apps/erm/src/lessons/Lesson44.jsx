@@ -3,6 +3,8 @@ import { getLesson } from '../curriculum.js';
 import { LessonShell } from '../components/LessonShell.jsx';
 import { Lead, Objectives, Stage, Pull } from '../components/prose.jsx';
 import { VaRES } from '../tools/VaRES.jsx';
+import { MathBlock, ProblemSet } from '../components/MathBlock.jsx';
+import { CodeExercise } from '../components/CodeExercise.jsx';
 
 const lesson = getLesson('4.4');
 const readings = [
@@ -44,9 +46,50 @@ export default function Lesson44() {
       <p className="measure">In the lab below, VaR and ES sit close together when outcomes are mild and normal. Then tick “fat tails” — the world of real crises — and watch ES leap above VaR while VaR barely flinches. That gap is precisely the danger VaR conceals: when losses are heavy-tailed, the rare disaster beyond the line dwarfs the line. The lesson isn’t “VaR is useless”; it’s “VaR is a threshold, not a worst case, and in the conditions you most fear it is least informative.” Read both numbers, and trust the one that looks at the tail.</p>
       <Pull>VaR tells you where the floor is. Expected Shortfall tells you how far you fall through it. In a crisis, only the second number matters.</Pull>
 
-      <Stage n={3} kicker="Build it on your organization" title="Read VaR and ES" />
-      <p className="measure">Set a confidence level, flip between calm and fat-tailed worlds, and watch VaR and Expected Shortfall diverge. Carry the habit into any risk report you’re handed: ask not just for the VaR, but for the shortfall beyond it. Saved into Artifact A11.</p>
+      <MathBlock>
+        <p>Value-at-Risk is a <em>quantile</em> of the loss distribution: <span className="eq">VaRₐ(L) = inf&#123; l : P(L ≤ l) ≥ α &#125;</span> — the loss you won’t exceed with probability α. Its flaw is formal: VaR is <em>not subadditive</em>, so <span className="eq">VaR(A+B)</span> can exceed <span className="eq">VaR(A) + VaR(B)</span>, making diversification look like it <em>adds</em> risk. A coherent risk measure shouldn’t do that.</p>
+        <p>Expected Shortfall (a.k.a. CVaR) is the average loss <em>given</em> you’re past VaR: <span className="eq">ESₐ(L) = E[ L | L ≥ VaRₐ ]</span> = <span className="eq">(1/(1−α)) ∫ from α to 1 of VaR_u du</span>. It is coherent — in particular subadditive — and it looks <em>into</em> the tail rather than stopping at its edge. That coherence, plus tail-sensitivity, is exactly why the Basel market-risk framework replaced VaR with ES.</p>
+      </MathBlock>
+
+      <Stage n={3} kicker="Build it — write the model" title="Compute VaR and ES yourself" />
+      <p className="measure">The lab below marks VaR and ES on a distribution. Build the calculation first: from a list of losses and a confidence level, find the VaR quantile and average the tail beyond it. Watching ES emerge as “the mean of everything past the line” is the whole intuition in one function.</p>
+
+      <CodeExercise
+        id="4.4-var"
+        title="Write VaR and Expected Shortfall"
+        prompt="Sort the losses ascending. Take the value at index floor(conf · n) as VaR. Expected Shortfall is the mean of all losses from that index upward. Return { var, es }."
+        entry="varAndES"
+        starter={`// losses: array of loss amounts;  conf: e.g. 0.99
+function varAndES(losses, conf) {
+  const sorted = [...losses].sort((a, b) => a - b);
+  // TODO: idx = floor(conf * sorted.length)
+  //       VaR = sorted[idx];  ES = mean of sorted[idx .. end]
+  return { var: 0, es: 0 };
+}`}
+        solution={`function varAndES(losses, conf) {
+  const sorted = [...losses].sort((a, b) => a - b);
+  const idx = Math.floor(conf * sorted.length);
+  const v = sorted[idx];
+  const tail = sorted.slice(idx);
+  const es = tail.reduce((s, x) => s + x, 0) / tail.length;
+  return { var: v, es };
+}`}
+        test={(fn) => {
+          const losses = Array.from({ length: 100 }, (_, i) => i + 1);
+          const r = fn(losses, 0.95) || {};
+          return (Math.abs(r.var - 96) < 1e-9 && Math.abs(r.es - 98) < 1e-9)
+            ? { pass: true, summary: `Correct — for losses 1…100 at 95%, VaR = ${r.var} and ES = ${r.es}. ES sits above VaR because it averages the whole tail.` }
+            : { pass: false, summary: `Got VaR ${r.var}, ES ${r.es} (expected 96 and 98). Sort ascending, VaR = sorted[floor(0.95·100)], ES = mean from there up.` };
+        }}
+      />
+
+      <p className="measure">Now flip between calm and fat-tailed worlds in the lab and watch VaR and ES diverge. Carry the habit into any risk report: ask not just for the VaR, but for the shortfall beyond it. Saved into Artifact A11.</p>
       <VaRES lessonId="4.4" artifactId="A11-var" />
+
+      <ProblemSet items={[
+        { q: 'Give an intuitive reason VaR can violate subadditivity.', solution: 'Take two bonds, each with a small, independent chance of a large default loss. Individually, the loss event sits just beyond the 99% point, so each has a modest VaR. Combined, the chance that at least one defaults pushes a large loss inside the 99% window, so VaR(A+B) can exceed VaR(A)+VaR(B) — diversification appears to raise risk, which a coherent measure (ES) never does.' },
+        { q: 'Two portfolios have identical 99% VaR. How can one be far riskier?', solution: 'VaR says nothing beyond its threshold. One portfolio’s losses past the 99% point might be modestly larger; the other’s might be catastrophic. Expected Shortfall, by averaging the tail, separates them — VaR cannot.' },
+      ]} />
     </LessonShell>
   );
 }

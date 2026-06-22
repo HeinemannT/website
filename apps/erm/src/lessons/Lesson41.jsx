@@ -3,6 +3,9 @@ import { getLesson } from '../curriculum.js';
 import { LessonShell } from '../components/LessonShell.jsx';
 import { Lead, Objectives, Stage, Pull } from '../components/prose.jsx';
 import { DecisionExplorer } from '../tools/DecisionExplorer.jsx';
+import { MathBlock, ProblemSet } from '../components/MathBlock.jsx';
+import { CodeExercise } from '../components/CodeExercise.jsx';
+import { fmt } from '../tools/riskmath.js';
 
 const lesson = getLesson('4.1');
 const readings = [
@@ -40,9 +43,49 @@ export default function Lesson41() {
       <p className="measure">Here’s the catch that haunts this entire part: the expected value is only as good as the probabilities you feed it, and those usually come from human heads — the same overconfident heads you met in 2b. A precise EV computed from guessed probabilities is precision theatre. The fix isn’t to abandon the method; it’s to calibrate the inputs, state them as honest ranges, and remember that the number is an aid to judgement, not a replacement for it. Notice the explorer below recomputes instantly when you change a probability — which is exactly why a sloppy probability is dangerous: it flows straight into a confident-looking answer.</p>
       <Pull>A sharp number built on a soft probability isn’t knowledge. It’s a guess wearing a lab coat.</Pull>
 
-      <Stage n={3} kicker="Build it on your organization" title="Work a real decision" />
-      <p className="measure">Take a genuine decision your organization faces, lay out the alternatives and their outcomes, and compare expected values — then ask whether the spread changes which one you’d actually choose. Saved into Artifact A11, your quantified analyses.</p>
+      <MathBlock>
+        <p>Expected value is the first moment of a random variable. For a discrete outcome <span className="eq">X</span> taking values <span className="eq">xᵢ</span> with probabilities <span className="eq">pᵢ</span>:</p>
+        <p style={{ textAlign: 'center' }}><span className="eq">E[X] = Σ pᵢ · xᵢ</span></p>
+        <p>The reason it composes so cleanly is the <em>linearity of expectation</em>: <span className="eq">E[aX + bY] = a·E[X] + b·E[Y]</span>, true even when X and Y are dependent. That’s why you can fold a decision tree branch by branch.</p>
+        <p>It also frames the <em>expected value of perfect information</em> (EVPI) — the most you’d rationally pay to remove uncertainty: <span className="eq">EVPI = E[payoff with perfect info] − E[payoff of best action now]</span>.</p>
+        <p>And it explains risk aversion precisely. Model preferences with a concave utility <span className="eq">u</span>. By Jensen’s inequality, <span className="eq">E[u(X)] ≤ u(E[X])</span>, so the <em>certainty equivalent</em> — the sure amount as good as the gamble — sits below the mean. A risk-averse decider maximises <span className="eq">E[u(X)]</span>, not <span className="eq">E[X]</span>, which is exactly why the lower-EV, lower-spread option can win.</p>
+      </MathBlock>
+
+      <Stage n={3} kicker="Build it — write the model" title="Work a real decision, and build the engine" />
+      <p className="measure">The explorer above runs on one tiny function — expected value. Before you use it, build it. Implement the probability-weighted average yourself; this is the first model in the course you write rather than read.</p>
+
+      <CodeExercise
+        id="4.1-ev"
+        title="Write the expected-value function"
+        prompt="Given a list of outcomes, each with a probability p (a percent) and a value, return the probability-weighted average."
+        entry="expectedValue"
+        starter={`// outcomes: array of { p, value }   (p is a percent, 0–100)
+function expectedValue(outcomes) {
+  // TODO: return the probability-weighted average value
+  return 0;
+}`}
+        solution={`function expectedValue(outcomes) {
+  return outcomes.reduce(
+    (sum, o) => sum + (o.p / 100) * o.value,
+    0
+  );
+}`}
+        test={(fn) => {
+          const a = fn([{ p: 40, value: 5000000 }, { p: 60, value: -1500000 }]);
+          const b = fn([{ p: 50, value: 100 }, { p: 50, value: -100 }]);
+          return (Math.abs(a - 1100000) < 1 && Math.abs(b) < 1e-6)
+            ? { pass: true, summary: `Correct — the launch example has EV ${fmt(a)}, and a fair 50/50 gives 0.` }
+            : { pass: false, summary: `Not yet — the launch example returned ${fmt(a)} (should be ${fmt(1100000)}). Weight each value by p/100 and sum.` };
+        }}
+      />
+
+      <p className="measure">That function is the seed of everything in this part. Now use the full explorer on a real decision your organization faces, and ask whether the spread changes which option you’d actually choose. Saved into Artifact A11.</p>
       <DecisionExplorer lessonId="4.1" artifactId="A11-decision" />
+
+      <ProblemSet items={[
+        { q: 'An option pays €2m with probability 30%, €0 with 50%, and loses €1m with 20%. What is its expected value?', solution: 'E[X] = 0.30·2,000,000 + 0.50·0 + 0.20·(−1,000,000) = 600,000 − 200,000 = €400,000.' },
+        { q: 'Two options share the same EV, but A risks a €5m loss (10% chance) while B’s worst case is −€200k. Which should a thinly-capitalised firm prefer, and what principle is that?', solution: 'B. With little capital, a 10% chance of €5m could be fatal regardless of EV — that is risk aversion. Formally, a concave utility makes A’s certainty equivalent lower than B’s, so E[u(B)] > E[u(A)] even though E[B] = E[A].' },
+      ]} />
     </LessonShell>
   );
 }

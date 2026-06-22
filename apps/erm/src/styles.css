@@ -170,6 +170,42 @@ tr.flag td{background:#fcf0ee}
 .form textarea{min-height:90px;resize:vertical}
 .hint{font-family:var(--sans);font-size:13px;color:var(--muted);margin-top:4px}
 
+/* ---------- build-it-in-JS code exercise ---------- */
+.code-ex{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:30px 0;overflow:hidden;
+  box-shadow:0 10px 34px -18px rgba(40,30,10,.45);max-width:980px}
+.code-ex .bar{background:#23211d;border-bottom:1px solid #000;padding:13px 20px;font-family:var(--sans);
+  display:flex;justify-content:space-between;align-items:center}
+.code-ex .bar .t{font-weight:600;font-size:14px;color:#f6f2e9}
+.code-ex .bar .tag.build{background:#2c5750;color:#eaf6ef}
+.code-ex .body{padding:20px}
+textarea.code,pre.code{font-family:'SF Mono',ui-monospace,'Cascadia Code','Source Code Pro',Menlo,Consolas,monospace;
+  font-size:13.5px;line-height:1.55;width:100%;border:1px solid var(--line);border-radius:10px;
+  background:#1f1d1a;color:#f3ede0;padding:14px 16px;tab-size:2;white-space:pre;overflow:auto}
+textarea.code{resize:vertical}
+textarea.code:focus{outline:2px solid var(--teal);outline-offset:-1px}
+pre.code.solution{margin-top:14px;border-color:#3a875b}
+.coderesult{font-family:'SF Mono',ui-monospace,monospace;font-size:13px;margin-top:12px;padding:11px 14px;border-radius:9px}
+.coderesult.pass{background:#ecf6ef;border:1px solid #bfe0cb;color:#1f5a36}
+.coderesult.fail{background:#fcf0ee;border:1px solid #e9c4bf;color:#8c2b22}
+
+/* ---------- opt-in math rigour ---------- */
+.mathblock{max-width:700px;margin:18px 0;border:1px solid var(--line);border-radius:12px;background:#fbf9f4;overflow:hidden}
+.mathtoggle{width:100%;text-align:left;background:none;border:none;padding:12px 16px;cursor:pointer;
+  font-family:var(--sans);font-size:14px;font-weight:600;color:var(--teal);display:flex;align-items:center;gap:8px}
+.mathtoggle .tw{color:var(--muted)}
+.mathtoggle .optional{margin-left:auto;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mathblock.open{box-shadow:0 6px 24px -18px rgba(40,30,10,.4)}
+.mathbody{padding:4px 18px 16px;font-size:16px;line-height:1.6;border-top:1px solid var(--hair)}
+.mathbody .eq{font-family:'SF Mono',ui-monospace,monospace;background:#f0ece2;border-radius:6px;padding:2px 6px;font-size:14px}
+.mathbody p{margin:.7em 0}
+
+/* ---------- problem set ---------- */
+.problemset{max-width:700px;margin:24px 0;border-top:1px solid var(--line);padding-top:18px}
+.problemset .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:10px}
+.problem{margin:14px 0}
+.problem .q{font-size:15px;margin-bottom:6px}
+.problem .sol{margin-top:8px;font-size:14px;background:#f5efe4;border-radius:9px;padding:10px 14px;color:var(--soft);line-height:1.55}
+
 @media(max-width:860px){
   .app{grid-template-columns:1fr}
   .side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}

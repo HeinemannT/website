@@ -3,6 +3,8 @@ import { getLesson } from '../curriculum.js';
 import { LessonShell } from '../components/LessonShell.jsx';
 import { Lead, Objectives, Stage, Pull } from '../components/prose.jsx';
 import { OrgValueSnapshot } from '../tools/OrgValueSnapshot.jsx';
+import { MathBlock } from '../components/MathBlock.jsx';
+import { CodeExercise } from '../components/CodeExercise.jsx';
 
 const lesson = getLesson('1.2');
 
@@ -61,9 +63,37 @@ export default function Lesson12() {
 
       <Pull>Margin is your cushion. Leverage is your amplifier. Cash is your oxygen. Three numbers, and you already know more about an organization’s fragility than most of its managers.</Pull>
 
-      <Stage n={3} kicker="Build it on your organization" title="Map the value, read the snapshot" />
-      <p className="measure">Sketch how your organization creates value, then drop in rough financial figures — they don’t have to be exact. Watch what the snapshot says about fragility: a thin margin, heavy leverage, a negative cushion. Keep this; in later parts, when you size financial and strategic risks, you’ll come straight back to these numbers.</p>
+      <MathBlock title="New to JavaScript? A two-minute primer">
+        <p>This course teaches you to <em>build</em> the models, in JavaScript, a little at a time — starting just below. You’ll only ever need a handful of things:</p>
+        <p><span className="eq">function name(a, b) &#123; return a + b; &#125;</span> defines a function. <span className="eq">const x = 5;</span> names a value. <span className="eq">if (cond) &#123; … &#125;</span> branches. <span className="eq">for (const r of list) &#123; … &#125;</span> loops over an array. <span className="eq">list.reduce((sum, x) =&gt; sum + x, 0)</span> adds up a list. <span className="eq">Math.random()</span> gives a number in [0, 1).</p>
+        <p>Every build exercise gives you a starter with a <span className="eq">// TODO</span>, a <strong>Run</strong> button that checks your work, and a <strong>Show solution</strong> button if you get stuck. You can’t break anything — experiment freely.</p>
+      </MathBlock>
 
+      <Stage n={3} kicker="Build it — write the model" title="Compute the margin, then map the value" />
+      <p className="measure">Your first model is a one-liner — the cushion number itself. Write the function that turns revenue and costs into an operating margin.</p>
+
+      <CodeExercise
+        id="1.2-margin"
+        title="Write the operating-margin function"
+        prompt="Operating margin is profit (revenue minus costs) as a fraction of revenue. Return it as a decimal — e.g. 0.15 for 15%."
+        entry="operatingMargin"
+        starter={`// revenue and costs in euros
+function operatingMargin(revenue, costs) {
+  // TODO: return (revenue - costs) / revenue
+  return 0;
+}`}
+        solution={`function operatingMargin(revenue, costs) {
+  return (revenue - costs) / revenue;
+}`}
+        test={(fn) => {
+          const a = fn(120000000, 104000000), b = fn(100, 90);
+          return (Math.abs(a - 0.13333) < 1e-3 && Math.abs(b - 0.1) < 1e-9)
+            ? { pass: true, summary: `Correct — €120m revenue on €104m costs is a ${(a * 100).toFixed(1)}% margin. That’s your shock absorber.` }
+            : { pass: false, summary: `Got ${(a * 100).toFixed(1)}% for the first case (expected 13.3%). Margin = (revenue − costs) / revenue.` };
+        }}
+      />
+
+      <p className="measure">Now sketch how your organization creates value and drop in rough financial figures. Watch what the snapshot says about fragility — a thin margin, heavy leverage, a negative cushion. You’ll come straight back to these numbers when you size financial and strategic risks later.</p>
       <OrgValueSnapshot lessonId="1.2" artifactId="A1-value" />
     </LessonShell>
   );

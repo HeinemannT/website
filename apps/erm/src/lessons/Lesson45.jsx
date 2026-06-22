@@ -3,6 +3,8 @@ import { getLesson } from '../curriculum.js';
 import { LessonShell } from '../components/LessonShell.jsx';
 import { Lead, Objectives, Stage, Pull } from '../components/prose.jsx';
 import { StressSandbox } from '../tools/StressSandbox.jsx';
+import { MathBlock, ProblemSet } from '../components/MathBlock.jsx';
+import { CodeExercise } from '../components/CodeExercise.jsx';
 
 const lesson = getLesson('4.5');
 const readings = [
@@ -41,9 +43,45 @@ export default function Lesson45() {
       <p className="measure">The sandbox below is deliberately simple arithmetic: each stress factor knocks a chunk off your capital, and you watch whether the buffer holds. Then it solves the reverse problem — by how much would you have to scale the whole scenario to bring capital to zero? If the answer is “only a bit worse than what I just drew,” that’s a finding no average could give you. The maths here is trivial on purpose; the value is entirely in the conversation it forces about whether the breaking scenario is really beyond imagining. Stress testing’s limit is the same as its strength: it only tests the scenarios you’re wise or worried enough to imagine.</p>
       <Pull>A model tells you what the past implies. A stress test tells you what you’re afraid of. You need both — and the things you forgot to fear are the ones that get you.</Pull>
 
-      <Stage n={3} kicker="Build it on your organization" title="Find your breaking point" />
-      <p className="measure">Set a capital buffer, dial in a severe-but-coherent scenario, and see if you survive — then read the reverse-stress multiple that takes you to zero. Ask the uncomfortable question honestly. Saved into Artifact A11.</p>
+      <MathBlock>
+        <p>A stress test is <em>conditional</em>: it asks for the loss <span className="eq">given</span> a specified scenario, <span className="eq">E[L | scenario]</span>, rather than drawing from a historical distribution. That’s its strength — it needs no probability for the scenario — and its weakness — it tells you nothing about how <em>likely</em> the scenario is.</p>
+        <p>Reverse stress testing inverts the question. Fix the outcome at failure (capital = 0) and solve for the scenario. In the simple linear case where each factor’s loss is <span className="eq">shockᵢ · sensᵢ</span> and you scale the whole scenario by a multiple <span className="eq">m</span>, failure occurs when <span className="eq">base = m · Σ(shockᵢ · sensᵢ)</span>, giving the <em>breaking multiple</em> <span className="eq">m* = base / Σ(shockᵢ · sensᵢ)</span>. A small <span className="eq">m*</span> means a scenario barely worse than the one you drew would ruin you.</p>
+      </MathBlock>
+
+      <Stage n={3} kicker="Build it — write the model" title="Build the reverse-stress solver" />
+      <p className="measure">The sandbox below solves for your breaking point. Build that solver: given a capital buffer and a set of stress factors, return the multiple of the whole scenario that drives capital to zero.</p>
+
+      <CodeExercise
+        id="4.5-rev"
+        title="Write the reverse-stress solver"
+        prompt="Each factor’s hit is shock × sens. Return the multiple of the whole scenario that brings capital to zero: base ÷ (total hit). If there’s no hit, the multiple is Infinity."
+        entry="breakingMultiple"
+        starter={`// base: capital buffer (€)
+// factors: array of { shock, sens }   — each factor's loss is shock * sens
+function breakingMultiple(base, factors) {
+  // TODO: total = sum of shock*sens; return base / total (or Infinity if total is 0)
+  return 0;
+}`}
+        solution={`function breakingMultiple(base, factors) {
+  const total = factors.reduce((s, f) => s + f.shock * f.sens, 0);
+  return total > 0 ? base / total : Infinity;
+}`}
+        test={(fn) => {
+          const m = fn(1000000, [{ shock: 10, sens: 50000 }, { shock: 5, sens: 20000 }]);
+          const inf = fn(1000000, [{ shock: 0, sens: 0 }]);
+          return (Math.abs(m - 1000000 / 600000) < 1e-6 && inf === Infinity)
+            ? { pass: true, summary: `Correct — this scenario (€600k hit) breaks €1m of capital at ×${m.toFixed(2)}; a zero scenario returns Infinity.` }
+            : { pass: false, summary: `Got ${m && m.toFixed ? m.toFixed(3) : m} (expected ${(1000000 / 600000).toFixed(3)}). Sum shock·sens, then divide base by it; guard the zero case with Infinity.` };
+        }}
+      />
+
+      <p className="measure">Now use the sandbox: set a buffer, dial in a severe-but-coherent scenario, and read the reverse-stress multiple that takes you to zero. Then ask, honestly, whether a scenario that severe is really beyond imagining. Saved into Artifact A11.</p>
       <StressSandbox lessonId="4.5" artifactId="A11-stress" />
+
+      <ProblemSet items={[
+        { q: 'A bank passes its stress test, but its reverse-stress breaking multiple is 1.2×. Should it be reassured?', solution: 'No. A scenario only 20% worse than the one tested would wipe out its capital — that’s fragile, and there’s rarely any guarantee the tested scenario is the worst plausible one. A small breaking multiple is a warning, not a clean pass.' },
+        { q: 'Why can’t stress testing replace probabilistic models like Monte Carlo?', solution: 'Stress tests don’t assign likelihoods and only cover scenarios you imagined. Probabilistic models give a distribution over many outcomes but lean on historical calibration. Each covers the other’s blind spot, so a mature function runs both.' },
+      ]} />
     </LessonShell>
   );
 }

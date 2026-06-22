@@ -3,6 +3,9 @@ import { getLesson } from '../curriculum.js';
 import { LessonShell } from '../components/LessonShell.jsx';
 import { Lead, Objectives, Stage, Pull } from '../components/prose.jsx';
 import { IsoContourFigure, HeatMapEvaluator } from '../tools/HeatMap.jsx';
+import { MathBlock, ProblemSet } from '../components/MathBlock.jsx';
+import { CodeExercise } from '../components/CodeExercise.jsx';
+import { fmt } from '../tools/riskmath.js';
 
 const lesson = getLesson('2d');
 
@@ -77,8 +80,37 @@ export default function Lesson2d() {
 
       <Pull>A heat map communicates; it does not measure. The instant a decision turns on the difference between two cells, that is your signal to put the underlying numbers on the table.</Pull>
 
-      <Stage n={3} kicker="Build it on your organisation" title="Evaluate the register both ways" />
+      <MathBlock title="The math of the reversal">
+        <p>True expected loss is <span className="eq">EL = p · i</span> — a smooth product. Lines of equal EL are hyperbolas <span className="eq">i = EL / p</span>, sweeping across the plane.</p>
+        <p>The heat map instead computes <span className="eq">score = bin(p) · bin(i)</span>, where <span className="eq">bin(·)</span> snaps a continuous value to an integer 1–5. Two information-destroying steps hide here: binning collapses a whole range to one integer, and multiplying <em>integers</em> is not the same as multiplying the underlying <em>quantities</em>. So one cell spans a wide band of true EL, and two risks in different cells can have <span className="eq">score(A) &gt; score(B)</span> while <span className="eq">EL(A) &lt; EL(B)</span> — a reversal. Concretely: p=10%, i=€5m sits in bins (2,5) → score 10 but EL €500k; p=70%, i=€400k sits in bins (4,3) → score 12 but EL €280k. The map ranks the second higher; the money ranks the first higher.</p>
+      </MathBlock>
+
+      <Stage n={3} kicker="Build it — write the model" title="Evaluate the register both ways" />
       <p className="measure">The fix isn’t to abandon the heat map; it’s to refuse to let it stand alone. Evaluate every risk twice — once by placing it on the grid, once by its expected loss — and look hard where the two rankings part company. Those gaps aren’t noise to smooth over; they’re the most informative thing here, because each one marks a risk your map is mis-prioritising in front of the board. The tool below does this for the worked example. Enter a probability and a money impact for each risk and everything recalculates: the cell, the expected loss, the two rankings side by side, and a flag wherever they disagree. Save it and it becomes Artifact A5 in your operating model.</p>
+
+      <p className="measure">The evaluator runs on one honest function — expected loss. Build it yourself before you use it; it’s the number that exposes every reversal.</p>
+
+      <CodeExercise
+        id="2d-el"
+        title="Write the expected-loss function"
+        prompt="Given a probability as a percent and a money impact, return the expected loss."
+        entry="expectedLoss"
+        starter={`// probabilityPercent: e.g. 10 means 10%
+// impact: euro cost if it happens
+function expectedLoss(probabilityPercent, impact) {
+  // TODO: return the expected loss
+  return 0;
+}`}
+        solution={`function expectedLoss(probabilityPercent, impact) {
+  return (probabilityPercent / 100) * impact;
+}`}
+        test={(fn) => {
+          const a = fn(10, 5000000), b = fn(70, 400000);
+          return (Math.abs(a - 500000) < 1e-6 && Math.abs(b - 280000) < 1e-6)
+            ? { pass: true, summary: `Correct — the ransomware risk is ${fmt(a)} of expected loss, the supplier risk ${fmt(b)}. The heat map ranks them the other way round.` }
+            : { pass: false, summary: `Got ${fmt(a)} and ${fmt(b)} (expected ${fmt(500000)} and ${fmt(280000)}). Expected loss = (probability/100) × impact.` };
+        }}
+      />
 
       <HeatMapEvaluator lessonId="2d" artifactId="A5" />
 

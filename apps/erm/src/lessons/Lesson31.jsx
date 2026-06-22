@@ -3,6 +3,8 @@ import { getLesson } from '../curriculum.js';
 import { LessonShell } from '../components/LessonShell.jsx';
 import { Lead, Objectives, Stage, Pull } from '../components/prose.jsx';
 import { PortfolioAggregation } from '../tools/PortfolioAggregation.jsx';
+import { MathBlock } from '../components/MathBlock.jsx';
+import { CodeExercise } from '../components/CodeExercise.jsx';
 
 const lesson = getLesson('3.1');
 const readings = [
@@ -46,7 +48,46 @@ export default function Lesson31() {
       <p className="measure">You don’t need the formula, only its shape. If you add up the standalone worst case of every risk, you get a big, scary number — but it assumes every disaster happens on the same afternoon, which they rarely do. The true aggregate accounts for the fact that risks partly cancel, and how much they cancel depends on one quantity: <em>correlation</em>. At low correlation, the aggregate sits well below the naïve sum — that gap is the diversification benefit. As correlation climbs toward 1, the gap closes and the aggregate rises back to the sum. The cruel twist is that correlations are low in calm markets and lurch toward 1 in a crisis, so the diversification you bank on is weakest exactly when you need it. The tool lets you feel this directly: drag the correlation, or hit “crisis,” and watch the real total move.</p>
       <Pull>Diversification is a loan from calm markets that a crisis calls back — usually at the worst possible moment.</Pull>
 
-      <Stage n={3} kicker="Build it on your organization" title="See your portfolio" />
+      <MathBlock>
+        <p>The risk of a sum is not the sum of the risks. For exposures with magnitudes <span className="eq">σᵢ</span> and a shared correlation <span className="eq">ρ</span>, the aggregate scales like</p>
+        <p style={{ textAlign: 'center' }}><span className="eq">σ_agg = √( Σ σᵢ² + 2ρ · Σ_(i&lt;j) σᵢσⱼ )</span></p>
+        <p>The first term adds each risk on its own; the second — the cross term — is the interaction. At <span className="eq">ρ = 0</span> the cross term vanishes and risks partly cancel, so <span className="eq">σ_agg</span> falls well below the naïve sum <span className="eq">Σσᵢ</span>. At <span className="eq">ρ = 1</span> the whole thing becomes <span className="eq">(Σσᵢ)²</span> under the root, so <span className="eq">σ_agg = Σσᵢ</span> — the diversification benefit is exactly zero. This is the same covariance algebra you’ll use on a portfolio in lesson 4.6; here it’s the enterprise total.</p>
+      </MathBlock>
+
+      <Stage n={3} kicker="Build it — write the model" title="See your portfolio" />
+      <p className="measure">Build the aggregation yourself: given each risk’s magnitude and a correlation, return the aggregate. Watch it collapse to the naïve sum as correlation goes to one.</p>
+
+      <CodeExercise
+        id="3.1-agg"
+        title="Write the aggregate-tail function"
+        prompt="Return √( Σσᵢ² + 2ρ·Σ_(i<j) σᵢσⱼ ): the sum of squares, plus twice rho times every distinct pair product, all under a square root."
+        entry="aggregateTail"
+        starter={`// sigmas: array of magnitudes;  rho: correlation 0..1
+function aggregateTail(sigmas, rho) {
+  let sumSq = 0, cross = 0;
+  // TODO: sumSq = sum of sigma^2
+  //       cross = sum of sigma_i * sigma_j for every pair i < j
+  //       return Math.sqrt(sumSq + 2 * rho * cross)
+  return 0;
+}`}
+        solution={`function aggregateTail(sigmas, rho) {
+  let sumSq = 0, cross = 0;
+  for (let i = 0; i < sigmas.length; i++) {
+    sumSq += sigmas[i] * sigmas[i];
+    for (let j = i + 1; j < sigmas.length; j++) {
+      cross += sigmas[i] * sigmas[j];
+    }
+  }
+  return Math.sqrt(sumSq + 2 * rho * cross);
+}`}
+        test={(fn) => {
+          const indep = fn([3, 4], 0), perfect = fn([3, 4], 1);
+          return (Math.abs(indep - 5) < 1e-9 && Math.abs(perfect - 7) < 1e-9)
+            ? { pass: true, summary: `Correct — [3,4] aggregate to 5 when independent (below the sum of 7), and to exactly 7 when perfectly correlated. The gap is diversification.` }
+            : { pass: false, summary: `Got ${indep} at ρ=0 and ${perfect} at ρ=1 (expected 5 and 7). Sum the squares, add 2·ρ·(every pair product), take the root.` };
+        }}
+      />
+
       <p className="measure">Take your register and look at it as one portfolio. Compare the sum-of-silos against the diversified aggregate, then push the correlation up and watch the benefit evaporate. This is the view a board almost never sees and most needs. Saved as Artifact A9, it sits at the centre of your risk universe.</p>
       <PortfolioAggregation lessonId="3.1" artifactId="A9-portfolio" />
     </LessonShell>

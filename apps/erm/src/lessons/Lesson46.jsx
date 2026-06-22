@@ -3,6 +3,8 @@ import { getLesson } from '../curriculum.js';
 import { LessonShell } from '../components/LessonShell.jsx';
 import { Lead, Objectives, Stage, Pull } from '../components/prose.jsx';
 import { PortfolioViz } from '../tools/PortfolioViz.jsx';
+import { MathBlock, ProblemSet } from '../components/MathBlock.jsx';
+import { CodeExercise } from '../components/CodeExercise.jsx';
 
 const lesson = getLesson('4.6');
 const readings = [
@@ -40,9 +42,48 @@ export default function Lesson46() {
       <p className="measure">The visualizer plots your portfolio’s risk against correlation. At low correlation the combined risk sits well below the dashed “just add them up” line — that gap is your diversification benefit. Slide correlation toward one, or hit “crisis,” and the curve rises to meet the line: the benefit melts. You don’t need the formula behind the curve; you need the picture in your head, so that the next time someone says “we’re diversified,” you ask the right question — <em>diversified under what correlation, and what happens to that number in a storm?</em></p>
       <Pull>Diversification is a discount the market offers in calm weather and revokes in a crisis. Never spend it as if it were guaranteed.</Pull>
 
-      <Stage n={3} kicker="Build it on your organization" title="Explore your diversification" />
-      <p className="measure">Set two risk sources, weight them, and move the correlation to feel the benefit appear and vanish. Then look back at your register: which of your risks share a driver, and would move together exactly when you hoped they wouldn’t? Saved into Artifact A11 — the quantification of your risk universe is complete.</p>
+      <MathBlock>
+        <p>For two risks with volatilities <span className="eq">σ₁, σ₂</span>, weights <span className="eq">w</span> and <span className="eq">1−w</span>, and correlation <span className="eq">ρ</span>, the portfolio variance is</p>
+        <p style={{ textAlign: 'center' }}><span className="eq">σ_p² = w²σ₁² + (1−w)²σ₂² + 2·w(1−w)·ρ·σ₁σ₂</span></p>
+        <p>The first two terms are the standalone risks; the third — the covariance term — is where diversification lives. At <span className="eq">ρ = 1</span> the expression is a perfect square and <span className="eq">σ_p</span> equals the weighted average of the two vols: no benefit. At <span className="eq">ρ &lt; 1</span>, <span className="eq">σ_p</span> falls below that average, and at <span className="eq">ρ = −1</span> risk can in principle be driven to zero. The general case is <span className="eq">σ_p = √(wᵀ Σ w)</span> for a covariance matrix Σ — the same idea, scaled to many assets.</p>
+      </MathBlock>
+
+      <Stage n={3} kicker="Build it — write the model" title="Build the portfolio-risk formula" />
+      <p className="measure">The visualizer draws the curve of portfolio risk against correlation. Build the formula behind it — combine two volatilities under a correlation — and you’ll feel exactly where the diversification benefit comes from and where it goes.</p>
+
+      <CodeExercise
+        id="4.6-port"
+        title="Write the portfolio-volatility function"
+        prompt="Given two volatilities, a weight w in the first, and a correlation rho, return the portfolio volatility (the square root of the variance above)."
+        entry="portfolioVol"
+        starter={`// s1, s2: volatilities (%)   w: weight in s1 (0–1)   rho: correlation (−1…1)
+function portfolioVol(s1, s2, w, rho) {
+  // TODO: return sqrt( w^2 s1^2 + (1-w)^2 s2^2 + 2 w (1-w) rho s1 s2 )
+  return 0;
+}`}
+        solution={`function portfolioVol(s1, s2, w, rho) {
+  const variance =
+    w * w * s1 * s1 +
+    (1 - w) * (1 - w) * s2 * s2 +
+    2 * w * (1 - w) * rho * s1 * s2;
+  return Math.sqrt(variance);
+}`}
+        test={(fn) => {
+          const indep = fn(20, 15, 0.5, 0);
+          const perfect = fn(20, 15, 0.5, 1);
+          return (Math.abs(indep - 12.5) < 1e-6 && Math.abs(perfect - 17.5) < 1e-6)
+            ? { pass: true, summary: `Correct — at ρ=0 the 50/50 mix has vol 12.5% (below either risk); at ρ=1 it’s 17.5%, exactly the weighted average. The gap is diversification.` }
+            : { pass: false, summary: `Got ${indep && indep.toFixed ? indep.toFixed(2) : indep}% at ρ=0 and ${perfect && perfect.toFixed ? perfect.toFixed(2) : perfect}% at ρ=1 (expected 12.5% and 17.5%). Check the covariance term 2·w·(1−w)·ρ·s1·s2.` };
+        }}
+      />
+
+      <p className="measure">Now move the correlation in the visualizer and feel the benefit appear and vanish. Then look back at your register: which risks share a driver, and would move together exactly when you hoped they wouldn’t? Saved into Artifact A11 — your quantification of the risk universe is complete.</p>
       <PortfolioViz lessonId="4.6" artifactId="A11-portfolio" />
+
+      <ProblemSet items={[
+        { q: 'Two risks each have 20% volatility, held 50/50. What is the portfolio volatility at ρ = 0? At ρ = 1?', solution: 'ρ=0: √(0.25·400 + 0.25·400) = √200 ≈ 14.1%. ρ=1: √(0.25·400 + 0.25·400 + 2·0.25·1·400) = √400 = 20% (the weighted average). Independence buys ~6 points of risk reduction; perfect correlation buys nothing.' },
+        { q: 'Why is assuming a single fixed correlation dangerous in risk management?', solution: 'Correlations rise under stress. A book that looks well-diversified at ρ=0.2 can behave like ρ=0.9 precisely when losses cluster, so the diversification benefit evaporates exactly when it’s needed. Stress the correlation, don’t trust the calm-time estimate.' },
+      ]} />
     </LessonShell>
   );
 }

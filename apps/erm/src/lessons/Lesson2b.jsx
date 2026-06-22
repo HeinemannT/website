@@ -40,7 +40,7 @@ const retrieval = [
 
 export default function Lesson2b() {
   return (
-    <LessonShell lesson={lesson} retrieval={retrieval} readings={readings}>
+    <LessonShell lesson={lesson} retrieval={retrieval}>
       <Lead>Pick any large risk failure and read the post-mortem. Someone saw it coming. The information almost never went missing — the willingness to say it, or to hear it, did.</Lead>
 
       <Pathway lessonId="2b" items={pathway} />

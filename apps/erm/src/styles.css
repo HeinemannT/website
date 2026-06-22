@@ -237,6 +237,28 @@ pre.code.solution{margin-top:14px;border-color:#3a875b}
 .rubric li{margin:4px 0}
 .rubric .exemplar{margin-top:12px;padding-top:10px;border-top:1px solid #e6dcc9;font-size:14px;color:var(--ink);line-height:1.55}
 
+/* ============================================================
+   Visual consolidation — collapse the vocabulary to a small,
+   coherent set: ONE aside, ONE panel surface, ONE card chrome.
+   (Later in the file, so these win the cascade.)
+   ============================================================ */
+/* One quiet aside — pull-quotes and inline "do this now" cues share it */
+.pull, .donow{
+  max-width:700px;margin:1.5em 0;padding:12px 18px;
+  background:#f4efe6;border:none;border-left:3px solid var(--teal);border-radius:0 8px 8px 0;
+  font-family:var(--serif);font-style:normal;font-size:16px;line-height:1.6;color:var(--soft);
+}
+.donow{font-family:var(--sans);font-size:14.5px}
+/* One panel surface for all study apparatus */
+.objectives, .pathway, .rubric, .mathblock{
+  background:#faf7f0;border:1px solid var(--line);border-radius:14px;box-shadow:none;
+}
+.rubric .exemplar{border-top-color:var(--line)}
+/* One card chrome — code editor matches the tool card (only the code area stays dark) */
+.code-ex .bar{background:#fbf8f1;border-bottom:1px solid var(--line)}
+.code-ex .bar .t{color:var(--ink)}
+.code-ex .bar .tag.build{background:#e7eeec;color:var(--teal)}
+
 @media(max-width:860px){
   .app{grid-template-columns:1fr}
   .side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}

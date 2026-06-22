@@ -23,10 +23,14 @@ export function Home() {
           real artifact for it — a charter, a register, an appetite statement, quantified analyses, a board dashboard —
           and they accumulate into a complete risk operating model. The final lesson simply assembles it.
         </p>
+        <p className="measure" style={{ fontSize: '15px', color: 'var(--muted)' }}>
+          New to coding or rusty on the maths? Begin with <strong>Part 0 — Groundwork</strong>: a from-scratch JavaScript primer and the few statistics ideas the course uses. Already comfortable? Jump straight to orientation.
+        </p>
         <div style={{ display: 'flex', gap: '10px', marginTop: '8px', fontFamily: 'var(--sans)' }}>
-          <button className="btn primary" onClick={() => navigate(`#/lesson/${org ? (firstUnfinished?.id || '1.0') : '1.0'}`)}>
-            {org ? 'Continue' : 'Start with orientation'}
+          <button className="btn primary" onClick={() => navigate(`#/lesson/${firstUnfinished?.id || '0.1'}`)}>
+            {org ? 'Continue' : 'Start here'}
           </button>
+          <button className="btn" onClick={() => navigate('#/lesson/1.0')}>Skip to orientation</button>
         </div>
       </div>
 

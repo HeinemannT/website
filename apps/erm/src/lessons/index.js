@@ -1,3 +1,5 @@
+import LessonJSPrimer from './LessonJSPrimer.jsx';
+import LessonMathPrimer from './LessonMathPrimer.jsx';
 import Orientation from './Orientation.jsx';
 import Lesson11 from './Lesson11.jsx';
 import Lesson12 from './Lesson12.jsx';
@@ -33,6 +35,8 @@ import Lesson5e from './Lesson5e.jsx';
 /* Registry of built lessons. As each lesson is authored it gets registered here;
    lessons not yet present render a "coming soon" placeholder so the shell stays navigable. */
 export const LESSON_COMPONENTS = {
+  '0.1': LessonJSPrimer,
+  '0.2': LessonMathPrimer,
   '1.0': Orientation,
   '1.1': Lesson11,
   '1.2': Lesson12,

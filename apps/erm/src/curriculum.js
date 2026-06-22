@@ -4,6 +4,14 @@
 
 export const PARTS = [
   {
+    id: 'p0', n: 'Part 0', title: 'Groundwork',
+    blurb: 'Optional starters: a gentle JavaScript primer and the few maths ideas the course leans on. Skip them if you’re already comfortable.',
+    lessons: [
+      { id: '0.1', title: 'JavaScript from zero', artifact: null },
+      { id: '0.2', title: 'The maths you’ll lean on', artifact: null },
+    ],
+  },
+  {
     id: 'p1', n: 'Part 1', title: 'Foundations',
     blurb: 'What risk is, the organization you protect, the frameworks, and who owns risk.',
     lessons: [

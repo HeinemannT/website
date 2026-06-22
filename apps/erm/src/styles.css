@@ -259,6 +259,25 @@ pre.code.solution{margin-top:14px;border-color:#3a875b}
 .code-ex .bar .t{color:var(--ink)}
 .code-ex .bar .tag.build{background:#e7eeec;color:var(--teal)}
 
+/* ---------- glossary: inline tooltip terms + the page ---------- */
+.gloss{border-bottom:1px dotted var(--gold);cursor:help;position:relative}
+.gloss-tip{position:absolute;left:0;top:1.7em;width:min(300px,78vw);
+  background:#23211d;color:#f6f2e9;font-family:var(--sans);font-style:normal;font-weight:400;
+  font-size:13px;line-height:1.5;letter-spacing:normal;text-transform:none;
+  padding:11px 13px;border-radius:9px;box-shadow:0 14px 34px -10px rgba(0,0,0,.55);
+  opacity:0;visibility:hidden;transform:translateY(-4px);transition:opacity .12s,transform .12s;
+  z-index:60;pointer-events:none}
+.gloss:hover .gloss-tip,.gloss:focus .gloss-tip,.gloss:focus-within .gloss-tip{opacity:1;visibility:visible;transform:none}
+.gloss:focus{outline:none}
+.glossary-list{max-width:780px;margin:24px 0 0}
+.glossary-entry{display:grid;grid-template-columns:210px 1fr;gap:20px;padding:14px 0;border-top:1px solid var(--line);font-family:var(--sans)}
+.glossary-entry dt{font-weight:700;color:var(--wine);font-size:15px}
+.glossary-entry dd{margin:0;font-size:14.5px;line-height:1.55;color:var(--soft)}
+.sidelink{margin-top:20px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--teal);
+  cursor:pointer;padding:10px 8px 0;border-top:1px solid var(--line)}
+.sidelink:hover{color:var(--wine)}
+@media(max-width:640px){.glossary-entry{grid-template-columns:1fr;gap:4px}}
+
 @media(max-width:860px){
   .app{grid-template-columns:1fr}
   .side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}

@@ -8,6 +8,7 @@ export function parseHash(hash) {
   const h = (hash || '').replace(/^#/, '');
   const parts = h.split('/').filter(Boolean);
   if (parts[0] === 'lesson' && parts[1]) return { view: 'lesson', id: decodeURIComponent(parts[1]) };
+  if (parts[0] === 'glossary') return { view: 'glossary' };
   return { view: 'home' };
 }
 

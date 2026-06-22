@@ -40,6 +40,7 @@ export function Sidebar({ activeId }) {
           </React.Fragment>
         ))}
       </ul>
+      <div className="sidelink" onClick={() => navigate('#/glossary')}>📖 Glossary</div>
     </aside>
   );
 }

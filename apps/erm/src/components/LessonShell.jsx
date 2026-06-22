@@ -4,6 +4,7 @@ import { navigate } from '../router.js';
 import { useStore } from '../store.jsx';
 import { Readings } from './prose.jsx';
 import { Retrieval } from './Retrieval.jsx';
+import { glossify } from './Glossary.jsx';
 
 export function LessonShell({ lesson, retrieval, readings, children }) {
   const { isComplete } = useStore();
@@ -20,7 +21,7 @@ export function LessonShell({ lesson, retrieval, readings, children }) {
         </div>
       )}
 
-      {children}
+      {glossify(children)}
 
       {retrieval && <Retrieval items={retrieval} />}
       {readings && <Readings items={readings} />}

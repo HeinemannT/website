@@ -5,6 +5,7 @@ import { Sidebar } from './components/Sidebar.jsx';
 import { Home } from './components/Home.jsx';
 import { LESSON_COMPONENTS } from './lessons/index.js';
 import { LessonShell } from './components/LessonShell.jsx';
+import { GlossaryPage } from './components/Glossary.jsx';
 
 function Placeholder({ lesson }) {
   return (
@@ -33,6 +34,8 @@ export default function App() {
       const Comp = LESSON_COMPONENTS[lesson.id];
       content = Comp ? <Comp /> : <Placeholder lesson={lesson} />;
     }
+  } else if (route.view === 'glossary') {
+    content = <GlossaryPage />;
   } else {
     content = <Home />;
   }

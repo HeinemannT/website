@@ -1,9 +1,10 @@
 import React from 'react';
+import { glossify } from './Glossary.jsx';
 
 /* Quiet, textbook-style building blocks. One stage marker per lens; no header clutter. */
 
 export function Lead({ children }) {
-  return <p className="lead">{children}</p>;
+  return <p className="lead">{glossify(children)}</p>;
 }
 
 export function Objectives({ items, title = "What you'll be able to do" }) {

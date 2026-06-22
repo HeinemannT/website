@@ -20,12 +20,16 @@ import Lesson34 from './Lesson34.jsx';
 import Lesson35 from './Lesson35.jsx';
 import Lesson36 from './Lesson36.jsx';
 import Lesson37 from './Lesson37.jsx';
+import Lesson38 from './Lesson38.jsx';
+import Lesson39 from './Lesson39.jsx';
 import Lesson41 from './Lesson41.jsx';
 import Lesson42 from './Lesson42.jsx';
 import Lesson43 from './Lesson43.jsx';
 import Lesson44 from './Lesson44.jsx';
 import Lesson45 from './Lesson45.jsx';
 import Lesson46 from './Lesson46.jsx';
+import Lesson47 from './Lesson47.jsx';
+import Lesson48 from './Lesson48.jsx';
 import Lesson5a from './Lesson5a.jsx';
 import Lesson5b from './Lesson5b.jsx';
 import Lesson5c from './Lesson5c.jsx';
@@ -57,12 +61,16 @@ export const LESSON_COMPONENTS = {
   '3.5': Lesson35,
   '3.6': Lesson36,
   '3.7': Lesson37,
+  '3.8': Lesson38,
+  '3.9': Lesson39,
   '4.1': Lesson41,
   '4.2': Lesson42,
   '4.3': Lesson43,
   '4.4': Lesson44,
   '4.5': Lesson45,
   '4.6': Lesson46,
+  '4.7': Lesson47,
+  '4.8': Lesson48,
   '5a': Lesson5a,
   '5b': Lesson5b,
   '5c': Lesson5c,

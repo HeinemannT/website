@@ -47,6 +47,8 @@ export const PARTS = [
       { id: '3.5', title: 'Conduct, compliance, legal & reputational', artifact: 'A10' },
       { id: '3.6', title: 'Technology, cyber & climate', artifact: 'A10' },
       { id: '3.7', title: 'Model risk', artifact: 'A10' },
+      { id: '3.8', title: 'Third-party & supply-chain risk', artifact: 'A10' },
+      { id: '3.9', title: 'ESG & sustainability risk', artifact: 'A10' },
     ],
   },
   {
@@ -59,6 +61,8 @@ export const PARTS = [
       { id: '4.4', title: 'Market & credit: VaR and Expected Shortfall', artifact: 'A11' },
       { id: '4.5', title: 'Stress testing & scenarios', artifact: 'A11' },
       { id: '4.6', title: 'Portfolio risk', artifact: 'A11' },
+      { id: '4.7', title: 'Tails & extremes', artifact: 'A11' },
+      { id: '4.8', title: 'Backtesting & model validation', artifact: 'A11' },
     ],
   },
   {

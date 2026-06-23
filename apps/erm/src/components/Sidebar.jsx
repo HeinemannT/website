@@ -40,7 +40,15 @@ export function Sidebar({ activeId }) {
           </React.Fragment>
         ))}
       </ul>
-      <div className="sidelink" onClick={() => navigate('#/glossary')}>📖 Glossary</div>
+      <div className="sidelink" onClick={() => navigate('#/glossary')}>
+        <svg className="sidelink-ico" viewBox="0 0 24 24" width="15" height="15" fill="none"
+             stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"
+             aria-hidden="true" focusable="false">
+          <path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H5.5A1.5 1.5 0 0 0 4 21.5z" />
+          <path d="M4 4.5A1.5 1.5 0 0 0 5.5 6H20" />
+        </svg>
+        <span>Glossary</span>
+      </div>
     </aside>
   );
 }

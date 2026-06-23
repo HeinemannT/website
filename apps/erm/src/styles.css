@@ -274,7 +274,9 @@ pre.code.solution{margin-top:14px;border-color:#3a875b}
 .glossary-entry dt{font-weight:700;color:var(--wine);font-size:15px}
 .glossary-entry dd{margin:0;font-size:14.5px;line-height:1.55;color:var(--soft)}
 .sidelink{margin-top:20px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--teal);
-  cursor:pointer;padding:10px 8px 0;border-top:1px solid var(--line)}
+  cursor:pointer;padding:10px 8px 0;border-top:1px solid var(--line);
+  display:flex;align-items:center;gap:8px}
+.sidelink-ico{flex:none;opacity:.9}
 .sidelink:hover{color:var(--wine)}
 @media(max-width:640px){.glossary-entry{grid-template-columns:1fr;gap:4px}}
 

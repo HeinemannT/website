@@ -4,14 +4,20 @@ import { navigate } from '../router.js';
 import { useStore } from '../store.jsx';
 import { hasLesson } from '../lessons/index.js';
 
-export function Sidebar({ activeId }) {
+export function Sidebar({ activeId, open = false, onClose }) {
   const { isComplete, org } = useStore();
   const done = FLAT.filter(l => isComplete(l.id)).length;
   const total = FLAT.length;
   const pct = Math.round((done / total) * 100);
 
   return (
-    <aside className="side ui">
+    <aside className={'side ui' + (open ? ' open' : '')}>
+      <button className="side-close" aria-label="Close menu" onClick={onClose}>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+             strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
       <div className="brand" onClick={() => navigate('#/')}>
         Enterprise Risk Management
         <small>{org ? org.name : 'A self-paced course'}</small>

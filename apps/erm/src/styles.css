@@ -280,9 +280,58 @@ pre.code.solution{margin-top:14px;border-color:#3a875b}
 .sidelink:hover{color:var(--wine)}
 @media(max-width:640px){.glossary-entry{grid-template-columns:1fr;gap:4px}}
 
+/* ---------- mobile chrome (hidden on desktop) ---------- */
+.topbar{display:none}
+.hamb,.side-close{display:none}
+
 @media(max-width:860px){
+  /* single column; the sidebar becomes an off-canvas drawer */
   .app{grid-template-columns:1fr}
-  .side{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}
-  main{padding:30px 22px 80px}
-  h1{font-size:32px}
+
+  /* sticky top bar with the hamburger */
+  .topbar{display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:70;
+    background:#f7f4edee;backdrop-filter:saturate(1.2) blur(6px);
+    border-bottom:1px solid var(--line);padding:10px 16px}
+  .hamb{display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--line);
+    border-radius:9px;background:#fff;color:var(--ink);cursor:pointer;flex:0 0 auto}
+  .hamb:active{transform:translateY(1px)}
+  .tb-title{font-family:var(--sans);font-weight:600;font-size:15px;color:var(--wine);cursor:pointer;
+    line-height:1.2}
+
+  /* drawer */
+  .side{position:fixed;top:0;left:0;bottom:0;height:100dvh;width:min(86vw,330px);z-index:90;
+    border-right:1px solid var(--line);border-bottom:none;
+    transform:translateX(-100%);transition:transform .25s ease;
+    box-shadow:0 0 50px -8px rgba(40,30,10,.5);will-change:transform}
+  .side.open{transform:none}
+  .side-close{display:grid;place-items:center;position:absolute;top:14px;right:14px;
+    width:36px;height:36px;border:1px solid var(--line);border-radius:9px;background:#fff;
+    color:var(--soft);cursor:pointer}
+  .brand{padding-right:46px}                  /* clear the close button */
+  .toc li.lesson{padding:9px 10px}            /* roomier touch targets */
+  .toc li.lesson .dot{width:17px;height:17px;line-height:15px}
+
+  /* backdrop */
+  .scrim{position:fixed;inset:0;z-index:85;background:rgba(30,24,14,.42);
+    animation:scrimIn .2s ease}
+
+  /* reading column + typography */
+  body{font-size:18px}
+  main{padding:22px 18px 72px;max-width:100%}
+  h1{font-size:30px}
+  .hero h1{font-size:30px}
+  .lead{font-size:19px}
+  .stage h2{font-size:21px}
+  .pull{font-size:17px}
+
+  /* cards: tighter padding, and let wide tables/charts scroll inside the card */
+  figure{padding:18px 16px 14px}
+  figure,.tool .body,.code-ex .body{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tool .body{padding:16px}
+  .tool .bar{padding:13px 16px;flex-wrap:wrap}
+  .ctrls{gap:14px}
+  .quiz{padding:18px}
+  table{font-size:12.5px}
+  th,td{padding:7px 7px}
 }
+@keyframes scrimIn{from{opacity:0}to{opacity:1}}

@@ -22,6 +22,9 @@ function Placeholder({ lesson }) {
 
 export default function App() {
   const route = useRoute();
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  // Close the mobile drawer whenever the route changes.
+  React.useEffect(() => { setMenuOpen(false); }, [route]);
   let activeId = null;
   let content;
 
@@ -41,9 +44,22 @@ export default function App() {
   }
 
   return (
-    <div className="app">
-      <Sidebar activeId={activeId} />
-      {content}
-    </div>
+    <>
+      <header className="topbar ui">
+        <button className="hamb" aria-label="Open course menu" aria-expanded={menuOpen}
+                onClick={() => setMenuOpen(o => !o)}>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+               strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <span className="tb-title" onClick={() => navigate('#/')}>Enterprise Risk Management</span>
+      </header>
+      <div className="app">
+        <Sidebar activeId={activeId} open={menuOpen} onClose={() => setMenuOpen(false)} />
+        {content}
+      </div>
+      {menuOpen && <div className="scrim" onClick={() => setMenuOpen(false)} aria-hidden="true" />}
+    </>
   );
 }

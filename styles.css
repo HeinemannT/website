@@ -73,10 +73,23 @@ body { overflow-x: hidden; }
   background: linear-gradient(to bottom, transparent 34%, rgba(9, 9, 9, 0.85) 70%, #090909 100%);
 }
 
+/* Colored grain over the backdrop (z 2), under the composition (z 3) — a top
+   overlay over the transformed boxes would black-composite them, so it sits
+   beneath the stage. feTurbulence emits per-channel noise → naturally colored. */
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.26;
+}
+
 /* Full-width composition, locked to the reference aspect ratio. */
 .stage {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   width: 100vw;
   aspect-ratio: var(--stage-ar);
 }
@@ -140,14 +153,19 @@ body { overflow-x: hidden; }
   .hero { align-items: center; }
 }
 
-/* Long scroll spacer, then the generative "screamflow" finale. */
-.void-pad { height: 180vh; }
+/* Scroll spacer that fully resolves to pure black before the finale, so the
+   page background and the screamflow canvas (also pure black) are one
+   continuous void — the transition is imperceptible. */
+.void-pad {
+  height: 90vh;
+  background: linear-gradient(180deg, #090909 0%, #000 65%);
+}
 
 .screamflow {
   position: relative;
   height: 100vh;
   height: 100svh;
-  background: #05060a;
+  background: #000;
 }
 
 .screamflow canvas {
@@ -157,6 +175,20 @@ body { overflow-x: hidden; }
   width: 100%;
   height: 100%;
 }
+
+/* Long black-to-transparent fades top and bottom so the galaxy dissolves out
+   of the void with no visible canvas edge. */
+.screamflow::before,
+.screamflow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.screamflow::before { top: 0;    height: 42vh; background: linear-gradient(to bottom, #000 20%, transparent); }
+.screamflow::after  { bottom: 0; height: 24vh; background: linear-gradient(to top,    #000, transparent); }
 
 @media (prefers-reduced-motion: reduce) {
   .split { transform: none !important; }

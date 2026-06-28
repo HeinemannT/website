@@ -1,8 +1,7 @@
 "use strict";
-// Stripped-down "screamflow" finale, adapted from the tixyvoid draft.
-// Kept: the swirl stir + the screamflow expression. Removed: all UI/text,
-// the camera rotation (yaw/pitch are fixed), and the scroll-hijacking wheel
-// zoom, so the page scrolls normally over it. Pauses when off-screen.
+// "screamflow" finale, adapted from the tixyvoid draft.
+// No cursor interaction at all (no stir, no glow, no trail). The galaxy swirls
+// on its own, with a soft slow rotation + gentle tumble. Pauses off-screen.
 (function () {
   const canvas = document.getElementById("rot");
   if (!canvas) return;
@@ -24,7 +23,6 @@
     const x01 = lerp(c(0, 0, 1), c(1, 0, 1), xf), x11 = lerp(c(0, 1, 1), c(1, 1, 1), xf);
     return lerp(lerp(x00, x10, yf), lerp(x01, x11, yf), zf);
   }
-  const nfn = (p, q, s) => noise3((p || 0) * 1.7, (q || 0) * 1.7, (s || 0) * 1.7) * 2 - 1;
   function gauss() { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v); }
 
   // ---------- rot palette (oil-slick decay) ----------
@@ -39,9 +37,8 @@
     return [a[0] + (b[0] - a[0]) * fr, a[1] + (b[1] - a[1]) * fr, a[2] + (b[2] - a[2]) * fr];
   }
 
-  // ---------- the one expression: "screamflow" ----------
-  const fn = (t, i, x, y, z, r, a, m) =>
-    Math.sin(t * 3 + i * 0.02) * Math.cos(r * 18 - t * 5) + m * 2;
+  // ---------- the one expression: "screamflow" (no cursor term) ----------
+  const fn = (t, i, x, y, z, r) => Math.sin(t * 3 + i * 0.02) * Math.cos(r * 18 - t * 5);
 
   // ---------- the field ----------
   const ARMS = 2, SPIRAL = 4.7;
@@ -68,12 +65,12 @@
   let dust = [];
   function buildDust() { dust = []; const n = Math.round(W * H / 11000); for (let i = 0; i < n; i++) dust.push({ x: Math.random(), y: Math.random(), a: Math.random() * 0.22 + 0.03, s: Math.random() + 0.3 }); }
 
-  // ---------- view (fixed orientation — no rotation) ----------
+  // ---------- view ----------
   let W = 0, H = 0, DPR = 1, cx = 0, cy = 0;
-  const yaw = 0.0, pitch = -0.62, zoom = 1;
+  let yaw = 0.0, pitch = -0.62;
+  const ZOOM = 1.65;                 // bigger
+  const autoYaw = reduce ? 0 : 0.04; // soft slow rotation
   const FOCAL = 2.6, CAMZ = 3.3;
-  const cyaw = Math.cos(yaw), syaw = Math.sin(yaw), cpit = Math.cos(pitch), spit = Math.sin(pitch);
-  function baseScale() { return (FOCAL / (FOCAL + CAMZ)) * zoom * Math.min(W, H) * 0.46; }
 
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -84,9 +81,10 @@
     cx = W / 2; cy = H / 2; buildDust();
   }
 
-  // ---------- mouse / stir (swirl only) ----------
+  // ---------- cursor stir (swirl force only — no glow) ----------
   const mouse = { x: 0, y: 0, inside: false, strength: 0, vx: 0, vy: 0 };
   function setMouse(x, y) { mouse.vx = x - mouse.x; mouse.vy = y - mouse.y; mouse.x = x; mouse.y = y; mouse.inside = true; mouse.strength = 1; }
+  function baseScale() { return (FOCAL / (FOCAL + CAMZ)) * ZOOM * Math.min(W, H) * 0.46; }
 
   // ---------- render ----------
   let last = performance.now(), glitch = 0, visible = true;
@@ -95,6 +93,12 @@
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     const t = now / 1000;
 
+    // soft slow rotation + gentle tumble
+    yaw += autoYaw * dt;
+    pitch = -0.62 + (reduce ? 0 : Math.sin(t * 0.13) * 0.10);
+    const cyaw = Math.cos(yaw), syaw = Math.sin(yaw), cpit = Math.cos(pitch), spit = Math.sin(pitch);
+
+    // cursor speed feeds the corruption; strength decays when idle
     const mspeed = Math.hypot(mouse.vx, mouse.vy); mouse.vx *= 0.6; mouse.vy *= 0.6;
     mouse.strength *= 0.94;
     let target = 1.0 + Math.sin(t * 0.21) * 0.8 + Math.min(2.4, mspeed * 0.03);
@@ -102,6 +106,7 @@
     if (reduce) target = Math.min(target, 1.1);
     glitch += (target - glitch) * 0.12;
 
+    // unproject the cursor onto the disk plane (y=0) for world-space stirring
     const S = baseScale();
     let Sx = 0, Sz = 0, stirOn = mouse.inside && mouse.strength > 0.02;
     if (stirOn) {
@@ -110,11 +115,12 @@
       Sx = x1 * cyaw + z1 * syaw; Sz = -x1 * syaw + z1 * cyaw;
     }
     const R = 0.55, FORCE = 2.4 * mouse.strength;
+
     const wedgeC = t * 0.16, wedgeW = 0.42 + Math.sin(t * 0.5) * 0.18;
 
     const moshing = glitch > 6;
     ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = moshing ? "rgba(5,6,10,0.05)" : "rgba(5,6,10,0.14)";
+    ctx.fillStyle = moshing ? "rgba(0,0,0,0.05)" : "rgba(0,0,0,0.14)";
     ctx.fillRect(0, 0, W, H);
 
     ctx.globalCompositeOperation = "lighter";
@@ -126,7 +132,7 @@
       const x1 = X * cyaw - Z * syaw, z1b = X * syaw + Z * cyaw;
       const y1 = Y * cpit - z1b * spit, z2 = Y * spit + z1b * cpit;
       const denom = FOCAL + z2 + CAMZ; if (denom <= 0.05) return null;
-      const s = (FOCAL / denom) * zoom * Math.min(W, H) * 0.46;
+      const s = (FOCAL / denom) * ZOOM * Math.min(W, H) * 0.46;
       return [cx + x1 * s, cy + y1 * s, z2, s];
     };
 
@@ -139,13 +145,13 @@
       const sw = 0.6 / (r + 0.3); bvx += -p.z * sw; bvz += p.x * sw;   // swirl
       bvx += 0.18; bvz += 0.10;                                        // diagonal current
 
-      let mInf = 0;
+      // cursor swirl force (motion only — no glow, no brightness bloom)
       if (stirOn) {
         const dx = p.x - Sx, dz = p.z - Sz, dd = Math.hypot(dx, dz) + 1e-4;
-        if (dd < R) { const w = 1 - dd / R; mInf = w; bvx += -dz / dd * w * FORCE; bvz += dx / dd * w * FORCE; }
+        if (dd < R) { const w = 1 - dd / R; bvx += -dz / dd * w * FORCE; bvz += dx / dd * w * FORCE; }
       }
 
-      let v; try { v = fn(t, p.i, p.x, p.y, p.z, r, ang, mInf); } catch (_) { v = 0; }
+      let v; try { v = fn(t, p.i, p.x, p.y, p.z, r, ang); } catch (_) { v = 0; }
       if (!isFinite(v)) v = 0; if (v > 1) v = 1; else if (v < -1) v = -1;
       let mag = Math.abs(v);
 
@@ -167,11 +173,10 @@
 
       const depth = Math.max(0, Math.min(1, (1.9 - a2[2]) / 3.2));
       const tw = 0.8 + 0.2 * Math.sin(t * 2.1 + p.seed * 9);
-      let bright = mag * depth * tw;
-      if (mInf > 0) bright = Math.min(1.4, bright + mInf * 0.6);
+      let bright = mag * depth * tw * 1.7;   // brighter, since there's no cursor bloom
       if (bright < 0.015) continue;
 
-      let hueIdx = p.hue * 0.6 + v * 0.32 + depth * 0.15 + noise3(p.x, p.z, t * 0.1) * 0.25 + mInf * 0.3;
+      let hueIdx = p.hue * 0.6 + v * 0.32 + depth * 0.15 + noise3(p.x, p.z, t * 0.1) * 0.25;
       let col = ramp(hueIdx);
       const hl = Math.min(1, Math.pow(bright, 1.5) * 1.2);
       let cr = col[0] + (BONE[0] - col[0]) * hl, cg = col[1] + (BONE[1] - col[1]) * hl, cb = col[2] + (BONE[2] - col[2]) * hl;
@@ -208,27 +213,17 @@
     ctx.fillStyle = "rgba(0,0,0,0.14)";
     for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
 
-    if (mouse.inside) {
-      ctx.globalCompositeOperation = "lighter";
-      const g = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 46);
-      const tint = "90,214,255";
-      g.addColorStop(0, "rgba(" + tint + "," + (0.16 + mouse.strength * 0.22) + ")");
-      g.addColorStop(1, "rgba(" + tint + ",0)");
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(mouse.x, mouse.y, 46, 0, TAU); ctx.fill();
-      ctx.globalCompositeOperation = "source-over";
-    }
-
     requestAnimationFrame(render);
   }
 
-  // ---------- pointer: stir only (no drag-rotate, no wheel zoom) ----------
-  function local(clientX, clientY) { const r = canvas.getBoundingClientRect(); return [clientX - r.left, clientY - r.top]; }
+  // ---------- pointer: stir only (no rotate, no zoom, no glow) ----------
+  function local(clientX, clientY) { const rc = canvas.getBoundingClientRect(); return [clientX - rc.left, clientY - rc.top]; }
   window.addEventListener("mousemove", e => {
     const [x, y] = local(e.clientX, e.clientY);
     if (x >= 0 && y >= 0 && x <= W && y <= H) setMouse(x, y); else mouse.inside = false;
   });
   canvas.addEventListener("mouseleave", () => { mouse.inside = false; });
-  canvas.addEventListener("touchmove", e => { const tch = e.touches[0]; const [x, y] = local(tch.clientX, tch.clientY); if (x >= 0 && y >= 0 && x <= W && y <= H) setMouse(x, y); }, { passive: true });
+  canvas.addEventListener("touchmove", e => { const tc = e.touches[0]; const [x, y] = local(tc.clientX, tc.clientY); if (x >= 0 && y >= 0 && x <= W && y <= H) setMouse(x, y); }, { passive: true });
   canvas.addEventListener("touchend", () => { mouse.inside = false; });
 
   // ---------- boot ----------

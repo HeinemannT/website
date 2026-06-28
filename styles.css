@@ -1,9 +1,10 @@
 :root {
   --bg: #090909;
   --ink: #e9eaec;
-  /* Aspect ratio of the split + blocks composition (width / height).
-     Taller than the artwork itself to leave empty space below the boxes. */
-  --stage-ar: 1024 / 1075;
+  /* Aspect ratio of the composition (width / height). At 1.40 the full-width
+     structures backdrop lands its bottom at ~78.5% (1.40 / 1.78), matching the
+     reference measurements. */
+  --stage-ar: 7 / 5;
 }
 
 * { box-sizing: border-box; }
@@ -70,26 +71,13 @@ body { overflow-x: hidden; }
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 34%, rgba(9, 9, 9, 0.85) 70%, #090909 100%);
-}
-
-/* Colored grain over the backdrop (z 2), under the composition (z 3) — a top
-   overlay over the transformed boxes would black-composite them, so it sits
-   beneath the stage. feTurbulence emits per-channel noise → naturally colored. */
-.grain {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  opacity: 0.26;
+  background: linear-gradient(to bottom, transparent 50%, rgba(9, 9, 9, 0.5) 74%, #090909 86%);
 }
 
 /* Full-width composition, locked to the reference aspect ratio. */
 .stage {
   position: relative;
-  z-index: 3;
+  z-index: 2;
   width: 100vw;
   aspect-ratio: var(--stage-ar);
 }
@@ -100,10 +88,10 @@ body { overflow-x: hidden; }
 .split {
   position: absolute;
   margin: 0;
-  left: 11%;
-  top: 2%;
-  width: 80%;
-  z-index: 3;
+  left: 12%;
+  top: 3.6%;
+  width: 78%;
+  z-index: 2;
   transform: translateY(var(--py, 0px));
   opacity: 0;
   animation: fade-in 1100ms ease forwards;
@@ -123,7 +111,7 @@ body { overflow-x: hidden; }
   position: absolute;
   margin: 0;
   width: 28%;
-  z-index: 2;
+  z-index: 3;
   background: #000;
   opacity: 0;
   animation: fade-in 1100ms ease forwards;
@@ -140,9 +128,9 @@ body { overflow-x: hidden; }
    scroll parallax as the split while keeping their own tilt/scale. Tops sit
    well below the split (generous gap) and the row is horizontally centered.
    Staggered fade-in on load. */
-.block--1 { left: 4.9%;  top: 53%; transform: translateY(var(--py, 0px)) rotate(0deg);   animation-delay: 280ms; }
-.block--2 { left: 36%;   top: 55%; transform: translateY(var(--py, 0px)) rotate(-3deg);  animation-delay: 380ms; }
-.block--3 { left: 67.1%; top: 53%; transform: translateY(var(--py, 0px)) scale(0.92); transform-origin: top center; animation-delay: 480ms; }
+.block--1 { left: 3.5%;  top: 56%; transform: translateY(var(--py, 0px)) rotate(0deg);   animation-delay: 280ms; }
+.block--2 { left: 36%;   top: 58%; transform: translateY(var(--py, 0px)) rotate(-3deg);  animation-delay: 380ms; }
+.block--3 { left: 68.5%; top: 56%; transform: translateY(var(--py, 0px)) scale(0.92); transform-origin: top center; animation-delay: 480ms; }
 
 @keyframes fade-in {
   to { opacity: 1; }
@@ -157,7 +145,7 @@ body { overflow-x: hidden; }
    page background and the screamflow canvas (also pure black) are one
    continuous void — the transition is imperceptible. */
 .void-pad {
-  height: 90vh;
+  height: 45vh;
   background: linear-gradient(180deg, #090909 0%, #000 65%);
 }
 

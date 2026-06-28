@@ -98,10 +98,12 @@
     pitch = -0.62 + (reduce ? 0 : Math.sin(t * 0.13) * 0.10);
     const cyaw = Math.cos(yaw), syaw = Math.sin(yaw), cpit = Math.cos(pitch), spit = Math.sin(pitch);
 
-    // cursor speed feeds the corruption; strength decays when idle
-    const mspeed = Math.hypot(mouse.vx, mouse.vy); mouse.vx *= 0.6; mouse.vy *= 0.6;
+    // strength decays when idle. NOTE: cursor speed deliberately does NOT feed
+    // the corruption — that produced cyan chromatic tearing around the cursor
+    // (the "blueish glow"). The cursor only stirs (swirls) the filaments.
+    mouse.vx *= 0.6; mouse.vy *= 0.6;
     mouse.strength *= 0.94;
-    let target = 1.0 + Math.sin(t * 0.21) * 0.8 + Math.min(2.4, mspeed * 0.03);
+    let target = 1.0 + Math.sin(t * 0.21) * 0.8;
     const spike = noise3(t * 0.9, 11.3, 4.1); if (spike > 0.75) target += (spike - 0.75) * 44;
     if (reduce) target = Math.min(target, 1.1);
     glitch += (target - glitch) * 0.12;

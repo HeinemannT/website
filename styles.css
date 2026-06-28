@@ -1,0 +1,152 @@
+:root {
+  --bg: #090909;
+  --ink: #e9eaec;
+  /* Aspect ratio of the split + blocks composition (width / height).
+     Taller than the artwork itself to leave empty space below the boxes. */
+  --stage-ar: 1024 / 1075;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #090909;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body { overflow-x: hidden; }
+
+/* Full-bleed hero. The stage runs taller than the viewport on wide monitors,
+   so the upper part shows first and you scroll down to reveal the blocks. */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: hidden;
+}
+
+/* Base background: very dark grey gradient. z-index 0. */
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg, #222222 0%, #131313 55%, #090909 100%);
+}
+
+/* Colored grain on the base layer (NOT a top overlay — an overlay over the
+   transformed image layers re-triggers black-compositing on software GPUs). */
+.hero__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  opacity: 0.18;
+}
+
+/* Hero image (structures): full-bleed textured backdrop. A div with
+   background-size:cover, never an <img> with object-fit (object-fit
+   black-composites on software GPUs). Slow Ken Burns drift for subtle life;
+   it starts slightly scaled up so the pan never reveals an edge. */
+.hero-img {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: url("/assets/img/structures.webp");
+  background-size: cover;
+  background-position: center top;
+  animation: drift 60s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from { transform: scale(1.04) translate(0, 0); }
+  to   { transform: scale(1.09) translate(-1%, -1.2%); }
+}
+
+/* Fade the backdrop into the dark page colour toward the bottom. */
+.hero-img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 48%, rgba(9, 9, 9, 0.82) 86%, #090909 100%);
+}
+
+/* Full-width composition, locked to the reference aspect ratio. */
+.stage {
+  position: relative;
+  z-index: 2;
+  width: 100vw;
+  aspect-ratio: var(--stage-ar);
+}
+
+/* Split panel — layered clearly ABOVE the three blocks. The parallax offset
+   comes in through the --py custom property so it composes with any other
+   transform. Fades in on load. */
+.split {
+  position: absolute;
+  margin: 0;
+  left: 11%;
+  top: 2%;
+  width: 80%;
+  z-index: 3;
+  transform: translateY(var(--py, 0px));
+  opacity: 0;
+  animation: fade-in 1100ms ease forwards;
+  animation-delay: 120ms;
+}
+
+.split img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Three body-mass blocks — foreground row, below the split.
+   Square source images, so width:100% + height:auto keeps them square.
+   Do NOT add object-fit/aspect-ratio/height:100% — black-composite trigger. */
+.block {
+  position: absolute;
+  margin: 0;
+  width: 28%;
+  z-index: 2;
+  background: #000;
+  opacity: 0;
+  animation: fade-in 1100ms ease forwards;
+}
+
+.block img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* 1 — straight, 2 — tilted slightly left, 3 — straight but slightly smaller.
+   Each transform leads with translateY(var(--py)) so the boxes get the same
+   scroll parallax as the split while keeping their own tilt/scale. Tops sit
+   well below the split (generous gap) and the row is horizontally centered.
+   Staggered fade-in on load. */
+.block--1 { left: 4.9%;  top: 53%; transform: translateY(var(--py, 0px)) rotate(0deg);   animation-delay: 280ms; }
+.block--2 { left: 36%;   top: 55%; transform: translateY(var(--py, 0px)) rotate(-3deg);  animation-delay: 380ms; }
+.block--3 { left: 67.1%; top: 53%; transform: translateY(var(--py, 0px)) scale(0.92); transform-origin: top center; animation-delay: 480ms; }
+
+@keyframes fade-in {
+  to { opacity: 1; }
+}
+
+/* On phones, centre the (shorter) full-width composition vertically. */
+@media (max-width: 720px) {
+  .hero { align-items: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-img { animation: none; transform: none; }
+  .split { transform: none !important; }
+  .split, .block { opacity: 1; animation: none; }
+}

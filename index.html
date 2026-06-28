@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>theinemann</title>
+  <meta name="description" content="theinemann" />
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <link rel="preload" as="image" href="/assets/img/structures.webp" />
+  <link rel="preload" as="image" href="/assets/img/split.webp" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="hero">
+    <!-- Base background: very dark grey gradient + colored grain. -->
+    <div class="hero__bg" aria-hidden="true"></div>
+
+    <!-- Hero image (structures): full-bleed textured backdrop behind the split. -->
+    <div class="hero-img" aria-hidden="true"></div>
+
+    <!-- Full-bleed stage holding the split + blocks at fixed positions, so
+         their alignment is locked. Taller than the viewport on wide monitors,
+         so the upper part shows first and you scroll down to the blocks. -->
+    <div class="stage">
+      <!-- Split panel: layered clearly above the blocks; drifts slower than
+           the page on scroll for a sense of hierarchy. -->
+      <figure class="split" data-parallax="0.08">
+        <img src="/assets/img/split.webp" alt="" decoding="async" />
+      </figure>
+
+      <!-- Three body-mass blocks, the foreground row below the split.
+           Same parallax factor as the split, so they drift together. -->
+      <figure class="block block--1" data-parallax="0.08">
+        <img src="/assets/img/body-mass-1.jpg" alt="" decoding="async" />
+      </figure>
+      <figure class="block block--2" data-parallax="0.08">
+        <img src="/assets/img/body-mass-2.jpg" alt="" decoding="async" />
+      </figure>
+      <figure class="block block--3" data-parallax="0.08">
+        <img src="/assets/img/body-mass-3.jpg" alt="" decoding="async" />
+      </figure>
+    </div>
+  </main>
+
+  <script src="/parallax.js" defer></script>
+</body>
+</html>

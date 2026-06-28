@@ -1,0 +1,74 @@
+name: Deploy static site to Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # The two sub-apps build into /genealogy and /erm at the repo root
+      # (configured via `base` + `outDir` in each app's vite config).
+      - name: Build Genealogy App
+        run: |
+          cd apps/genealogy
+          npm ci
+          npm run build
+
+      - name: Build ERM Course App
+        run: |
+          cd apps/erm
+          npm ci
+          npm run build
+
+      # Assemble the publish directory: the static landing page plus the
+      # built apps. No Jekyll involved.
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp index.html styles.css parallax.js _site/
+          cp -r assets _site/
+          cp CNAME robots.txt site.webmanifest _site/ 2>/dev/null || true
+          cp favicon.ico favicon.svg favicon-96x96.png apple-touch-icon.png _site/ 2>/dev/null || true
+          cp web-app-manifest-192x192.png web-app-manifest-512x512.png _site/ 2>/dev/null || true
+          cp -r genealogy _site/genealogy
+          cp -r erm _site/erm
+          touch _site/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

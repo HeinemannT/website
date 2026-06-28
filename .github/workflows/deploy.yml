@@ -45,7 +45,7 @@ jobs:
       - name: Assemble site
         run: |
           mkdir -p _site
-          cp index.html styles.css parallax.js _site/
+          cp index.html styles.css parallax.js screamflow.js _site/
           cp -r assets _site/
           cp CNAME robots.txt site.webmanifest _site/ 2>/dev/null || true
           cp favicon.ico favicon.svg favicon-96x96.png apple-touch-icon.png _site/ 2>/dev/null || true

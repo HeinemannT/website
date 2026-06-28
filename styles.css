@@ -51,31 +51,26 @@ body { overflow-x: hidden; }
   opacity: 0.18;
 }
 
-/* Hero image (structures): full-bleed textured backdrop. A div with
-   background-size:cover, never an <img> with object-fit (object-fit
-   black-composites on software GPUs). Slow Ken Burns drift for subtle life;
-   it starts slightly scaled up so the pan never reveals an edge. */
+/* Hero image (structures): the wide textured backdrop. A div with a
+   background image (never an <img> with object-fit — that black-composites on
+   software GPUs). background-size:100% auto shows the FULL width of the image
+   (it's a wide 1.78:1 source) instead of cropping it like `cover` did. */
 .hero-img {
   position: absolute;
   inset: 0;
   z-index: 1;
   background-image: url("/assets/img/structures.webp");
-  background-size: cover;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
   background-position: center top;
-  animation: drift 60s ease-in-out infinite alternate;
 }
 
-@keyframes drift {
-  from { transform: scale(1.04) translate(0, 0); }
-  to   { transform: scale(1.09) translate(-1%, -1.2%); }
-}
-
-/* Fade the backdrop into the dark page colour toward the bottom. */
+/* Fade the bottom edge of the backdrop into the dark page colour. */
 .hero-img::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 48%, rgba(9, 9, 9, 0.82) 86%, #090909 100%);
+  background: linear-gradient(to bottom, transparent 34%, rgba(9, 9, 9, 0.85) 70%, #090909 100%);
 }
 
 /* Full-width composition, locked to the reference aspect ratio. */
@@ -145,8 +140,25 @@ body { overflow-x: hidden; }
   .hero { align-items: center; }
 }
 
+/* Long scroll spacer, then the generative "screamflow" finale. */
+.void-pad { height: 180vh; }
+
+.screamflow {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  background: #05060a;
+}
+
+.screamflow canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .hero-img { animation: none; transform: none; }
   .split { transform: none !important; }
   .split, .block { opacity: 1; animation: none; }
 }

@@ -10,7 +10,7 @@ interface Options {
   onTileError: () => void;
 }
 
-/** Markers live for the map's lifetime; filtering only attaches/detaches them. */
+/** Marker objects and DOM paths survive selection for the map lifetime. */
 export function createPlacesMap(host: HTMLDivElement, options: Options) {
   const camera = options.camera ?? [23.02, 113.13, 9];
   const map = L.map(host, {
@@ -53,12 +53,7 @@ export function createPlacesMap(host: HTMLDivElement, options: Options) {
     if (reduced.matches) map.setView(target, zoom, { animate: false });
     else map.flyTo(target, zoom, { duration: 1.1 });
   }
-  function update(
-    points: MigrationPoint[],
-    visibleIds: Set<string>,
-    selected: string,
-    dark: boolean,
-  ) {
+  function update(points: MigrationPoint[], selected: string, dark: boolean) {
     const allIds = new Set(points.map((p) => p.id));
     for (const [id, marker] of markers)
       if (!allIds.has(id)) {
@@ -86,10 +81,8 @@ export function createPlacesMap(host: HTMLDivElement, options: Options) {
         weight: point.id === selected ? 3 : 2,
       });
       marker.setRadius(point.id === selected ? 10 : 7);
-      if (visibleIds.has(point.id)) {
-        if (!map.hasLayer(marker)) marker.addTo(map);
-      } else marker.remove();
-      if (point.id === selected && visibleIds.has(point.id)) {
+      if (!map.hasLayer(marker)) marker.addTo(map);
+      if (point.id === selected) {
         marker.bringToFront();
         marker.openTooltip();
       } else marker.closeTooltip();

@@ -6,7 +6,6 @@ import {
   searchManuscript,
   searchPeople,
   focusedLayout,
-  filterEvents,
   focusZoom,
   validSelection,
   parseExplorerHash,
@@ -79,16 +78,14 @@ test("Zongrong appears once with natural Guanxin and adoptive Guanzhi edges", ()
     ),
   );
 });
-test("all events initially available; unknown geography remains selectable in fallback/list", () => {
+test("all fourteen records remain selectable, including unresolved geography", () => {
   const points = data.migration.points;
-  assert.equal(filterEvents(points).length, 14);
-  assert.equal(filterEvents(points, "all", false).length, 5);
-  for (const p of points.filter((p) => !p.coordinates))
-    assert.equal(validSelection(filterEvents(points), p.id), p.id);
+  assert.equal(points.length, 14);
+  for (const p of points) assert.equal(validSelection(points, p.id), p.id);
+  assert.equal(points.filter((p) => !p.coordinates).length, 2);
   assert.equal(validSelection(points, "invalid"), "");
-  for (const p of filterEvents(points, "burial"))
-    assert.equal(p.event_type, "burial");
 });
+
 test("validated explorer links round-trip and preserve old page links", () => {
   assert.equal(parseExplorerHash("#page=36", 36).page, 35);
   assert.equal(

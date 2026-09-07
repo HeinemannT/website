@@ -134,8 +134,6 @@ const GenealogyApp: React.FC = () => {
   });
   const [mapState, setMapState] = useState<MapState>({
     event: initialRoute.current.event,
-    kind: "all",
-    undated: true,
     camera: null,
   });
   const [returnView, setReturnView] = useState<"tree" | "map" | null>(null);

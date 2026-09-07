@@ -169,16 +169,13 @@
   padding: 10px 14px;
   border-bottom: 1px solid #d6d3d1;
 }
-.tree-tools button,
-.places-map-controls button,
-.event-navigation button {
+.tree-tools button {
   padding: 8px;
   font-size: 12px;
   border: 1px solid transparent;
   border-radius: 3px;
 }
-.tree-tools button:hover,
-.places-map-controls button:hover {
+.tree-tools button:hover {
   border-color: #a8a29e;
 }
 .tree-tools button[aria-pressed="true"] {
@@ -267,6 +264,8 @@
   display: flex;
 }
 .places-map-stage {
+  display: flex;
+  flex-direction: column;
   position: relative;
   flex: 1;
   min-width: 0;
@@ -281,59 +280,72 @@
   position: absolute;
   inset: 0;
 }
+.places-map-view {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
 .places-map-controls {
-  position: absolute;
-  top: 12px;
-  left: 16px;
-  right: 16px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 8px;
-  pointer-events: none;
+  height: 44px;
+  flex-shrink: 0;
+  padding: 0 12px;
+  border-bottom: 1px solid #d6d3d1;
+  background: #faf9f6;
 }
 .places-map-controls > div {
   display: flex;
-  background: #faf9f6ef;
-  border: 1px solid #d6d3d1;
-  border-radius: 3px;
-  pointer-events: auto;
+  align-items: center;
+  gap: 4px;
 }
-.dark .places-map-controls > div {
-  background: #18181bef;
-  border-color: #52525b;
+.places-map-controls button {
+  font-size: 12px;
+  color: #57534e;
+  padding: 9px 8px;
+  white-space: nowrap;
+}
+.places-map-controls button:hover {
+  color: #a63434;
+  background: #00000005;
+}
+.dark .places-map-controls {
+  background: #18181b;
+  border-color: #3f3f46;
+}
+.dark .places-map-controls button {
+  color: #d4d4d8;
+}
+.dark .places-map-controls button:hover {
+  color: #fca5a5;
+}
+.places-list-heading {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 18px;
+  border-bottom: 1px solid #d6d3d1;
+  background: #faf9f6;
+  font-size: 13px;
+  font-weight: 500;
+}
+.dark .places-list-heading {
+  background: #18181b;
+  border-color: #3f3f46;
 }
 .places-map-events {
-  width: 342px;
+  width: 300px;
   flex-shrink: 0;
   border-left: 1px solid #d6d3d1;
   overflow-y: auto;
 }
-.event-filters {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background: #faf9f6;
-  padding: 14px 18px;
-  border-bottom: 1px solid #a8a29e;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 12px;
-}
-.event-filters select {
-  background: transparent;
-  border: 1px solid #a8a29e;
-  padding: 4px;
-  max-width: 100%;
-  border-radius: 3px;
-}
-.event-filters label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
 .event-list > li {
-  scroll-margin-top: 116px;
+  scroll-margin-top: 44px;
   border-bottom: 1px solid #d6d3d1;
 }
 .dark .event-list > li {
@@ -342,15 +354,16 @@
 .event-select {
   display: block;
   text-align: left;
-  padding: 13px 18px;
+  padding: 11px 18px;
   width: 100%;
   border-left: 3px solid transparent;
 }
 .event-select strong {
   display: block;
-  font:
-    17px "Source Serif 4",
-    serif;
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
 }
 .event-select small {
   display: block;
@@ -368,7 +381,9 @@
 .event-detail {
   font-size: 13px;
   line-height: 1.55;
-  padding: 0 18px 16px 21px;
+  margin: 0 18px;
+  padding: 8px 0 16px;
+  border-top: 1px solid #d6d3d1;
 }
 .event-detail p {
   margin: 8px 0;
@@ -377,12 +392,15 @@
   font-size: 11px;
   color: #78716c;
 }
-.event-navigation {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: space-between;
+.event-date {
   font-size: 12px;
+  color: #57534e;
+}
+.dark .event-date {
+  color: #a1a1aa;
+}
+.dark .event-detail {
+  border-color: #3f3f46;
 }
 .places-map-fallback {
   position: absolute;
@@ -457,23 +475,20 @@
   }
   .places-map-events {
     width: 100%;
-    height: 42%;
+    height: 35%;
     border-left: 0;
     border-top: 1px solid #a8a29e;
-  }
-  .event-filters {
-    padding: 8px 14px;
   }
   .event-select {
     padding: 10px 14px;
   }
   .places-map-controls {
-    left: 10px;
-    right: 10px;
-    top: 8px;
+    padding: 0 6px;
+    gap: 0;
   }
   .places-map-controls button {
-    padding: 7px;
+    padding: 9px 6px;
+    font-size: 11px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -515,7 +530,4 @@
   max-width: min(280px, calc(100vw - 40px));
   white-space: normal;
   overflow-wrap: anywhere;
-}
-.dark .event-filters {
-  background: #18181b;
 }

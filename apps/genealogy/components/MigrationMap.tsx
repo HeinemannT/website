@@ -1,14 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Minus, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
-import { filterEvents, validSelection } from "../utils/explorers.mjs";
+import React, { useEffect, useRef, useState } from "react";
+import { Plus, Minus } from "lucide-react";
+import { validSelection } from "../utils/explorers.mjs";
 import { createPlacesMap, MapCamera } from "../utils/placesMap";
 import type { MigrationPoint } from "../types";
 import "leaflet/dist/leaflet.css";
 import "../styles/explorers.css";
 export interface MapState {
   event: string;
-  kind: string;
-  undated: boolean;
   camera: MapCamera | null;
 }
 interface Props {
@@ -32,10 +30,6 @@ export default function MigrationMap({
   const [fallback, setFallback] = useState(false),
     [tileError, setTileError] = useState(false),
     [expanded, setExpanded] = useState(true);
-  const visible = useMemo(
-    () => filterEvents(points, state.kind, state.undated),
-    [points, state.kind, state.undated],
-  );
   const select = (id: string) => {
     const { state: s, onChange: change } = latest.current;
     const next = { ...s, event: id, camera: null };
@@ -66,17 +60,12 @@ export default function MigrationMap({
     };
   }, []);
   useEffect(() => {
-    const id = validSelection(visible, state.event);
+    const id = validSelection(points, state.event);
     if (id !== state.event) onChange({ ...state, event: id });
-    api.current?.update(
-      points,
-      new Set(visible.map((p) => p.id)),
-      id,
-      isDarkMode,
-    );
-  }, [points, visible, state.event, isDarkMode]);
+    api.current?.update(points, id, isDarkMode);
+  }, [points, state.event, isDarkMode]);
   useEffect(() => {
-    const point = visible.find((p) => p.id === state.event);
+    const point = points.find((p) => p.id === state.event);
     if (point && !state.camera) api.current?.focus(point);
   }, [state.event]);
   useEffect(() => {
@@ -84,140 +73,81 @@ export default function MigrationMap({
       .getElementById(`event-${state.event}`)
       ?.scrollIntoView({ block: "nearest" });
   }, [state.event]);
-  const kinds = [...new Set(points.map((p) => p.event_type))];
-  const step = (offset: number) => {
-    if (!visible.length) return;
-    const i = visible.findIndex((p) => p.id === state.event);
-    select(visible[(i + offset + visible.length) % visible.length].id);
-  };
   return (
     <section
       className="explorer places-map-explorer"
       aria-label="Recorded places explorer"
     >
-      <div className="explorer-heading">
-        <div>
-          <h2>Places in the family record</h2>
-          <p>Approximate recorded places; no traveled route is established.</p>
-        </div>
-        <MapPin size={22} className="hidden sm:block text-stone-500" />
-      </div>
       <div className="places-map-body">
         <div className="places-map-stage">
-          <div ref={host} className="places-map-canvas" />
-          {fallback ? (
-            <div className="places-map-fallback" role="status">
-              The map is unavailable.
-              <br />
-              All records and source links remain available in the event list.
+          <nav className="places-map-controls" aria-label="Map area and zoom">
+            <div>
+              <button onClick={() => api.current?.fit(points)}>
+                All places
+              </button>
+              <button
+                onClick={() =>
+                  api.current?.fit(
+                    points.filter(
+                      (p) =>
+                        p.coordinates &&
+                        p.coordinates.lat > 22 &&
+                        p.coordinates.lat < 24 &&
+                        p.coordinates.lng > 112 &&
+                        p.coordinates.lng < 114,
+                    ),
+                  )
+                }
+              >
+                Guangdong
+              </button>
+              <button
+                onClick={() =>
+                  api.current?.fit(
+                    points.filter(
+                      (p) => p.coordinates && p.coordinates.lat < 0,
+                    ),
+                  )
+                }
+              >
+                South Africa
+              </button>
             </div>
-          ) : (
-            <div className="places-map-controls">
-              <div>
-                <button onClick={() => api.current?.fit(visible)}>
-                  All places
-                </button>
-                <button
-                  onClick={() =>
-                    api.current?.fit(
-                      visible.filter(
-                        (p) =>
-                          p.coordinates &&
-                          p.coordinates.lat > 22 &&
-                          p.coordinates.lat < 24 &&
-                          p.coordinates.lng > 112 &&
-                          p.coordinates.lng < 114,
-                      ),
-                    )
-                  }
-                >
-                  Guangdong
-                </button>
-                <button
-                  onClick={() =>
-                    api.current?.fit(
-                      visible.filter(
-                        (p) => p.coordinates && p.coordinates.lat < 0,
-                      ),
-                    )
-                  }
-                >
-                  South Africa
-                </button>
-              </div>
-              <div>
-                <button
-                  aria-label="Zoom out map"
-                  onClick={() => api.current?.zoom(-1)}
-                >
-                  <Minus size={16} />
-                </button>
-                <button
-                  aria-label="Zoom in map"
-                  onClick={() => api.current?.zoom(1)}
-                >
-                  <Plus size={16} />
-                </button>
-              </div>
+            <div>
+              <button
+                aria-label="Zoom out map"
+                onClick={() => api.current?.zoom(-1)}
+              >
+                <Minus size={16} />
+              </button>
+              <button
+                aria-label="Zoom in map"
+                onClick={() => api.current?.zoom(1)}
+              >
+                <Plus size={16} />
+              </button>
             </div>
-          )}
-          {tileError && (
-            <p className="map-tile-error" role="status">
-              Some map tiles could not load. The event list remains available.
-            </p>
-          )}
+          </nav>
+          <div className="places-map-view">
+            <div ref={host} className="places-map-canvas" />
+            {fallback && (
+              <div className="places-map-fallback" role="status">
+                The map is unavailable.
+                <br />
+                All records and source links remain available in the list.
+              </div>
+            )}
+            {tileError && (
+              <p className="map-tile-error" role="status">
+                Some map tiles could not load. The event list remains available.
+              </p>
+            )}
+          </div>
         </div>
         <aside className="places-map-events" aria-label="Recorded events">
-          <div className="event-filters">
-            <label>
-              Event{" "}
-              <select
-                aria-label="Filter event kind"
-                value={state.kind}
-                onChange={(e) => onChange({ ...state, kind: e.target.value })}
-              >
-                <option value="all">All kinds</option>
-                {kinds.map((k) => (
-                  <option key={k} value={k}>
-                    {k.replaceAll("_", " ")}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={state.undated}
-                onChange={(e) =>
-                  onChange({ ...state, undated: e.target.checked })
-                }
-              />{" "}
-              Include undated
-            </label>
-            <div className="event-navigation w-full">
-              <button
-                aria-label="Previous event"
-                onClick={() => step(-1)}
-                disabled={!visible.length}
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <span>
-                {visible.length} records ·{" "}
-                {visible.filter((p) => !p.coordinates).length} unresolved
-                locations
-              </span>
-              <button
-                aria-label="Next event"
-                onClick={() => step(1)}
-                disabled={!visible.length}
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
+          <h2 className="places-list-heading">Recorded places</h2>
           <ol className="event-list">
-            {visible.map((p) => (
+            {points.map((p) => (
               <li key={p.id} id={`event-${p.id}`}>
                 <button
                   className="event-select"
@@ -226,7 +156,9 @@ export default function MigrationMap({
                 >
                   <strong>{p.name}</strong>
                   <small>
-                    {p.date_label} · {p.event_type.replaceAll("_", " ")}
+                    {p.year === null
+                      ? "Undated"
+                      : `${p.date_label.trim().startsWith("c.") ? "c. " : ""}${p.year}${p.year_end && p.year_end !== p.year ? `–${p.year_end}` : ""}`}
                     {!p.coordinates ? " · Location unresolved" : ""}
                   </small>
                 </button>
@@ -234,6 +166,9 @@ export default function MigrationMap({
                   <div className="event-detail">
                     {expanded && (
                       <>
+                        <p className="event-date">
+                          {p.date_label} · {p.event_type.replaceAll("_", " ")}
+                        </p>
                         <p>{p.description}</p>
                         {p.coordinates &&
                           points
@@ -250,8 +185,6 @@ export default function MigrationMap({
                                 onClick={() => {
                                   const next = {
                                     ...state,
-                                    kind: "all",
-                                    undated: true,
                                     event: other.id,
                                     camera: null,
                                   };
@@ -289,9 +222,6 @@ export default function MigrationMap({
               </li>
             ))}
           </ol>
-          {!visible.length && (
-            <p className="p-4 text-sm">No records match these filters.</p>
-          )}
         </aside>
       </div>
     </section>

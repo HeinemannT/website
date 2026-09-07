@@ -96,12 +96,6 @@ export function focusedLayout(people, selectedId, mode = "family") {
   };
 }
 
-export function filterEvents(points, kind = "all", undated = true) {
-  return points.filter(
-    (p) =>
-      (kind === "all" || p.event_type === kind) && (undated || p.year !== null),
-  );
-}
 // Guangxi is a province-level identification, not an identified town/site.
 export function focusZoom(point) {
   if (!point.coordinates) return null;

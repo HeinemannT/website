@@ -167,6 +167,7 @@ export function createPlacesMap(host: HTMLDivElement, options: Options) {
   }
   return {
     update,
+    stop: manualMove,
     focus,
     fit,
     zoom: (offset: number) => {

@@ -8,11 +8,12 @@ import {
 } from "lucide-react";
 import type { MigrationPoint } from "../types";
 import {
-  adjacentRecord,
-  chronologicalRecords,
+  adjacentMapStop,
+  datedMapStops,
   chronologyBounds,
   PLAYBACK_DELAY,
-  recordAtYear,
+  mapStopAtYear,
+  mapPlaybackStart,
   hasCoordinates,
 } from "../utils/chronology.mjs";
 
@@ -34,7 +35,7 @@ export default function ChronologyTimeline({
 }: Props) {
   const selectRef = useRef(onSelect);
   selectRef.current = onSelect;
-  const dated = useMemo(() => chronologicalRecords(records), [records]);
+  const stops = useMemo(() => datedMapStops(records), [records]);
   const bounds = useMemo(() => chronologyBounds(records), [records]);
   const [playing, setPlaying] = useState(false);
   const current = records.find((r) => r.id === selected);
@@ -51,26 +52,26 @@ export default function ChronologyTimeline({
   useEffect(() => {
     if (!playing || document.hidden) return;
     const timer = window.setTimeout(() => {
-      const next = adjacentRecord(dated, selected, year, 1);
+      const next = adjacentMapStop(stops, current, year, 1);
       if (next) selectRef.current(next.id, true);
       else setPlaying(false);
     }, PLAYBACK_DELAY);
     return () => window.clearTimeout(timer);
-  }, [playing, dated, selected, year]);
+  }, [playing, stops, selected, year]);
   if (!bounds)
     return (
       <div className="chronology-empty">
         No dated records. Undated records remain in the list.
       </div>
     );
-  const prev = adjacentRecord(dated, selected, year, -1),
-    next = adjacentRecord(dated, selected, year, 1);
+  const prev = adjacentMapStop(stops, current, year, -1),
+    next = adjacentMapStop(stops, current, year, 1);
   const stop = () => setPlaying(false);
   const choose = (id: string) => {
     stop();
     onSelect(id);
   };
-  const ticks = [...new Set<number>(dated.map((r: MigrationPoint) => r.year!))];
+  const ticks = [...new Set<number>(stops.map((r: MigrationPoint) => r.year!))];
   const undated = records.find((r) => r.year === null);
   const percent = (value: number) =>
     bounds.max === bounds.min
@@ -80,7 +81,9 @@ export default function ChronologyTimeline({
     <section className="chronology" aria-label="Family chronology">
       <div className="chronology-current">
         <div className="chronology-year">
-          {current && current.year !== year ? (
+          {current?.year === null ? (
+            <><span className="chronology-undated-date">Undated</span><small>Year cursor: {year}</small></>
+          ) : current && current.year !== year ? (
             <>
               <small>Year cursor</small>
               {year}
@@ -96,39 +99,46 @@ export default function ChronologyTimeline({
           <strong>{current?.name ?? "Explore the family chronology"}</strong>
           <span>
             {current?.date_label ??
-              "Drag the year slider or select a dated record."}
+              (stops.length ? "No mapped record at or before this year." : "No dated places. Select records from the list.")}
             {current && !hasCoordinates(current) ? " · Location unrecorded" : ""}
           </span>
         </div>
         <div className="chronology-buttons">
           <button
-            aria-label="Reset timeline"
-            onClick={() => choose(dated[0].id)}
+            aria-label="Reset to first dated place"
+            title="Reset to first dated place"
+            disabled={!stops.length}
+            onClick={() => stops[0] && choose(stops[0].id)}
           >
             <RotateCcw size={16} />
           </button>
           <button
-            aria-label="Previous dated record"
+            aria-label="Previous dated place"
+            title="Previous dated place"
             disabled={!prev}
             onClick={() => prev && choose(prev.id)}
           >
             <ChevronLeft size={18} />
           </button>
           <button
-            aria-label={playing ? "Pause timeline" : "Play timeline"}
+            aria-label={playing ? "Pause map timeline" : "Play map timeline"}
+            title={playing ? "Pause map timeline" : "Play dated places"}
+            disabled={!stops.length}
             onClick={() => {
               if (playing) {
                 stop();
                 return;
               }
-              if (!next) onSelect(dated[0].id, true);
+              const start = mapPlaybackStart(stops, current, year);
+              if (start) onSelect(start.id, true);
               setPlaying(true);
             }}
           >
             {playing ? <Pause size={18} /> : <Play size={18} />}
           </button>
           <button
-            aria-label="Next dated record"
+            aria-label="Next dated place"
+            title="Next dated place"
             disabled={!next}
             onClick={() => next && choose(next.id)}
           >
@@ -149,12 +159,12 @@ export default function ChronologyTimeline({
         <input
           type="range"
           aria-label="Timeline year"
-          aria-valuetext={`${year}, ${recordAtYear(dated, year)?.name ?? "no dated record"}`}
+          aria-valuetext={`${year}, ${mapStopAtYear(stops, year)?.name ?? "no dated mapped record at or before this year"}`}
           min={bounds.min}
           max={bounds.max}
           step={1}
           value={year}
-          disabled={bounds.min === bounds.max}
+          disabled={!stops.length || bounds.min === bounds.max}
           onPointerDown={stop}
           onKeyDown={stop}
           onChange={(e) => {

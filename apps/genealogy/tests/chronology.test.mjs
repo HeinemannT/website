@@ -9,7 +9,10 @@ import {
   PLAYBACK_DELAY,
   reachedPlaces,
   recordAtYear,
-  adjacentPlace,
+  datedMapStops,
+  adjacentMapStop,
+  mapStopAtYear,
+  mapPlaybackStart,
   hasCoordinates,
   eligibleConnections,
 } from "../utils/chronology.mjs";
@@ -26,7 +29,7 @@ const additions = JSON.parse(
 const full = [...data.migration.points, ...additions];
 const connections = JSON.parse(fs.readFileSync(new URL("../public/place-connections.json", import.meta.url), "utf8")).connections;
 
-test("place navigation skips unlocated and same-position events, retains undated places and stops at endpoints", () => {
+test("one dated map sequence skips unlocated, invalid and repeated positions without dating undated places", () => {
   const records = [
     { id: "a", year: 1400, coordinates: { lat: 23, lng: 113 } },
     { id: "life", year: 1401, coordinates: null },
@@ -36,18 +39,56 @@ test("place navigation skips unlocated and same-position events, retains undated
     { id: "unknown", year: null, coordinates: null },
     { id: "u", year: null, coordinates: { lat: 24, lng: 114 } },
   ];
-  assert.equal(adjacentPlace(records, "a", 1400, 1).id, "b");
-  assert.equal(adjacentPlace(records, "life", 1401, 1).id, "duplicate");
-  assert.equal(adjacentPlace(records, "life", 1401, -1).id, "a");
-  assert.equal(adjacentPlace(records, "b", 1900, 1).id, "u");
-  assert.equal(adjacentPlace(records, "u", 1900, 1), null);
-  assert.equal(adjacentPlace(records, "a", 1400, -1), null);
-  assert.equal(adjacentPlace(records, "missing", 1500, 1).id, "b");
-  assert.equal(adjacentPlace(records, "missing", 1500, -1).id, "duplicate");
-  assert.equal(adjacentPlace(records, "unknown", 1900, 1).year, null);
+  const stops = datedMapStops(records);
+  assert.deepEqual(stops.map((p) => p.id), ["a", "b"]);
+  assert.equal(adjacentMapStop(stops, records[0], 1400, 1).id, "b");
+  assert.equal(adjacentMapStop(stops, records[1], 1401, 1).id, "b");
+  assert.equal(adjacentMapStop(stops, records[1], 1401, -1).id, "a");
+  assert.equal(adjacentMapStop(stops, records[2], 1402, -1), null);
+  assert.equal(adjacentMapStop(stops, records[2], 1402, 1).id, "b");
+  assert.equal(adjacentMapStop(stops, records[4], 1900, 1), null);
+  assert.equal(adjacentMapStop(stops, records[0], 1400, -1), null);
+  assert.equal(adjacentMapStop(stops, null, 1500, 1).id, "b");
+  assert.equal(adjacentMapStop(stops, null, 1500, -1).id, "a");
+  assert.equal(mapPlaybackStart(stops, records[4], 1900).id, "a");
+  assert.equal(mapPlaybackStart(stops, records[1], 1401).id, "a");
+  assert.equal(mapPlaybackStart(stops, records[6], 1500).id, "a");
+  assert.equal(mapPlaybackStart(stops, null, 1000).id, "a");
+  assert.equal(mapStopAtYear(stops, 1399), null, "scrubbing never selects a future place");
+  assert.equal(mapStopAtYear(stops, 1500).id, "a");
+  assert.equal(mapStopAtYear(stops, 1900).id, "b");
   for (const coordinates of [null, { lat: NaN, lng: 0 }, { lat: 91, lng: 0 }, { lat: 0, lng: -181 }])
     assert.equal(hasCoordinates({ coordinates }), false);
   assert.ok(!reachedPlaces(records, 2000).some((p) => p.id === "bad"));
+});
+
+test("same-year distinct places remain separate stops and empty/undated-only sequences stay inert", () => {
+  const records = [
+    { id: "a", year: 1900, sort_date: "1900-01-01", coordinates: { lat: 23, lng: 113 } },
+    { id: "b", year: 1900, sort_date: "1900-02-01", coordinates: { lat: 24, lng: 114 } },
+    { id: "c", year: 1901, coordinates: { lat: 23, lng: 113 } },
+  ];
+  const stops = datedMapStops(records);
+  assert.equal(stops.length, 3, "returning to an earlier place after another stop is retained");
+  assert.equal(adjacentMapStop(stops, records[0], 1900, 1).id, "b");
+  assert.equal(adjacentMapStop(stops, records[1], 1900, -1).id, "a");
+  assert.equal(mapStopAtYear(stops, 1900).id, "b");
+  for (const input of [[], [{ id: "life", year: 1400, coordinates: null }], [{ id: "undated", year: null, coordinates: { lat: 23, lng: 113 } }]]) {
+    const empty = datedMapStops(input);
+    assert.deepEqual(empty, []);
+    assert.equal(mapPlaybackStart(empty, input[0], 1500), null);
+    assert.equal(mapStopAtYear(empty, 1500), null);
+    assert.equal(adjacentMapStop(empty, input[0], 1500, 1), null);
+  }
+});
+
+test("real map transport has six geographic stops while all 191 records stay available", () => {
+  const stops = datedMapStops(full);
+  assert.deepEqual(stops.map((p) => p.year), [1378, 1509, 1848, 1857, 1870, 1955]);
+  assert.equal(adjacentMapStop(stops, full.find((p) => p.id === "shunde_conflict"), 1870, 1).id, "port_elizabeth");
+  assert.equal(mapPlaybackStart(stops, stops.at(-1), 1955).id, "xiaolao");
+  assert.equal(mapStopAtYear(stops, 1800).id, "chronology_009");
+  assert.equal(full.length, 191);
 });
 
 test("connections are explicitly sourced endpoint associations, limited to selected and reached places", () => {

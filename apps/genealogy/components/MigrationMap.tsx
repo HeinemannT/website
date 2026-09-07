@@ -7,8 +7,8 @@ import {
   chronologicalRecords,
   chronologyBounds,
   reachedPlaces,
-  recordAtYear,
-  adjacentPlace,
+  mapStopAtYear,
+  datedMapStops,
   eligibleConnections,
   hasCoordinates,
 } from "../utils/chronology.mjs";
@@ -105,6 +105,7 @@ function RecordedMap({
   const [focusRequest, setFocusRequest] = useState(0);
   const pause = () => setInteraction((n) => n + 1);
   const dated = useMemo(() => chronologicalRecords(points), [points]);
+  const stops = useMemo(() => datedMapStops(points), [points]);
   const bounds = useMemo(() => chronologyBounds(points), [points]);
   const requestedYear =
     state.year ??
@@ -126,8 +127,6 @@ function RecordedMap({
     connectionData.connections as PlaceConnection[], points, state.event,
     new Set(reached.map((p) => p.id)),
   ), [points, state.event, reached]);
-  const previousPlace = adjacentPlace(points, state.event, currentYear, -1);
-  const nextPlace = adjacentPlace(points, state.event, currentYear, 1);
   const selectRef = useRef<(id: string) => void>(() => {});
   const select = (id: string, automatic = false) => {
     if (!automatic) pause();
@@ -147,7 +146,8 @@ function RecordedMap({
   selectRef.current = select;
   const scrub = (year: number) => {
     pause();
-    const record = recordAtYear(dated, year);
+    const record = mapStopAtYear(stops, year);
+    if (!record) api.current?.stop();
     const { state: s, onChange: change } = latest.current;
     const next = {
       ...s,
@@ -165,8 +165,8 @@ function RecordedMap({
     const record =
       existing && (existing.year === null || existing.year <= currentYear)
         ? existing
-        : recordAtYear(dated, currentYear);
-    if (state.year !== currentYear || state.event !== record?.id) {
+        : mapStopAtYear(stops, currentYear);
+    if (state.year !== currentYear || state.event !== (record?.id ?? "")) {
       const next = { ...state, year: currentYear, event: record?.id ?? "" };
       latest.current.state = next;
       onChange(next);
@@ -273,14 +273,6 @@ function RecordedMap({
                 <Plus size={16} />
               </button>
             </div>
-          </nav>
-          <nav className="recorded-place-controls" aria-label="Recorded place navigation">
-            <button disabled={!previousPlace} onClick={() => previousPlace && select(previousPlace.id)}>
-              ← Previous place
-            </button>
-            <button disabled={!nextPlace} onClick={() => nextPlace && select(nextPlace.id)}>
-              Next place →
-            </button>
           </nav>
           <div className="places-map-view">
             <div ref={host} className="places-map-canvas" />

@@ -45,22 +45,35 @@ export function hasCoordinates(record) {
     Math.abs(c.lat) <= 90 && Math.abs(c.lng) <= 180);
 }
 
-// Undated records follow dated records without assigning them a year.
-export function adjacentPlace(records, id, year, direction) {
-  const ordered = [...chronologicalRecords(records), ...records.filter((r) => r.year === null)];
-  let index = ordered.findIndex((r) => r.id === id);
-  const current = ordered[index];
-  if (index < 0) {
-    index = ordered.findLastIndex((r) => Number.isFinite(r.year) && r.year <= year);
-    if (direction < 0) index += 1;
-  }
-  for (let i = index + direction; i >= 0 && i < ordered.length; i += direction) {
-    const candidate = ordered[i];
-    if (hasCoordinates(candidate) && (!hasCoordinates(current) ||
-      candidate.coordinates.lat !== current.coordinates.lat ||
-      candidate.coordinates.lng !== current.coordinates.lng)) return candidate;
-  }
-  return null;
+// One dated sequence for the transport, playback and slider. Other records remain in the list.
+export function datedMapStops(records) {
+  return chronologicalRecords(records).filter(hasCoordinates).filter((record, index, located) =>
+    index === 0 || record.coordinates.lat !== located[index - 1].coordinates.lat ||
+    record.coordinates.lng !== located[index - 1].coordinates.lng);
+}
+
+export function mapStopAtYear(stops, year) {
+  return stops.findLast((record) => record.year <= year) ?? null;
+}
+
+function selectedMapStop(stops, selected) {
+  if (!selected) return null;
+  const exact = stops.find((record) => record.id === selected.id);
+  if (exact) return exact;
+  const previous = mapStopAtYear(stops, selected.year);
+  return Number.isFinite(selected.year) && hasCoordinates(selected) && previous &&
+    previous.coordinates.lat === selected.coordinates.lat &&
+    previous.coordinates.lng === selected.coordinates.lng ? previous : null;
+}
+
+export function adjacentMapStop(stops, selected, year, direction) {
+  return adjacentRecord(stops, selectedMapStop(stops, selected)?.id ?? "", year, direction);
+}
+
+export function mapPlaybackStart(stops, selected, year) {
+  const current = selectedMapStop(stops, selected);
+  if (current) return current === stops.at(-1) ? stops[0] : current;
+  return mapStopAtYear(stops, year) ?? stops[0] ?? null;
 }
 
 // Curated source associations only; proximity, surname and event order are not evidence.

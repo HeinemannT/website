@@ -73,6 +73,9 @@ test("map cancels stale flights, reselects places, retains layers, and disposes 
   api.focus(a);
   listeners.get("pointerdown")();
   assert.equal(flying, false, "manual pan can interrupt programmatic flights");
+  api.focus(b);
+  api.stop();
+  assert.equal(flying, false, "an empty slider selection can stop without inventing coordinates");
   api.dispose();
   assert.equal(listeners.size, 0);
   assert.equal(events.size, 0);

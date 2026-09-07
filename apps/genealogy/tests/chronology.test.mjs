@@ -9,6 +9,9 @@ import {
   PLAYBACK_DELAY,
   reachedPlaces,
   recordAtYear,
+  adjacentPlace,
+  hasCoordinates,
+  eligibleConnections,
 } from "../utils/chronology.mjs";
 import { explorerHash, parseExplorerHash } from "../utils/explorers.mjs";
 const data = yaml.load(
@@ -21,6 +24,55 @@ const additions = JSON.parse(
   ),
 ).points;
 const full = [...data.migration.points, ...additions];
+const connections = JSON.parse(fs.readFileSync(new URL("../public/place-connections.json", import.meta.url), "utf8")).connections;
+
+test("place navigation skips unlocated and same-position events, retains undated places and stops at endpoints", () => {
+  const records = [
+    { id: "a", year: 1400, coordinates: { lat: 23, lng: 113 } },
+    { id: "life", year: 1401, coordinates: null },
+    { id: "duplicate", year: 1402, coordinates: { lat: 23, lng: 113 } },
+    { id: "bad", year: 1403, coordinates: { lat: Infinity, lng: 0 } },
+    { id: "b", year: 1900, coordinates: { lat: -32, lng: 27 } },
+    { id: "unknown", year: null, coordinates: null },
+    { id: "u", year: null, coordinates: { lat: 24, lng: 114 } },
+  ];
+  assert.equal(adjacentPlace(records, "a", 1400, 1).id, "b");
+  assert.equal(adjacentPlace(records, "life", 1401, 1).id, "duplicate");
+  assert.equal(adjacentPlace(records, "life", 1401, -1).id, "a");
+  assert.equal(adjacentPlace(records, "b", 1900, 1).id, "u");
+  assert.equal(adjacentPlace(records, "u", 1900, 1), null);
+  assert.equal(adjacentPlace(records, "a", 1400, -1), null);
+  assert.equal(adjacentPlace(records, "missing", 1500, 1).id, "b");
+  assert.equal(adjacentPlace(records, "missing", 1500, -1).id, "duplicate");
+  assert.equal(adjacentPlace(records, "unknown", 1900, 1).year, null);
+  for (const coordinates of [null, { lat: NaN, lng: 0 }, { lat: 91, lng: 0 }, { lat: 0, lng: -181 }])
+    assert.equal(hasCoordinates({ coordinates }), false);
+  assert.ok(!reachedPlaces(records, 2000).some((p) => p.id === "bad"));
+});
+
+test("connections are explicitly sourced endpoint associations, limited to selected and reached places", () => {
+  const reached = new Set(reachedPlaces(full, 1955).map((p) => p.id));
+  assert.equal(connections.length, 2);
+  assert.equal(eligibleConnections(connections, full, "port_elizabeth", reached)[0].id, "zhenbang-death-and-burial");
+  assert.equal(eligibleConnections(connections, full, "guangxi", reached).length, 0);
+  assert.equal(eligibleConnections(connections, full, "queenstown", new Set(["queenstown"])).length, 0);
+  for (const connection of connections) {
+    assert.equal(connection.kind, "place_association");
+    assert.equal(connection.year, undefined);
+    for (const ref of connection.source_refs) {
+      const page = data.pages.find((p) => p.page_id === ref.page_ref);
+      for (const column of ref.column_refs) assert.ok(page.columns.some((c) => c.id === column));
+    }
+  }
+  const burialSource = data.pages.find((p) => p.page_id === "img_05").columns.filter((c) => [3, 4, 5].includes(c.id)).map((c) => c.translation).join(" ");
+  assert.match(burialSource, /this village.*moved the burial to Xiqiao/s);
+  const deathBurialSource = data.pages.find((p) => p.page_id === "img_36").columns.find((c) => c.id === 6).translation;
+  assert.match(deathBurialSource, /Bonishibi.*buried.*Queenstown/s);
+  assert.match(connections[1].description, /tentative/);
+  const valid = connections[1];
+  for (const invalid of [{ ...valid, source_refs: [] }, { ...valid, kind: "journey" }, { ...valid, toId: "yuping" }, { ...valid, toId: valid.fromId }])
+    assert.equal(eligibleConnections([invalid], full, "port_elizabeth", reached).length, 0);
+});
 
 test("reviewed chronology merges 191 unique records, 175 dated and 16 unresolved, with valid cross-page sources", () => {
   assert.equal(full.length, 191);

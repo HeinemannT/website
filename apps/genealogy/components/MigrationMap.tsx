@@ -8,8 +8,12 @@ import {
   chronologyBounds,
   reachedPlaces,
   recordAtYear,
+  adjacentPlace,
+  eligibleConnections,
+  hasCoordinates,
 } from "../utils/chronology.mjs";
-import type { MigrationPoint } from "../types";
+import type { MigrationPoint, PlaceConnection } from "../types";
+import connectionData from "../public/place-connections.json";
 import "leaflet/dist/leaflet.css";
 import "../styles/explorers.css";
 export interface MapState {
@@ -98,6 +102,7 @@ function RecordedMap({
     [tileError, setTileError] = useState(false),
     [expanded, setExpanded] = useState(true);
   const [interaction, setInteraction] = useState(0);
+  const [focusRequest, setFocusRequest] = useState(0);
   const pause = () => setInteraction((n) => n + 1);
   const dated = useMemo(() => chronologicalRecords(points), [points]);
   const bounds = useMemo(() => chronologyBounds(points), [points]);
@@ -117,6 +122,12 @@ function RecordedMap({
     () => [...dated, ...points.filter((p) => p.year === null)],
     [points, dated],
   );
+  const connections = useMemo(() => eligibleConnections(
+    connectionData.connections as PlaceConnection[], points, state.event,
+    new Set(reached.map((p) => p.id)),
+  ), [points, state.event, reached]);
+  const previousPlace = adjacentPlace(points, state.event, currentYear, -1);
+  const nextPlace = adjacentPlace(points, state.event, currentYear, 1);
   const selectRef = useRef<(id: string) => void>(() => {});
   const select = (id: string, automatic = false) => {
     if (!automatic) pause();
@@ -131,7 +142,7 @@ function RecordedMap({
     latest.current.state = next;
     change(next);
     setExpanded(true);
-    if (point && id === s.event) api.current?.focus(point);
+    setFocusRequest((n) => n + 1);
   };
   selectRef.current = select;
   const scrub = (year: number) => {
@@ -142,10 +153,11 @@ function RecordedMap({
       ...s,
       year,
       event: record?.id ?? "",
-      camera: record?.id === s.event ? s.camera : null,
+      camera: null,
     };
     latest.current.state = next;
     change(next);
+    setFocusRequest((n) => n + 1);
   };
   useEffect(() => {
     if (!bounds) return;
@@ -168,7 +180,9 @@ function RecordedMap({
         onSelect: (id) => selectRef.current(id),
         onRest: (camera) => {
           const { state: s, onChange: change } = latest.current;
-          change({ ...s, camera });
+          const next = { ...s, camera };
+          latest.current.state = next;
+          change(next);
         },
         onTileError: () => setTileError(true),
       });
@@ -188,12 +202,13 @@ function RecordedMap({
       id,
       isDarkMode,
       new Set(reached.map((p) => p.id)),
+      connections,
     );
-  }, [points, state.event, isDarkMode, reached]);
+  }, [points, state.event, isDarkMode, reached, connections]);
   useEffect(() => {
     const point = points.find((p) => p.id === state.event);
     if (point && !state.camera) api.current?.focus(point);
-  }, [state.event]);
+  }, [state.event, focusRequest]);
   useEffect(() => {
     document
       .getElementById(`event-${state.event}`)
@@ -214,7 +229,7 @@ function RecordedMap({
           <nav className="places-map-controls" aria-label="Map area and zoom">
             <div>
               <button onClick={() => api.current?.fit(reached)}>
-                All places
+                Places reached
               </button>
               <button
                 onClick={() =>
@@ -259,6 +274,14 @@ function RecordedMap({
               </button>
             </div>
           </nav>
+          <nav className="recorded-place-controls" aria-label="Recorded place navigation">
+            <button disabled={!previousPlace} onClick={() => previousPlace && select(previousPlace.id)}>
+              ← Previous place
+            </button>
+            <button disabled={!nextPlace} onClick={() => nextPlace && select(nextPlace.id)}>
+              Next place →
+            </button>
+          </nav>
           <div className="places-map-view">
             <div ref={host} className="places-map-canvas" />
             {fallback && (
@@ -274,6 +297,9 @@ function RecordedMap({
               </p>
             )}
           </div>
+          {connections.length > 0 && (
+            <p className="map-connection-key">Dashed line: source-linked places · approximate areas, not a travel route</p>
+          )}
         </div>
         <aside
           className="places-map-events"
@@ -304,7 +330,7 @@ function RecordedMap({
                       : p.year === null
                         ? "Undated"
                         : `${p.date_label.trim().startsWith("c.") ? "c. " : ""}${p.year}${p.year_end && p.year_end !== p.year ? `–${p.year_end}` : ""}`}
-                    {!p.coordinates ? " · Location unrecorded" : ""}
+                    {!hasCoordinates(p) ? " · Location unrecorded" : ""}
                   </small>
                 </button>
                 {state.event === p.id && (
@@ -332,6 +358,19 @@ function RecordedMap({
                           </button>
                         ))}
                         <p>{p.description.split("\n\nSource:")[0]}</p>
+                        {connections.map((connection) => (
+                          <div key={connection.id} className="place-connection-detail">
+                            <p>{connection.description}</p>
+                            {connection.source_refs.map((ref) => (
+                              <button key={ref.page_ref} className="source-link block" onClick={() => onNavigate?.(ref.page_ref)}>
+                                Connection source: page {Number(ref.page_ref.slice(4))}, columns {ref.column_refs.join(", ")} →
+                              </button>
+                            ))}
+                            <button className="source-link" onClick={() => api.current?.fit(points.filter((p) => [connection.fromId, connection.toId].includes(p.id)))}>
+                              Show both connected places
+                            </button>
+                          </div>
+                        ))}
                         {p.coordinates &&
                           points
                             .filter(
@@ -352,7 +391,7 @@ function RecordedMap({
                             ))}
                         <p className="evidence">
                           {p.evidence}.{" "}
-                          {p.coordinates
+                          {hasCoordinates(p)
                             ? `Location: ${p.coordinate_precision}.`
                             : "Location unrecorded."}
                         </p>

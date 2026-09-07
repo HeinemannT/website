@@ -92,6 +92,15 @@ export interface MigrationPath {
   year: number;
 }
 
+export interface PlaceConnection {
+  id: string;
+  kind: "place_association";
+  fromId: string;
+  toId: string;
+  description: string;
+  source_refs: { page_ref: string; column_refs: number[] }[];
+}
+
 export interface GenealogyData {
   metadata: DocumentMetadata;
   pages: PageData[];

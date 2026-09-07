@@ -311,6 +311,35 @@
   color: #a63434;
   background: #00000005;
 }
+.recorded-place-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 12px;
+  border-bottom: 1px solid #d6d3d1;
+  background: #faf9f6;
+}
+.recorded-place-controls button {
+  min-height: 44px;
+  padding: 8px;
+  font-size: 12px;
+}
+.recorded-place-controls button:disabled { opacity: 0.35; }
+.dark .recorded-place-controls { background: #18181b; border-color: #3f3f46; }
+.map-connection-key {
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 11px;
+  line-height: 1.4;
+  background: #faf9f6;
+}
+.dark .map-connection-key { background: #18181b; }
+.place-connection-detail {
+  margin: 12px 0;
+  padding: 8px 0;
+  border-top: 1px dashed #a8a29e;
+  border-bottom: 1px dashed #a8a29e;
+}
 .dark .places-map-controls {
   background: #18181b;
   border-color: #3f3f46;

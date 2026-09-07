@@ -1,0 +1,20 @@
+{
+  "connections": [
+    {
+      "id": "first-ancestors-wife-reburial",
+      "kind": "place_association",
+      "fromId": "xiaolao",
+      "toId": "xiqiao",
+      "description": "Yanzhong’s wife: the manuscript describes moving her burial from the home village to Xiqiao. The dashed line connects approximate areas; it does not trace the route or assign a relocation year. The village marker separately records Yanzhong’s settlement.",
+      "source_refs": [{ "page_ref": "img_05", "column_refs": [3, 4, 5] }]
+    },
+    {
+      "id": "zhenbang-death-and-burial",
+      "kind": "place_association",
+      "fromId": "port_elizabeth",
+      "toId": "queenstown",
+      "description": "Zhenbang: the same entry records his death at Bonishibi and burial at Queenstown. Port Elizabeth is a tentative identification of Bonishibi. The dashed line associates these approximate places; no traveled route or burial date is recorded.",
+      "source_refs": [{ "page_ref": "img_36", "column_refs": [5, 6] }]
+    }
+  ]
+}

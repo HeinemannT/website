@@ -13,6 +13,7 @@ import {
   chronologyBounds,
   PLAYBACK_DELAY,
   recordAtYear,
+  hasCoordinates,
 } from "../utils/chronology.mjs";
 
 interface Props {
@@ -96,7 +97,7 @@ export default function ChronologyTimeline({
           <span>
             {current?.date_label ??
               "Drag the year slider or select a dated record."}
-            {current && !current.coordinates ? " · Location unrecorded" : ""}
+            {current && !hasCoordinates(current) ? " · Location unrecorded" : ""}
           </span>
         </div>
         <div className="chronology-buttons">

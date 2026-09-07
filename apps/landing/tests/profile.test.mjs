@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+const source=await readFile(new URL('../index.html',import.meta.url),'utf8');
+assert.doesNotMatch(source,/<dialog|id="building-note"|Dein Name|Hier steht ein kurzer Absatz/,'No profile draft or visible text labels are shipped');
+const start=source.indexOf('function activateBuilding(index){');
+const context={blocks:[{slug:'gallery'},{slug:'thoughts'},{slug:'ruin'},{slug:'about'}],inCityMode:()=>true,entryStart:-1,destinations:{gallery:'',thoughts:'',about:''},location:{assign(){throw Error('Unfinished destinations must not navigate')}},crumble(){throw Error('Inactive buildings must not collapse')},selectCity(){},status:{}};
+vm.createContext(context);
+vm.runInContext(source.slice(start,source.indexOf('const cityLinks=',start)),context);
+for(const index of [0,1,3])context.activateBuilding(index);
+assert.equal(context.entryStart,-1);
+console.log('Passed: public release has no visible labels or placeholder profile; unfinished destinations remain inactive.');

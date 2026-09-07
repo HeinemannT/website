@@ -1,0 +1,10 @@
+{
+  "name": "at-the-lake",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node serve.mjs",
+    "test": "node --test"
+  }
+}

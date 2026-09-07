@@ -26,6 +26,10 @@ jobs:
         with:
           node-version: 20
 
+      - name: Build and test landing page
+        working-directory: apps/landing
+        run: npm test
+
       # The two sub-apps build into /genealogy and /erm at the repo root
       # (configured via `base` + `outDir` in each app's vite config).
       - name: Build Genealogy App
@@ -45,8 +49,10 @@ jobs:
       - name: Assemble site
         run: |
           mkdir -p _site
-          cp index.html styles.css parallax.js screamflow.js _site/
-          cp -r assets _site/
+          cp apps/landing/dist/index.html _site/
+          mkdir -p _site/assets _site/fonts
+          cp apps/landing/dist/assets/lake-* apps/landing/dist/assets/scene-* _site/assets/
+          cp apps/landing/dist/fonts/satoshi*.woff2 apps/landing/dist/fonts/Satoshi-FFL.txt _site/fonts/
           cp CNAME robots.txt site.webmanifest _site/ 2>/dev/null || true
           cp favicon.ico favicon.svg favicon-96x96.png apple-touch-icon.png _site/ 2>/dev/null || true
           cp web-app-manifest-192x192.png web-app-manifest-512x512.png _site/ 2>/dev/null || true

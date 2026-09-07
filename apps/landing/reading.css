@@ -1,0 +1,124 @@
+@font-face {
+  font-family: Satoshi;
+  src: url('/fonts/satoshi.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Satoshi;
+  src: url('/fonts/satoshi-italic.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: italic;
+  font-display: swap;
+}
+:root {
+  --paper: #f3efef;
+  --ink: #503843;
+  --muted: #79636d;
+  --line: #d2c5cb;
+  font-family: Satoshi, Arial, sans-serif;
+  font-size: 18px;
+  color: var(--ink);
+  background: var(--paper);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+input, select { font: inherit; }
+a:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
+}
+[hidden] { display: none !important; }
+h1, h2, p { margin-top: 0; }
+h1, h2 { font-weight: 500; overflow-wrap: break-word; }
+h1:focus { outline: none; }
+::selection { color: var(--paper); background: var(--ink); }
+
+.page-shell { max-width: 836px; margin: 0 auto; padding: 0 48px 36px; }
+.back-bar { display: flex; justify-content: flex-start; padding: 28px 0 0; }
+.back { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; text-decoration: none; font-size: 17px; color: var(--muted); }
+.back svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+.back:hover { color: var(--ink); }
+.back:hover span { text-decoration: underline; }
+.index-layout, .about-layout { padding-top: 48px; }
+.page-title { font-size: 22px; line-height: 1.3; margin: 0 0 42px; }
+
+/* Every title uses the same full reading width and a natural line break. */
+.post-list { list-style: none; padding: 0; margin: 0; }
+.post-list li { margin: 0 0 44px; }
+.post-list li:last-child { margin-bottom: 0; }
+.post-list a { display: block; text-decoration: none; }
+.post-list h2 { font-size: 36px; line-height: 1.2; letter-spacing: -.018em; margin: 0 0 14px; text-wrap: pretty; }
+.post-list p { font-size: 19px; line-height: 1.6; color: var(--muted); margin: 0; }
+.post-list a:hover h2 { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
+.post-list a:focus-visible { outline-offset: 10px; }
+.site-footer { display: flex; justify-content: space-between; gap: 24px; margin: 72px 0 0; padding-top: 24px; font-size: 14px; color: var(--muted); }
+.site-footer a { text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
+
+.about-copy .intro { font-size: 39px; line-height: 1.23; letter-spacing: -.018em; margin: 0 0 34px; text-wrap: pretty; }
+.about-body { max-width: 650px; }
+.about-body > p { font-size: 20px; line-height: 1.7; }
+.about-body .placeholder-note { font-size: 14px; line-height: 1.6; color: var(--muted); margin: 34px 0 0; }
+.contact-note { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 28px; font-size: 17px; color: var(--muted); }
+.prose { font-size: 20px; line-height: 1.7; overflow-wrap: break-word; }
+.prose p { margin: 0 0 26px; }
+
+/* Plain paragraphs are complete; optional additions can expand beyond the text. */
+article { padding-top: 32px; }
+.article-heading { margin-bottom: 38px; }
+.back-to-posts { display: inline-block; font-size: 16px; color: var(--muted); margin-bottom: 32px; text-decoration: none; }
+.back-to-posts:hover { text-decoration: underline; }
+article h1 { font-size: 46px; line-height: 1.16; letter-spacing: -.025em; margin: 0 0 22px; text-wrap: pretty; }
+.byline { font-size: 14px; color: var(--muted); margin: 0; }
+article > .prose:first-of-type > p:first-child { font-size: 23px; line-height: 1.6; }
+article .wide { width: calc(100% + 160px); margin: 24px -80px 40px; }
+.media img { display: block; width: 100%; height: auto; }
+.media figcaption { margin-top: 12px; font-size: 15px; color: var(--muted); }
+.reflection { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 8px 0 32px; }
+.reflection summary { cursor: pointer; padding: 20px 0; font-size: 20px; }
+.reflection summary:hover { text-decoration: underline; }
+.reflection .prose { font-size: 20px; }
+.plain .enhancement { display: none; }
+.related { display: flex; justify-content: space-between; gap: 24px; border-top: 1px solid var(--line); padding-top: 24px; margin-top: 32px; font-size: 16px; }
+.related a { text-decoration: none; }
+.related a:hover { text-decoration: underline; }
+
+@media (max-width: 1000px) {
+  article .wide { width: auto; margin-left: 0; margin-right: 0; }
+}
+@media (max-width: 600px) {
+  .page-shell { padding: 0 26px 28px; }
+  .index-layout, .about-layout { padding-top: 30px; }
+  .page-title { font-size: 20px; margin-bottom: 30px; }
+  .post-list li { margin-bottom: 36px; }
+  .post-list h2 { font-size: 29px; line-height: 1.23; margin-bottom: 12px; }
+  .post-list p { font-size: 19px; line-height: 1.55; }
+  .site-footer { margin-top: 48px; gap: 16px; font-size: 12px; }
+  .about-copy .intro { font-size: 32px; line-height: 1.26; margin-bottom: 28px; }
+  .about-body > p, .prose { font-size: 18px; line-height: 1.7; }
+  .contact-note { font-size: 16px; gap: 16px; }
+  article { padding-top: 24px; }
+  .article-heading { margin-bottom: 30px; }
+  .back-to-posts { margin-bottom: 28px; }
+  article h1 { font-size: 35px; line-height: 1.2; }
+  article > .prose:first-of-type > p:first-child { font-size: 21px; }
+  .reflection .prose, .reflection summary { font-size: 19px; }
+}
+@media print {
+  .back-bar, .site-footer, .related { display: none; }
+  :root { --paper: white; --ink: #222; --muted: #555; }
+  .page-shell { max-width: none; padding: 0; }
+  .prose { font-size: 12pt; }
+  .enhancement { break-inside: avoid; }
+}
+
+@media (max-width:600px) { .back-bar { padding-top:20px; } }
+
+.arriving .page-shell { animation: arrive .6s ease-out both; }
+@keyframes arrive { from { opacity:0; } to { opacity:1; } }
+@media (prefers-reduced-motion:reduce) { .arriving .page-shell { animation:none; } }
+

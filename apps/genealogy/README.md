@@ -12,6 +12,20 @@ npm run preview -- --host 127.0.0.1 --port 4173
 
 The preview is served at `/genealogy/`. Vite writes generated output to the repository-root `genealogy/` directory; edit source files here, not that build output.
 
+## Tree and map explorers
+
+The tree opens a compact close-family view. Search any Chinese or English name (including unnamed-child descriptions), then choose **Ancestor path** or **Descendants** to follow that person. Natural descent uses solid edges; adoption uses dashed red edges and explicit relationship labels. A person remains a single identity even when both relationships are visible. Notes and manuscript links appear in the person details.
+
+Drag the diagram to pan. The plus/minus buttons zoom and **Fit tree** resets the viewport. With the diagram focused, arrow keys pan, `+`/`-` zoom and `Home` fits. Person cards and relationship links are keyboard buttons. On mobile, the details panel scrolls separately above the diagram.
+
+The map starts near Shunde with all fourteen events available in its list, including the two unresolved locations. Filter by event kind or hide undated records. Select a record, map marker, or previous/next event to focus it. **All places**, **Guangdong** and **South Africa** fit the corresponding visible places. Approximate coordinates remain approximate; Guangxi uses a regional zoom. Records sharing a coordinate link to one another without moving their markers. The map has no inferred route lines or automatic playback.
+
+**Read manuscript** opens the corresponding page. **Return to selected person/event** restores the explorer and selection; map center and zoom also survive source inspection. Links use `#page=34&view=map&event=port_elizabeth` or `#page=29&view=tree&person=gen17_zongrong`; old `#page=5` links still work. Browser Back/Forward restores page, view and selected identity. Unknown IDs are cleared when the relevant explorer loads.
+
+Leaflet and its CSS are loaded only when Map opens. OpenStreetMap tiles are requested normally by the browser with attribution, under the [OSM tile policy](https://operations.osmfoundation.org/policies/tiles/); the project does not download tiles in bulk or need a map API key. Tile failure leaves the complete event list usable. Reduced-motion preferences disable programmatic map flights; the diagram applies pointer movement at most once per animation frame without rerendering React. Map markers are reused across filters and selections, and map listeners/resize observers are disposed on close.
+
+`utils/explorers.mjs` contains pure search, focused-layout, event-filter and URL helpers. `utils/placesMap.ts` owns the Leaflet instance and its lifetime. Tests cover real blank source columns, all 85 searchable identities, deterministic nonoverlapping cards, adoption, event filters, regional zoom, and validated link round-trips. Browser review additionally checks responsive layouts, history, source return, reduced motion, and map-layer reuse.
+
 ## Editorial maintenance
 
 Preserve `public/images/` and stable page/column IDs. Blank columns are intentional. The tests compare alignment with the 36-page source structure captured at commit `56ef18df`.

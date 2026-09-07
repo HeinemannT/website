@@ -1,109 +1,299 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import L from 'leaflet';
-import { Play, Pause, RotateCcw } from 'lucide-react';
-import { MigrationPoint, MigrationPath } from '../types';
-import { escapeHtml, nextTimelineYear, timelineBounds, visibleEvents } from '../utils/evidence.mjs';
-
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Plus, Minus, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import { filterEvents, validSelection } from "../utils/explorers.mjs";
+import { createPlacesMap, MapCamera } from "../utils/placesMap";
+import type { MigrationPoint } from "../types";
+import "leaflet/dist/leaflet.css";
+import "../styles/explorers.css";
+export interface MapState {
+  event: string;
+  kind: string;
+  undated: boolean;
+  camera: MapCamera | null;
+}
 interface Props {
   points: MigrationPoint[];
-  paths: MigrationPath[];
   isDarkMode: boolean;
-  onNavigate?: (pageId: string) => void;
+  onNavigate?: (id: string) => void;
+  state: MapState;
+  onChange: (s: MapState) => void;
 }
-
-export default function MigrationMap({ points, isDarkMode, onNavigate }: Props) {
-  const bounds = useMemo(() => timelineBounds(points), [points]);
-  const [year, setYear] = useState(bounds?.min ?? 0);
-  const [playing, setPlaying] = useState(false);
-  const [showUndated, setShowUndated] = useState(true);
-  const [showList, setShowList] = useState(true);
-  const container = useRef<HTMLDivElement>(null);
-  const map = useRef<L.Map | null>(null);
-  const markers = useRef(new Map<string, L.CircleMarker>());
-  const visible = useMemo(() => visibleEvents(points, year, showUndated), [points, year, showUndated]);
-  const latest = visible.filter(p => p.year !== null).at(-1);
-  useEffect(() => { map.current?.invalidateSize(); }, [showList]);
+export default function MigrationMap({
+  points,
+  isDarkMode,
+  onNavigate,
+  state,
+  onChange,
+}: Props) {
+  const host = useRef<HTMLDivElement>(null);
+  const api = useRef<ReturnType<typeof createPlacesMap> | null>(null);
+  const latest = useRef({ state, onChange });
+  latest.current = { state, onChange };
+  const [fallback, setFallback] = useState(false),
+    [tileError, setTileError] = useState(false),
+    [expanded, setExpanded] = useState(true);
+  const visible = useMemo(
+    () => filterEvents(points, state.kind, state.undated),
+    [points, state.kind, state.undated],
+  );
+  const select = (id: string) => {
+    const { state: s, onChange: change } = latest.current;
+    const next = { ...s, event: id, camera: null };
+    latest.current.state = next;
+    change(next);
+    setExpanded(true);
+    const point = points.find((p) => p.id === id);
+    if (point) api.current?.focus(point);
+  };
   useEffect(() => {
-    if (latest?.coordinates) map.current?.setView([latest.coordinates.lat, latest.coordinates.lng], latest.year! > 1900 ? 7 : 9);
-  }, [latest?.id]);
-
-  useEffect(() => { setYear(bounds?.min ?? 0); setPlaying(false); }, [bounds]);
-  useEffect(() => {
-    if (!container.current) return;
-    const instance = L.map(container.current, { center: [23, 113.1], zoom: 8 });
-    map.current = instance;
-    return () => { instance.remove(); map.current = null; };
+    if (!host.current) return;
+    try {
+      api.current = createPlacesMap(host.current, {
+        camera: latest.current.state.camera,
+        onSelect: select,
+        onRest: (camera) => {
+          const { state: s, onChange: change } = latest.current;
+          change({ ...s, camera });
+        },
+        onTileError: () => setTileError(true),
+      });
+    } catch {
+      setFallback(true);
+    }
+    return () => {
+      api.current?.dispose();
+      api.current = null;
+    };
   }, []);
   useEffect(() => {
-    if (!map.current) return;
-    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 16,
-    }).addTo(map.current);
-    return () => { tiles.remove(); };
-  }, [isDarkMode]);
+    const id = validSelection(visible, state.event);
+    if (id !== state.event) onChange({ ...state, event: id });
+    api.current?.update(
+      points,
+      new Set(visible.map((p) => p.id)),
+      id,
+      isDarkMode,
+    );
+  }, [points, visible, state.event, isDarkMode]);
   useEffect(() => {
-    if (!map.current) return;
-    markers.current.forEach(marker => marker.remove());
-    markers.current.clear();
-    visible.forEach(point => {
-      if (!point.coordinates) return;
-      const marker = L.circleMarker([point.coordinates.lat, point.coordinates.lng], {
-        radius: 7, color: isDarkMode ? '#f87171' : '#a63434', weight: 2,
-        fillOpacity: point.year === null ? 0.2 : 0.8,
-      }).addTo(map.current!);
-      marker.bindTooltip(escapeHtml(`${point.name} · ${point.event_type.replaceAll('_', ' ')}`));
-      marker.bindPopup(`<strong>${escapeHtml(point.name)}</strong><p>${escapeHtml(point.date_label)}</p><p>${escapeHtml(point.description)}</p><p>${escapeHtml(point.evidence)} · ${escapeHtml(point.coordinate_precision)} coordinates</p><p>Source: ${escapeHtml(point.page_ref)}, columns ${point.column_refs.join(', ')}</p>`);
-      markers.current.set(point.id, marker);
-    });
-  }, [visible, isDarkMode]);
+    const point = visible.find((p) => p.id === state.event);
+    if (point && !state.camera) api.current?.focus(point);
+  }, [state.event]);
   useEffect(() => {
-    if (!playing || !bounds) return;
-    const interval = window.setInterval(() => setYear(current => {
-      const next = nextTimelineYear(current, bounds);
-      if (next === bounds.max) setPlaying(false);
-      return next!;
-    }), 90);
-    return () => window.clearInterval(interval);
-  }, [playing, bounds]);
-
-  const focusPoint = (point: MigrationPoint) => {
-    if (point.coordinates) {
-      map.current?.setView([point.coordinates.lat, point.coordinates.lng], point.year && point.year > 1900 ? 8 : 10);
-      markers.current.get(point.id)?.openPopup();
-    }
+    document
+      .getElementById(`event-${state.event}`)
+      ?.scrollIntoView({ block: "nearest" });
+  }, [state.event]);
+  const kinds = [...new Set(points.map((p) => p.event_type))];
+  const step = (offset: number) => {
+    if (!visible.length) return;
+    const i = visible.findIndex((p) => p.id === state.event);
+    select(visible[(i + offset + visible.length) % visible.length].id);
   };
-  return <div className="relative w-full h-full flex flex-col bg-stone-100 dark:bg-zinc-950">
-    <div className="p-3 md:pt-28 border-b border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm z-10">
-      <div className="flex flex-wrap items-center gap-3">
-        <strong>Places and recorded events</strong>
-        <label className="flex items-center gap-2"><input type="checkbox" checked={showUndated} onChange={e => setShowUndated(e.target.checked)} /> Include undated events ({points.filter(p => p.year === null).length})</label>
-        <button className="underline" onClick={() => setShowList(value => !value)}>{showList ? 'Hide event list' : 'Show event list'}</button>
+  return (
+    <section
+      className="explorer places-map-explorer"
+      aria-label="Recorded places explorer"
+    >
+      <div className="explorer-heading">
+        <div>
+          <h2>Places in the family record</h2>
+          <p>Approximate recorded places; no traveled route is established.</p>
+        </div>
+        <MapPin size={22} className="hidden sm:block text-stone-500" />
       </div>
-      <p className="mt-1 text-stone-600 dark:text-zinc-400">Markers identify approximate areas. Events include burials, property, offices and travel; no traveled route is established.</p>
-    </div>
-    <div className="relative flex-1 min-h-0 flex">
-      <div ref={container} className="flex-1 min-w-0 z-0" aria-label="Map of recorded places" />
-      {showList && <div className="absolute md:relative right-0 top-0 bottom-0 w-64 max-w-[65%] overflow-y-auto border-l border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm z-10 p-3">
-        {!visible.length && <p>No events in this selection.</p>}
-        <ol className="space-y-4">
-          {visible.map(point => <li key={point.id}>
-            <button className="font-semibold text-left underline" onClick={() => focusPoint(point)} disabled={!point.coordinates}>{point.name}</button>
-            <p className="text-stone-600 dark:text-zinc-400">{point.event_type.replaceAll('_', ' ')} · {point.date_label}</p>
-            <p className="mt-1">{point.description}</p>
-            <p className="mt-1 text-stone-600 dark:text-zinc-400">{point.evidence}; {point.coordinate_precision}{point.coordinates ? ' coordinates' : ' location'}</p>
-            <button className="mt-1 underline text-cinnabar dark:text-red-400" onClick={() => onNavigate?.(point.page_ref)}>Page {Number(point.page_ref.slice(4))}, columns {point.column_refs.join(', ')}</button>
-          </li>)}
-        </ol>
-      </div>}
-    </div>
-    <div className="p-4 border-t border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 z-10">
-      <div className="flex items-center gap-3 mb-2">
-        <button disabled={!bounds || bounds.min === bounds.max} aria-label={playing ? 'Pause timeline' : 'Play timeline'} className="p-2 border rounded disabled:opacity-40" onClick={() => { if(bounds && year>=bounds.max)setYear(bounds.min);setPlaying(value=>!value); }}>{playing ? <Pause size={18}/> : <Play size={18}/>}</button>
-        <button disabled={!bounds} aria-label="Reset timeline" className="p-2 border rounded disabled:opacity-40" onClick={() => {setYear(bounds?.min ?? 0);setPlaying(false);}}><RotateCcw size={18}/></button>
-        <span>{bounds ? `${year} · ${latest?.name ?? 'Start of dated records'}` : 'No dated events; undated records remain available.'}</span>
+      <div className="places-map-body">
+        <div className="places-map-stage">
+          <div ref={host} className="places-map-canvas" />
+          {fallback ? (
+            <div className="places-map-fallback" role="status">
+              The map is unavailable.
+              <br />
+              All records and source links remain available in the event list.
+            </div>
+          ) : (
+            <div className="places-map-controls">
+              <div>
+                <button onClick={() => api.current?.fit(visible)}>
+                  All places
+                </button>
+                <button
+                  onClick={() =>
+                    api.current?.fit(
+                      visible.filter(
+                        (p) =>
+                          p.coordinates &&
+                          p.coordinates.lat > 22 &&
+                          p.coordinates.lat < 24 &&
+                          p.coordinates.lng > 112 &&
+                          p.coordinates.lng < 114,
+                      ),
+                    )
+                  }
+                >
+                  Guangdong
+                </button>
+                <button
+                  onClick={() =>
+                    api.current?.fit(
+                      visible.filter(
+                        (p) => p.coordinates && p.coordinates.lat < 0,
+                      ),
+                    )
+                  }
+                >
+                  South Africa
+                </button>
+              </div>
+              <div>
+                <button
+                  aria-label="Zoom out map"
+                  onClick={() => api.current?.zoom(-1)}
+                >
+                  <Minus size={16} />
+                </button>
+                <button
+                  aria-label="Zoom in map"
+                  onClick={() => api.current?.zoom(1)}
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+            </div>
+          )}
+          {tileError && (
+            <p className="map-tile-error" role="status">
+              Some map tiles could not load. The event list remains available.
+            </p>
+          )}
+        </div>
+        <aside className="places-map-events" aria-label="Recorded events">
+          <div className="event-filters">
+            <label>
+              Event{" "}
+              <select
+                aria-label="Filter event kind"
+                value={state.kind}
+                onChange={(e) => onChange({ ...state, kind: e.target.value })}
+              >
+                <option value="all">All kinds</option>
+                {kinds.map((k) => (
+                  <option key={k} value={k}>
+                    {k.replaceAll("_", " ")}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={state.undated}
+                onChange={(e) =>
+                  onChange({ ...state, undated: e.target.checked })
+                }
+              />{" "}
+              Include undated
+            </label>
+            <div className="event-navigation w-full">
+              <button
+                aria-label="Previous event"
+                onClick={() => step(-1)}
+                disabled={!visible.length}
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <span>
+                {visible.length} records ·{" "}
+                {visible.filter((p) => !p.coordinates).length} unresolved
+                locations
+              </span>
+              <button
+                aria-label="Next event"
+                onClick={() => step(1)}
+                disabled={!visible.length}
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+          <ol className="event-list">
+            {visible.map((p) => (
+              <li key={p.id} id={`event-${p.id}`}>
+                <button
+                  className="event-select"
+                  aria-pressed={state.event === p.id}
+                  onClick={() => select(p.id)}
+                >
+                  <strong>{p.name}</strong>
+                  <small>
+                    {p.date_label} · {p.event_type.replaceAll("_", " ")}
+                    {!p.coordinates ? " · Location unresolved" : ""}
+                  </small>
+                </button>
+                {state.event === p.id && (
+                  <div className="event-detail">
+                    {expanded && (
+                      <>
+                        <p>{p.description}</p>
+                        {p.coordinates &&
+                          points
+                            .filter(
+                              (other) =>
+                                other.id !== p.id &&
+                                other.coordinates?.lat === p.coordinates?.lat &&
+                                other.coordinates?.lng === p.coordinates?.lng,
+                            )
+                            .map((other) => (
+                              <button
+                                key={other.id}
+                                className="source-link"
+                                onClick={() => {
+                                  const next = {
+                                    ...state,
+                                    kind: "all",
+                                    undated: true,
+                                    event: other.id,
+                                    camera: null,
+                                  };
+                                  latest.current.state = next;
+                                  onChange(next);
+                                  api.current?.focus(other);
+                                }}
+                              >
+                                Also recorded here: {other.name} ·{" "}
+                                {other.date_label}
+                              </button>
+                            ))}
+                        <p className="evidence">
+                          {p.evidence} · {p.coordinate_precision}
+                          {p.coordinates ? " coordinates" : " location"}. Dates
+                          retain the record’s uncertainty.
+                        </p>
+                        <button
+                          className="source-link"
+                          onClick={() => onNavigate?.(p.page_ref)}
+                        >
+                          Read page {Number(p.page_ref.slice(4))}, columns{" "}
+                          {p.column_refs.join(", ")} →
+                        </button>
+                      </>
+                    )}
+                    <button
+                      className="block text-xs underline text-stone-500 mt-2"
+                      onClick={() => setExpanded((v) => !v)}
+                    >
+                      {expanded ? "Collapse details" : "Show details"}
+                    </button>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ol>
+          {!visible.length && (
+            <p className="p-4 text-sm">No records match these filters.</p>
+          )}
+        </aside>
       </div>
-      {bounds && <input className="w-full accent-cinnabar" type="range" aria-label="Timeline year" min={bounds.min} max={bounds.max} value={year} disabled={bounds.min===bounds.max} onChange={e=>{setPlaying(false);setYear(Number(e.target.value));}}/>}
-    </div>
-  </div>;
+    </section>
+  );
 }

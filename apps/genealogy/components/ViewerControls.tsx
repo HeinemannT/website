@@ -1,87 +1,70 @@
-import React from 'react';
-import { Image as ImageIcon, FileText, ChevronLeft, ChevronRight, Map, BookOpen, ScrollText } from 'lucide-react';
-
-interface ViewerControlsProps {
-  viewMode: 'image' | 'digital' | 'map' | 'tree' | 'glossary';
-  setViewMode: (mode: 'image' | 'digital' | 'map' | 'tree' | 'glossary') => void;
+import React from "react";
+import {
+  Image,
+  ScrollText,
+  Map,
+  Network,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+type View = "image" | "digital" | "map" | "tree" | "glossary";
+interface Props {
+  viewMode: View;
+  setViewMode: (view: View) => void;
   pageIndex: number;
   totalPageCount: number;
   onPrevPage: () => void;
   onNextPage: () => void;
 }
-
-const ViewerControls: React.FC<ViewerControlsProps> = ({
-  viewMode,
-  setViewMode,
-  pageIndex,
-  totalPageCount,
-  onPrevPage,
-  onNextPage,
-}) => {
+export default function ViewerControls(p: Props) {
   return (
-    <div className="absolute top-6 left-0 right-0 z-40 flex justify-center px-4 pointer-events-none">
-      <div className="flex items-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border border-stone-200 dark:border-slate-700 rounded-full shadow-lg p-2 pointer-events-auto transition-colors duration-300">
-
-        <button
-          onClick={() => setViewMode('image')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${viewMode === 'image'
-            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-            : 'text-stone-500 dark:text-slate-500 hover:text-stone-800 dark:hover:text-slate-300'
-            }`}
-        >
-          <ImageIcon size={16} />
-          <span className="hidden md:inline">Scan</span>
-        </button>
-        <button
-          onClick={() => setViewMode('digital')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${viewMode === 'digital'
-            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-            : 'text-stone-500 dark:text-slate-500 hover:text-stone-800 dark:hover:text-slate-300'
-            }`}
-        >
-          <ScrollText size={16} />
-          <span className="hidden md:inline">Script</span>
-        </button>
-        <button
-          onClick={() => setViewMode('map')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${viewMode === 'map'
-            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-            : 'text-stone-500 dark:text-slate-500 hover:text-stone-800 dark:hover:text-slate-300'
-            }`}
-        >
-          <Map size={16} />
-          <span className="hidden md:inline">Map</span>
-        </button>
-        {/* Divider */}
-        <div className="w-px h-8 bg-stone-300 dark:bg-slate-700 mr-6"></div>
-
-        {/* Pagination - Increased Sizes */}
-        <div className="flex items-center gap-3">
+    <nav
+      aria-label="Archive views"
+      className="h-16 shrink-0 flex items-center justify-between gap-2 px-3 border-b border-stone-200 dark:border-zinc-800 bg-paper dark:bg-zinc-900"
+    >
+      <div className="flex gap-1">
+        {(
+          [
+            ["image", "Scan", Image],
+            ["digital", "Script", ScrollText],
+            ["tree", "Tree", Network],
+            ["map", "Map", Map],
+          ] as const
+        ).map(([id, label, Icon]) => (
           <button
-            onClick={onPrevPage}
-            disabled={pageIndex === 0}
-            className="p-3 rounded-full hover:bg-stone-100 dark:hover:bg-slate-700 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-200 bg-stone-50 dark:bg-slate-800/50"
-            aria-label="Previous Page"
+            key={id}
+            aria-pressed={p.viewMode === id}
+            onClick={() => p.setViewMode(id)}
+            className={`flex items-center gap-2 px-3 py-2 text-sm border-b-2 ${p.viewMode === id ? "border-cinnabar text-cinnabar dark:text-red-400" : "border-transparent text-stone-600 dark:text-zinc-400 hover:text-ink dark:hover:text-white"}`}
           >
-            <ChevronLeft size={28} />
+            <Icon size={16} />
+            {label}
           </button>
-
-          <span className="font-mono text-xl font-bold text-stone-700 dark:text-slate-200 w-24 text-center select-none">
-            {pageIndex + 1} / {totalPageCount}
-          </span>
-
+        ))}
+      </div>
+      {p.viewMode !== "map" && p.viewMode !== "tree" && (
+        <div className="flex items-center gap-1 text-sm">
           <button
-            onClick={onNextPage}
-            disabled={pageIndex === totalPageCount - 1}
-            className="p-3 rounded-full hover:bg-stone-100 dark:hover:bg-slate-700 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-200 bg-stone-50 dark:bg-slate-800/50"
-            aria-label="Next Page"
+            aria-label="Previous page"
+            disabled={!p.pageIndex}
+            onClick={p.onPrevPage}
+            className="p-2 disabled:opacity-30"
           >
-            <ChevronRight size={28} />
+            <ChevronLeft size={18} />
+          </button>
+          <span className="whitespace-nowrap">
+            {p.pageIndex + 1} / {p.totalPageCount}
+          </span>
+          <button
+            aria-label="Next page"
+            disabled={p.pageIndex === p.totalPageCount - 1}
+            onClick={p.onNextPage}
+            className="p-2 disabled:opacity-30"
+          >
+            <ChevronRight size={18} />
           </button>
         </div>
-      </div>
-    </div>
+      )}
+    </nav>
   );
-};
-
-export default ViewerControls;
+}

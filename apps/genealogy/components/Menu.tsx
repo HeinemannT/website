@@ -3,6 +3,7 @@ import { X, Search, FileText, Code, Book, ChevronRight, Save, AlertCircle, Info,
 import { GenealogyData, GlossaryTerm } from '../types';
 import { marked } from 'marked';
 import jsyaml from 'js-yaml';
+import { searchManuscript } from '../utils/explorers.mjs';
 import ContextGlossary from './ContextGlossary';
 
 interface MenuProps {
@@ -59,25 +60,7 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
     }
   };
 
-  const searchResults = React.useMemo(() => {
-    if (!searchQuery || !data) return [];
-    const query = searchQuery.toLowerCase();
-    const results: Array<{ pageIndex: number; columnId: number; text: string; translation: string }> = [];
-
-    data.pages.forEach((page, pIdx) => {
-      page.columns.forEach(col => {
-        if (col.text_zh.includes(query) || col.translation.toLowerCase().includes(query)) {
-          results.push({
-            pageIndex: pIdx,
-            columnId: col.id,
-            text: col.text_zh,
-            translation: col.translation
-          });
-        }
-      });
-    });
-    return results;
-  }, [searchQuery, data]);
+  const searchResults = React.useMemo(() => searchManuscript(data?.pages ?? [], searchQuery), [searchQuery, data]);
 
   return (
     <>
@@ -87,9 +70,9 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose, data, onNavigate, yamlSour
       />
 
       <div className={`
-        fixed top-0 right-0 bottom-0 w-full md:w-[600px] 
-        bg-white dark:bg-zinc-900 
-        shadow-2xl z-[1200] 
+        fixed top-0 right-0 bottom-0 w-full md:w-[600px]
+        bg-white dark:bg-zinc-900
+        shadow-2xl z-[1200]
         transition-transform duration-300 ease-out
         flex flex-col
         ${isOpen ? 'translate-x-0' : 'translate-x-full'}

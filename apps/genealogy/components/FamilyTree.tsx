@@ -1,229 +1,301 @@
-import React, { useEffect, useState } from 'react';
-import jsyaml from 'js-yaml';
-import { Network } from 'lucide-react';
-import { useDraggableScroll } from '../hooks/useDraggableScroll';
-import { treeLayout } from '../utils/evidence.mjs';
+import React, { useEffect, useMemo, useState } from "react";
+import jsyaml from "js-yaml";
+import { Search, Plus, Minus, Scan } from "lucide-react";
+import {
+  focusedLayout,
+  searchPeople,
+  validSelection,
+} from "../utils/explorers.mjs";
+import { useTreeViewport } from "../hooks/useTreeViewport";
+import "../styles/explorers.css";
 
-interface FamilyMember {
-    id: string;
-    name_zh: string;
-    name_en: string;
-    title?: string;
-    generation: number;
-    page_ref?: string;
-    children?: string[];
-    adopted_children?: string[];
-    note?: string;
-    natural_parent_label?: string;
-    adoptive_parent_label?: string;
-    unidentified_adoption?: string;
+export interface FamilyMember {
+  id: string;
+  name_zh: string;
+  name_en: string;
+  generation: number;
+  title?: string;
+  page_ref?: string;
+  children?: string[];
+  adopted_children?: string[];
+  note?: string;
+  natural_parent_label?: string;
+  adoptive_parent_label?: string;
+  unidentified_adoption?: string;
 }
-
-interface TreeData {
+export interface TreeState {
+  person: string;
+  mode: "family" | "ancestors" | "branch";
+  query: string;
+}
+interface Props {
+  onNavigate: (id: string) => void;
+  isDarkMode: boolean;
+  state: TreeState;
+  onChange: (s: TreeState) => void;
+}
+let treeRequest:
+  Promise<{ root_id: string; people: FamilyMember[] }> | undefined;
+function loadTree() {
+  return (treeRequest ??= fetch("./family_tree.yaml")
+    .then((r) => {
+      if (!r.ok) throw Error("The family register could not be loaded.");
+      return r.text();
+    })
+    .then((t) => jsyaml.load(t) as { root_id: string; people: FamilyMember[] })
+    .catch((e) => {
+      treeRequest = undefined;
+      throw e;
+    }));
+}
+export default function FamilyTree({ onNavigate, state, onChange }: Props) {
+  const [data, setData] = useState<{
     root_id: string;
     people: FamilyMember[];
-}
-
-interface FamilyTreeProps {
-    onNavigate: (pageId: string) => void;
-    isDarkMode: boolean;
-}
-
-const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
-    const [data, setData] = useState<TreeData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const dragProps = useDraggableScroll();
-
-    useEffect(() => {
-        fetch('./family_tree.yaml')
-            .then(res => {
-                if (!res.ok) throw new Error(`Failed to load family_tree.yaml (${res.status})`);
-                return res.text();
-            })
-            .then(text => {
-                const parsed = jsyaml.load(text) as TreeData;
-                if (!parsed || !Array.isArray(parsed.people)) {
-                    throw new Error("Invalid format: 'people' array missing.");
-                }
-                setData(parsed);
-                setIsLoading(false);
-            })
-            .catch(err => {
-                console.error("Failed to load family tree", err);
-                setError(err.message || "Could not load family tree data.");
-                setIsLoading(false);
-            });
-    }, []);
-
-    // 1. Memoize Map creation to avoid expensive re-computation
-    const peopleMap = React.useMemo(() => {
-        if (!data) return new Map<string, FamilyMember>();
-        return new Map(data.people.map((p) => [p.id, p]));
-    }, [data]);
-
-    const layout = React.useMemo(() => treeLayout(data?.people || []), [data]);
-
-    // 2. Safer Scroll Logic using requestAnimationFrame
-    useEffect(() => {
-        if (!isLoading && data && data.root_id) {
-            requestAnimationFrame(() => {
-                setTimeout(() => {
-                    const rootElement = document.getElementById(`node-${data.root_id}`);
-                    if (rootElement) {
-                        try {
-                            // Only scroll to center if not manually dragging (initial load)
-                            rootElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
-                        } catch (e) {
-                            console.warn("Scroll failed", e);
-                        }
-                    }
-                }, 100);
-            });
-        }
-    }, [isLoading, data]);
-
-    // 3. Recursive Renderer with Circular Dependency Check
-    const renderNode = (id: string, depth: number, visited: Set<string>) => {
-        if (depth > 60) return <div key={id} className="text-red-500 font-bold p-2">Max Depth</div>;
-        if (visited.has(id)) return <div key={id} className="text-orange-500 font-bold text-xs p-1">Loop Detected</div>;
-
-        const newVisited = new Set(visited).add(id);
-        const person = peopleMap.get(id);
-        if (!person) return <div key={id}>Unresolved reference: {id}</div>;
-
-        const renderedChildren = layout.renderedChildren(person);
-        const hasChildren = renderedChildren.length > 0;
-
-        return (
-            <div key={id} className="flex flex-col items-center">
-                {/* Node Card */}
-                <div
-                    id={`node-${id}`}
-                    role={person.page_ref ? 'button' : undefined}
-                    tabIndex={person.page_ref ? 0 : undefined}
-                    aria-label={person.page_ref ? `${person.name_en} — open page` : undefined}
-                    onClick={(e) => {
-                        if (person.page_ref) {
-                            e.stopPropagation();
-                            onNavigate(person.page_ref);
-                        }
-                    }}
-                    onKeyDown={(e) => {
-                        if (person.page_ref && (e.key === 'Enter' || e.key === ' ')) {
-                            e.preventDefault();
-                            onNavigate(person.page_ref);
-                        }
-                    }}
-                    className={`
-                        relative p-5 rounded-sm border transition-all duration-300 group
-                        ${person.page_ref ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1 hover:border-cinnabar/50 dark:hover:border-red-500/50' : 'cursor-default'}
-                        focus:outline-none focus-visible:ring-2 focus-visible:ring-cinnabar/60
-                        bg-white dark:bg-zinc-900
-                        border-stone-200 dark:border-zinc-800
-                        shadow-[0_2px_8px_rgba(0,0,0,0.04)]
-                        min-w-[160px] max-w-[200px] text-center z-10
-                    `}
-                >
-                    {/* Generation Badge */}
-                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-stone-100 dark:bg-zinc-800 text-[9px] uppercase tracking-widest font-bold text-stone-500 dark:text-zinc-500 px-2 py-0.5 rounded-full border border-stone-200 dark:border-zinc-700 shadow-sm z-20">
-                        Gen {person.generation}
-                    </div>
-
-                    <div lang="zh-Hant" className="text-xl font-serif-tc text-ink dark:text-zinc-100 mt-2 mb-1 group-hover:text-cinnabar dark:group-hover:text-red-400 transition-colors">
-                        {person.name_zh}
-                    </div>
-                    <div className="text-xs uppercase tracking-wider font-semibold text-stone-500 dark:text-zinc-500 mb-1">
-                        {person.name_en}
-                    </div>
-
-                    {person.title && (
-                        <div className="border-t border-stone-100 dark:border-zinc-800 mt-2 pt-1">
-                            <div className="text-[10px] text-stone-400 dark:text-zinc-500 italic leading-tight font-serif">
-                                {person.title}
-                            </div>
-                        </div>
-                    )}
-                    {(person.note || person.natural_parent_label || person.adoptive_parent_label || layout.adoptedParent.has(id)) && <div className="mt-2 text-xs text-stone-600 dark:text-zinc-400 leading-relaxed normal-case">
-                        {layout.adoptedParent.has(id) && <p>Adopted heir of {peopleMap.get(layout.adoptedParent.get(id))?.name_en}.</p>}
-                        {person.natural_parent_label && <p>Natural parent: {person.natural_parent_label}.</p>}
-                        {person.adoptive_parent_label && <p>Adoptive parent: {person.adoptive_parent_label}.</p>}
-                        {person.note && <p>{person.note}</p>}
-                    </div>}
-                </div>
-                {layout.adoptionReferences(person).map(childId => <button key={`adoption-${id}-${childId}`} className="text-xs underline max-w-[200px] mt-2 text-cinnabar dark:text-red-400" onClick={() => document.getElementById(`node-${childId}`)?.scrollIntoView({block:'center',inline:'center',behavior:'smooth'})}>Adopted heir: {peopleMap.get(childId)?.name_en} (shown under natural parent)</button>)}
-                {person.unidentified_adoption && <p className="text-xs max-w-[200px] mt-2">Adopted heir: {person.unidentified_adoption}</p>}
-
-                {/* Vertical Line to Children */}
-                {hasChildren && (
-                    <div className="h-8 w-px bg-stone-300 dark:bg-zinc-700"></div>
-                )}
-
-                {/* Children Container - REMOVED gap-8, added padding to children for lines to connect */}
-                {hasChildren && (
-                    <div className="flex flex-nowrap relative pt-4">
-                        {renderedChildren.map((childId, index, arr) => {
-                            const isFirst = index === 0;
-                            const isLast = index === arr.length - 1;
-                            const isOnly = arr.length === 1;
-
-                            return (
-                                <div key={childId} className="flex flex-col items-center relative px-4">
-                                    {/* Connector Lines Logic */}
-                                    {!isOnly && (
-                                        <>
-                                            {/* Line to Left (if not first) - Extends from center to left edge (-left-0 to -right-1/2) NO, just center to left edge */}
-                                            {/* Since we are in the child container, we want a line at the top spanning from the center of this child to the left edge (connecting to left neighbor) and right edge (connecting the right neighbor) */}
-
-                                            {/* The gap was removing the connection. Now they touch. 
-                                                Width 50% starts at center (left: 50%) and goes right.
-                                                Width 50% starts at center (right: 50%) and goes left.
-                                            */}
-
-                                            <div className={`absolute top-0 right-1/2 h-px bg-stone-300 dark:bg-zinc-700 ${isFirst ? 'hidden' : 'w-1/2'}`}></div>
-                                            <div className={`absolute top-0 left-1/2 h-px bg-stone-300 dark:bg-zinc-700 ${isLast ? 'hidden' : 'w-1/2'}`}></div>
-                                        </>
-                                    )}
-
-                                    {/* Vertical line from horizontal bar down to node */}
-                                    <div className="h-4 w-px bg-stone-300 dark:bg-zinc-700"></div>
-
-                                    {renderNode(childId, depth + 1, newVisited)}
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
-        );
+  } | null>(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    let active = true;
+    loadTree()
+      .then((d) => {
+        if (active) setData(d);
+      })
+      .catch((e) => {
+        if (active) setError(e.message);
+      });
+    return () => {
+      active = false;
     };
-
-    if (isLoading) return <div className="p-8 text-center text-stone-500">Loading Tree...</div>;
-    if (error || !data) return <div className="p-8 text-center text-red-500">{error}</div>;
-
+  }, []);
+  const people = data?.people ?? [];
+  const selectedId = validSelection(people, state.person, data?.root_id ?? "");
+  useEffect(() => {
+    if (data && selectedId !== state.person)
+      onChange({ ...state, person: selectedId });
+  }, [data, selectedId, state.person]);
+  const layout = useMemo(
+    () => focusedLayout(people, selectedId, state.mode),
+    [data, selectedId, state.mode],
+  );
+  const viewport = useTreeViewport(
+    layout.width,
+    layout.height,
+    `${selectedId}:${state.mode}`,
+  );
+  const selected = people.find((p) => p.id === selectedId);
+  const results = useMemo(
+    () => searchPeople(people, state.query),
+    [data, state.query],
+  );
+  const index = useMemo(() => new Map(people.map((p) => [p.id, p])), [data]);
+  const choose = (id: string) => onChange({ ...state, person: id, query: "" });
+  if (error)
     return (
-        <div
-            ref={dragProps.ref}
-            {...dragProps.events}
-            className={`
-                w-full h-full overflow-auto bg-texture-paper p-4 pb-32 md:p-12
-                ${dragProps.cursorClass}
-                scrollbar-none [&::-webkit-scrollbar]:hidden
-            `}
-        >
-            <div className="min-w-max mx-auto flex flex-col items-center pointer-events-none">
-                <div className="mb-4 flex items-center gap-2 text-stone-400 dark:text-zinc-500 uppercase tracking-widest text-xs">
-                    <Network size={16} />
-                    <span>Lineage graph</span>
-                </div>
-                <p className="mb-6 text-sm text-stone-500">Natural descent uses lines; adoption is labeled. A missing continuation does not imply childlessness. [?] marks an unresolved reading.</p>
-                {/* Enable pointer events on nodes so clicking works */}
-                <div className="pointer-events-auto">
-                    {data.root_id && renderNode(data.root_id, 0, new Set())}
-                </div>
-            </div>
-        </div>
+      <p className="p-6" role="alert">
+        {error}{" "}
+        <button className="underline" onClick={() => location.reload()}>
+          Retry
+        </button>
+      </p>
     );
-};
-
-export default FamilyTree;
+  if (!data || !selected)
+    return <p className="p-6">Loading family register…</p>;
+  const relative = (id: string, label: string) => (
+    <button
+      key={`${label}-${id}`}
+      className="relative-link"
+      onClick={() => choose(id)}
+    >
+      <span>{label}</span>
+      <strong>
+        {index.get(id)?.name_en}{" "}
+        <span lang="zh-Hant">{index.get(id)?.name_zh}</span>
+      </strong>
+    </button>
+  );
+  const natural = layout.relationships.naturalParent.get(selectedId),
+    adoptive = layout.relationships.adoptedParent.get(selectedId);
+  return (
+    <section
+      className="explorer tree-explorer"
+      aria-label="Family tree explorer"
+    >
+      <div className="explorer-heading">
+        <div>
+          <h2>Family register</h2>
+          <p>Follow a person through the generations.</p>
+        </div>
+        <span className="text-xs text-stone-500">{people.length} people</span>
+      </div>
+      <div className="tree-body">
+        <aside className="tree-sidebar">
+          <label className="explorer-search">
+            <Search size={16} />
+            <input
+              aria-label="Find a person"
+              placeholder="Chinese or English name"
+              value={state.query}
+              onChange={(e) => onChange({ ...state, query: e.target.value })}
+            />
+          </label>
+          {state.query ? (
+            <div className="person-results">
+              <p className="text-xs text-stone-500 mb-2">
+                {results.length} matches
+              </p>
+              {results.map((p) => (
+                <button key={p.id} onClick={() => choose(p.id)}>
+                  <span lang="zh-Hant" className="font-serif-tc">
+                    {p.name_zh}
+                  </span>{" "}
+                  {p.name_en}
+                  <small>Generation {p.generation}</small>
+                </button>
+              ))}
+              {!results.length && (
+                <p>No matching record. Try part of a name.</p>
+              )}
+            </div>
+          ) : (
+            <div className="person-detail">
+              <span className="text-xs text-stone-500">
+                Generation {selected.generation}
+              </span>
+              <h3>
+                <span lang="zh-Hant">{selected.name_zh}</span>
+                <span>{selected.name_en}</span>
+              </h3>
+              {selected.title && <p>{selected.title}</p>}
+              {selected.page_ref && (
+                <button
+                  className="source-link"
+                  onClick={() => onNavigate(selected.page_ref!)}
+                >
+                  Read manuscript · Page {Number(selected.page_ref.slice(4))} →
+                </button>
+              )}
+              <div className="relatives">
+                {natural && relative(natural, "Natural parent")}
+                {adoptive && relative(adoptive, "Adoptive parent")}
+                {(selected.children ?? []).map((id) => relative(id, "Child"))}
+                {(selected.adopted_children ?? []).map((id) =>
+                  relative(id, "Adopted heir"),
+                )}
+              </div>
+              {selected.natural_parent_label && (
+                <p>Natural parent: {selected.natural_parent_label}.</p>
+              )}
+              {selected.adoptive_parent_label && (
+                <p>Adoptive parent: {selected.adoptive_parent_label}.</p>
+              )}
+              {selected.unidentified_adoption && (
+                <p>
+                  Unidentified adopted heir: {selected.unidentified_adoption}
+                </p>
+              )}
+              {selected.note && <p className="person-note">{selected.note}</p>}
+              <p className="text-xs text-stone-500">
+                A missing continuation does not imply childlessness. [?] marks
+                an unresolved reading.
+              </p>
+            </div>
+          )}
+        </aside>
+        <div className="tree-chart">
+          <div className="tree-tools">
+            <div className="flex flex-wrap gap-1">
+              {(
+                [
+                  ["family", "Close family"],
+                  ["ancestors", "Ancestor path"],
+                  ["branch", "Descendants"],
+                ] as const
+              ).map(([mode, label]) => (
+                <button
+                  key={mode}
+                  aria-pressed={state.mode === mode}
+                  onClick={() => onChange({ ...state, mode })}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-1">
+              <button
+                aria-label="Zoom out tree"
+                onClick={() => viewport.zoom(0.8)}
+              >
+                <Minus size={16} />
+              </button>
+              <button aria-label="Fit tree" onClick={viewport.fit}>
+                <Scan size={16} />
+              </button>
+              <button
+                aria-label="Zoom in tree"
+                onClick={() => viewport.zoom(1.25)}
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+          </div>
+          <div
+            ref={viewport.ref}
+            {...viewport.events}
+            className="tree-viewport"
+            tabIndex={0}
+            aria-label="Lineage diagram. Drag to pan. Arrow keys pan, plus and minus zoom, Home fits."
+          >
+            <div
+              ref={viewport.contentRef}
+              className="tree-transform"
+              style={{ width: layout.width, height: layout.height }}
+            >
+              <svg
+                width={layout.width}
+                height={layout.height}
+                aria-hidden="true"
+              >
+                {layout.edges.map((edge) => {
+                  const a = layout.nodes.find((n) => n.id === edge.source)!,
+                    b = layout.nodes.find((n) => n.id === edge.target)!;
+                  return (
+                    <path
+                      key={`${edge.kind}-${edge.source}-${edge.target}`}
+                      d={`M ${a.x + 92} ${a.y + 90} V ${(a.y + b.y + 90) / 2} H ${b.x + 92} V ${b.y}`}
+                      fill="none"
+                      stroke={edge.kind === "adoptive" ? "#a63434" : "#a8a29e"}
+                      strokeWidth="1.5"
+                      strokeDasharray={
+                        edge.kind === "adoptive" ? "5 4" : undefined
+                      }
+                    />
+                  );
+                })}
+              </svg>
+              {layout.nodes.map((p) => (
+                <button
+                  key={p.id}
+                  id={`node-${p.id}`}
+                  data-person={p.id}
+                  aria-pressed={p.id === selectedId}
+                  className={`tree-node ${p.id === selectedId ? "selected" : ""}`}
+                  style={{ left: p.x, top: p.y }}
+                  onClick={() => choose(p.id)}
+                >
+                  <small>Generation {p.generation}</small>
+                  <span lang="zh-Hant">{p.name_zh}</span>
+                  <strong>{p.name_en}</strong>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="tree-legend">
+            <span>― Natural descent</span>
+            <span className="text-cinnabar dark:text-red-400">┄ Adoption</span>
+            <span>Drag to pan · + / − to zoom</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

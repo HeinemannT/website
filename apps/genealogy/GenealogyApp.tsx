@@ -134,6 +134,7 @@ const GenealogyApp: React.FC = () => {
   });
   const [mapState, setMapState] = useState<MapState>({
     event: initialRoute.current.event,
+    year: initialRoute.current.year ?? null,
     camera: null,
   });
   const [returnView, setReturnView] = useState<"tree" | "map" | null>(null);
@@ -247,7 +248,12 @@ const GenealogyApp: React.FC = () => {
         r.view === "digital" ? "read" : (r.view as MobileViewMode),
       );
       setTreeState((s) => ({ ...s, person: r.person }));
-      setMapState((s) => ({ ...s, event: r.event, camera: null }));
+      setMapState((s) => ({
+        ...s,
+        event: r.event,
+        year: r.year ?? null,
+        camera: null,
+      }));
       routeReady.current = true;
     };
     read();
@@ -271,13 +277,23 @@ const GenealogyApp: React.FC = () => {
       view,
       person: treeState.person,
       event: mapState.event,
+      year: mapState.year,
     });
     if (handledRoute.current !== routeRevision) {
       handledRoute.current = routeRevision;
       if (location.hash !== desired) history.replaceState(null, "", desired);
       return;
     }
-    if (location.hash !== desired) history.pushState(null, "", desired);
+    if (location.hash !== desired) {
+      const previous = parseExplorerHash(location.hash, data.pages.length);
+      const sameRecord =
+        previous.page === currentPageIndex &&
+        previous.view === view &&
+        previous.person === treeState.person &&
+        previous.event === mapState.event;
+      if (sameRecord) history.replaceState(null, "", desired);
+      else history.pushState(null, "", desired);
+    }
   }, [
     data,
     currentPageIndex,
@@ -286,6 +302,7 @@ const GenealogyApp: React.FC = () => {
     isMobile,
     treeState.person,
     mapState.event,
+    mapState.year,
     routeRevision,
   ]);
 

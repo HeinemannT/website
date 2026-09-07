@@ -43,8 +43,8 @@ export function createPlacesMap(host: HTMLDivElement, options: Options) {
   );
   observer.observe(host);
   function focus(point: MigrationPoint) {
-    if (!point.coordinates) return;
     map.stop();
+    if (!point.coordinates) return;
     const target: [number, number] = [
       point.coordinates.lat,
       point.coordinates.lng,
@@ -53,7 +53,12 @@ export function createPlacesMap(host: HTMLDivElement, options: Options) {
     if (reduced.matches) map.setView(target, zoom, { animate: false });
     else map.flyTo(target, zoom, { duration: 1.1 });
   }
-  function update(points: MigrationPoint[], selected: string, dark: boolean) {
+  function update(
+    points: MigrationPoint[],
+    selected: string,
+    dark: boolean,
+    reached: Set<string>,
+  ) {
     const allIds = new Set(points.map((p) => p.id));
     for (const [id, marker] of markers)
       if (!allIds.has(id)) {
@@ -81,8 +86,10 @@ export function createPlacesMap(host: HTMLDivElement, options: Options) {
         weight: point.id === selected ? 3 : 2,
       });
       marker.setRadius(point.id === selected ? 10 : 7);
-      if (!map.hasLayer(marker)) marker.addTo(map);
-      if (point.id === selected) {
+      if (reached.has(point.id)) {
+        if (!map.hasLayer(marker)) marker.addTo(map);
+      } else marker.remove();
+      if (point.id === selected && reached.has(point.id)) {
         marker.bringToFront();
         marker.openTooltip();
       } else marker.closeTooltip();

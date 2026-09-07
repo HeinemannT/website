@@ -402,6 +402,171 @@
 .dark .event-detail {
   border-color: #3f3f46;
 }
+.chronology {
+  flex-shrink: 0;
+  padding: 13px 22px 10px;
+  background: #faf9f6;
+  border-top: 1px solid #d6d3d1;
+}
+.dark .chronology {
+  background: #18181b;
+  border-color: #3f3f46;
+}
+.chronology-current {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 42px;
+}
+.chronology-year {
+  font:
+    30px "Source Serif 4",
+    serif;
+  min-width: 68px;
+  font-variant-numeric: tabular-nums;
+}
+.chronology-year small {
+  display: block;
+  font:
+    10px Inter,
+    sans-serif;
+  color: #78716c;
+}
+.chronology-undated {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.chronology-source summary {
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  margin: 12px 0 6px;
+}
+.chronology-source > div {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 12px;
+}
+.chronology-caption {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.chronology-caption strong {
+  display: block;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chronology-caption span {
+  display: block;
+  color: #78716c;
+  white-space: normal;
+  text-overflow: ellipsis;
+}
+.chronology-buttons {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.chronology-buttons button {
+  padding: 9px;
+  color: #57534e;
+  border-radius: 3px;
+}
+.chronology-buttons button:hover {
+  background: #a634340a;
+  color: #a63434;
+}
+.chronology-buttons button:disabled {
+  opacity: 0.25;
+}
+.dark .chronology-buttons button {
+  color: #d4d4d8;
+}
+.chronology-track {
+  position: relative;
+  margin-top: 9px;
+}
+.chronology-ticks {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 10px;
+  height: 8px;
+  pointer-events: none;
+}
+.chronology-ticks span {
+  position: absolute;
+  width: 1px;
+  height: 8px;
+  background: #a8a29e;
+}
+.chronology-track input {
+  position: relative;
+  width: 100%;
+  height: 18px;
+  background: transparent;
+  accent-color: #a63434;
+  cursor: pointer;
+}
+.chronology-scale {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10px;
+  color: #78716c;
+}
+.chronology-scale > span:nth-child(2) {
+  text-align: center;
+}
+.chronology-empty {
+  padding: 16px;
+  font-size: 13px;
+}
+@media (max-width: 767px) {
+  .chronology {
+    padding: 9px 12px 7px;
+  }
+  .chronology-current {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .chronology-year {
+    font-size: 24px;
+    min-width: 58px;
+  }
+  .chronology-caption {
+    max-width: calc(100% - 68px);
+  }
+  .chronology-buttons {
+    position: absolute;
+    right: 9px;
+    bottom: 26px;
+    display: none;
+  }
+  .chronology-current .chronology-buttons {
+    position: static;
+    display: flex;
+    flex-basis: 100%;
+    justify-content: center;
+    margin-top: -4px;
+  }
+  .chronology-buttons button {
+    padding: 6px 12px;
+  }
+  .chronology-track {
+    margin-top: 3px;
+  }
+  .chronology-scale > span:nth-child(2) {
+    font-size: 9px;
+  }
+  .places-map-explorer .places-map-events {
+    height: 32%;
+  }
+}
 .places-map-fallback {
   position: absolute;
   inset: 0;

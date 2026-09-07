@@ -107,7 +107,11 @@ export function validSelection(items, id, fallback = "") {
 export function parseExplorerHash(hash, pageCount) {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
   const page = Number(p.get("page"));
+  const year = Number(p.get("year"));
   return {
+    ...(p.has("year") && Number.isInteger(year) && year >= 1 && year <= 9999
+      ? { year }
+      : {}),
     page:
       Number.isInteger(page) && page >= 1 && page <= pageCount ? page - 1 : 0,
     view: ["image", "digital", "map", "tree", "glossary"].includes(
@@ -126,5 +130,6 @@ export function explorerHash(state) {
   });
   if (state.person) p.set("person", state.person);
   if (state.event) p.set("event", state.event);
+  if (Number.isInteger(state.year)) p.set("year", String(state.year));
   return "#" + p.toString();
 }

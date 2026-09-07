@@ -1,12 +1,20 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Minus } from "lucide-react";
 import { validSelection } from "../utils/explorers.mjs";
 import { createPlacesMap, MapCamera } from "../utils/placesMap";
+import ChronologyTimeline from "./ChronologyTimeline";
+import {
+  chronologicalRecords,
+  chronologyBounds,
+  reachedPlaces,
+  recordAtYear,
+} from "../utils/chronology.mjs";
 import type { MigrationPoint } from "../types";
 import "leaflet/dist/leaflet.css";
 import "../styles/explorers.css";
 export interface MapState {
   event: string;
+  year: number | null;
   camera: MapCamera | null;
 }
 interface Props {
@@ -16,13 +24,72 @@ interface Props {
   state: MapState;
   onChange: (s: MapState) => void;
 }
-export default function MigrationMap({
+let chronologyRequest: Promise<MigrationPoint[]> | undefined;
+function loadChronology() {
+  return (chronologyRequest ??= fetch("./chronology.json")
+    .then((r) => {
+      if (!r.ok) throw Error("Chronology unavailable");
+      return r.json();
+    })
+    .then((data) => {
+      if (
+        !Array.isArray(data.points) ||
+        !data.points.every(
+          (p) =>
+            typeof p.id === "string" &&
+            (p.year === null || Number.isFinite(p.year)),
+        )
+      )
+        throw Error("Invalid chronology");
+      return data.points as MigrationPoint[];
+    })
+    .catch((error) => {
+      chronologyRequest = undefined;
+      throw error;
+    }));
+}
+export default function MigrationMap(props: Props) {
+  const [additions, setAdditions] = useState<MigrationPoint[] | null>(null);
+  const [warning, setWarning] = useState(false);
+  useEffect(() => {
+    let active = true;
+    loadChronology()
+      .then((data) => {
+        if (active) setAdditions(data);
+      })
+      .catch(() => {
+        if (active) {
+          setAdditions([]);
+          setWarning(true);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+  const records = useMemo(
+    () => [...props.points, ...(additions ?? [])],
+    [props.points, additions],
+  );
+  if (additions === null)
+    return (
+      <p className="p-6 text-sm text-stone-500">
+        Loading the reviewed chronology…
+      </p>
+    );
+  return (
+    <RecordedMap {...props} points={records} chronologyWarning={warning} />
+  );
+}
+
+function RecordedMap({
   points,
   isDarkMode,
   onNavigate,
   state,
   onChange,
-}: Props) {
+  chronologyWarning,
+}: Props & { chronologyWarning: boolean }) {
   const host = useRef<HTMLDivElement>(null);
   const api = useRef<ReturnType<typeof createPlacesMap> | null>(null);
   const latest = useRef({ state, onChange });
@@ -30,21 +97,75 @@ export default function MigrationMap({
   const [fallback, setFallback] = useState(false),
     [tileError, setTileError] = useState(false),
     [expanded, setExpanded] = useState(true);
-  const select = (id: string) => {
+  const [interaction, setInteraction] = useState(0);
+  const pause = () => setInteraction((n) => n + 1);
+  const dated = useMemo(() => chronologicalRecords(points), [points]);
+  const bounds = useMemo(() => chronologyBounds(points), [points]);
+  const requestedYear =
+    state.year ??
+    points.find((p) => p.id === state.event)?.year ??
+    bounds?.min ??
+    0;
+  const currentYear = bounds
+    ? Math.max(bounds.min, Math.min(bounds.max, requestedYear))
+    : requestedYear;
+  const reached = useMemo(
+    () => reachedPlaces(points, currentYear),
+    [points, currentYear],
+  );
+  const ordered = useMemo(
+    () => [...dated, ...points.filter((p) => p.year === null)],
+    [points, dated],
+  );
+  const selectRef = useRef<(id: string) => void>(() => {});
+  const select = (id: string, automatic = false) => {
+    if (!automatic) pause();
     const { state: s, onChange: change } = latest.current;
-    const next = { ...s, event: id, camera: null };
+    const point = points.find((p) => p.id === id);
+    const next = {
+      ...s,
+      event: id,
+      year: point?.year ?? s.year ?? currentYear,
+      camera: null,
+    };
     latest.current.state = next;
     change(next);
     setExpanded(true);
-    const point = points.find((p) => p.id === id);
-    if (point) api.current?.focus(point);
+    if (point && id === s.event) api.current?.focus(point);
   };
+  selectRef.current = select;
+  const scrub = (year: number) => {
+    pause();
+    const record = recordAtYear(dated, year);
+    const { state: s, onChange: change } = latest.current;
+    const next = {
+      ...s,
+      year,
+      event: record?.id ?? "",
+      camera: record?.id === s.event ? s.camera : null,
+    };
+    latest.current.state = next;
+    change(next);
+  };
+  useEffect(() => {
+    if (!bounds) return;
+    const existing = points.find((p) => p.id === state.event);
+    const record =
+      existing && (existing.year === null || existing.year <= currentYear)
+        ? existing
+        : recordAtYear(dated, currentYear);
+    if (state.year !== currentYear || state.event !== record?.id) {
+      const next = { ...state, year: currentYear, event: record?.id ?? "" };
+      latest.current.state = next;
+      onChange(next);
+    }
+  }, [bounds, state.year, state.event]);
   useEffect(() => {
     if (!host.current) return;
     try {
       api.current = createPlacesMap(host.current, {
         camera: latest.current.state.camera,
-        onSelect: select,
+        onSelect: (id) => selectRef.current(id),
         onRest: (camera) => {
           const { state: s, onChange: change } = latest.current;
           change({ ...s, camera });
@@ -61,9 +182,14 @@ export default function MigrationMap({
   }, []);
   useEffect(() => {
     const id = validSelection(points, state.event);
-    if (id !== state.event) onChange({ ...state, event: id });
-    api.current?.update(points, id, isDarkMode);
-  }, [points, state.event, isDarkMode]);
+    if (!bounds && id !== state.event) onChange({ ...state, event: id });
+    api.current?.update(
+      points,
+      id,
+      isDarkMode,
+      new Set(reached.map((p) => p.id)),
+    );
+  }, [points, state.event, isDarkMode, reached]);
   useEffect(() => {
     const point = points.find((p) => p.id === state.event);
     if (point && !state.camera) api.current?.focus(point);
@@ -79,10 +205,15 @@ export default function MigrationMap({
       aria-label="Recorded places explorer"
     >
       <div className="places-map-body">
-        <div className="places-map-stage">
+        <div
+          className="places-map-stage"
+          onPointerDownCapture={pause}
+          onWheelCapture={pause}
+          onKeyDownCapture={pause}
+        >
           <nav className="places-map-controls" aria-label="Map area and zoom">
             <div>
-              <button onClick={() => api.current?.fit(points)}>
+              <button onClick={() => api.current?.fit(reached)}>
                 All places
               </button>
               <button
@@ -144,10 +275,22 @@ export default function MigrationMap({
             )}
           </div>
         </div>
-        <aside className="places-map-events" aria-label="Recorded events">
-          <h2 className="places-list-heading">Recorded places</h2>
+        <aside
+          className="places-map-events"
+          aria-label="Recorded events"
+          onPointerDownCapture={pause}
+          onWheelCapture={pause}
+          onKeyDownCapture={pause}
+        >
+          <h2 className="places-list-heading">Recorded events</h2>
+          {chronologyWarning && (
+            <p className="p-3 text-xs" role="status">
+              Additional chronology could not load. The original place records
+              remain available.
+            </p>
+          )}
           <ol className="event-list">
-            {points.map((p) => (
+            {ordered.map((p) => (
               <li key={p.id} id={`event-${p.id}`}>
                 <button
                   className="event-select"
@@ -156,10 +299,12 @@ export default function MigrationMap({
                 >
                   <strong>{p.name}</strong>
                   <small>
-                    {p.year === null
-                      ? "Undated"
-                      : `${p.date_label.trim().startsWith("c.") ? "c. " : ""}${p.year}${p.year_end && p.year_end !== p.year ? `–${p.year_end}` : ""}`}
-                    {!p.coordinates ? " · Location unresolved" : ""}
+                    {p.source_refs
+                      ? p.date_label
+                      : p.year === null
+                        ? "Undated"
+                        : `${p.date_label.trim().startsWith("c.") ? "c. " : ""}${p.year}${p.year_end && p.year_end !== p.year ? `–${p.year_end}` : ""}`}
+                    {!p.coordinates ? " · Location unrecorded" : ""}
                   </small>
                 </button>
                 {state.event === p.id && (
@@ -169,7 +314,24 @@ export default function MigrationMap({
                         <p className="event-date">
                           {p.date_label} · {p.event_type.replaceAll("_", " ")}
                         </p>
-                        <p>{p.description}</p>
+                        {(
+                          p.source_refs ?? [
+                            {
+                              page_ref: p.page_ref,
+                              column_refs: p.column_refs,
+                            },
+                          ]
+                        ).map((ref) => (
+                          <button
+                            key={`${ref.page_ref}-${ref.column_refs.join("-")}`}
+                            className="source-link block"
+                            onClick={() => onNavigate?.(ref.page_ref)}
+                          >
+                            Read page {Number(ref.page_ref.slice(4))}, columns{" "}
+                            {ref.column_refs.join(", ")} →
+                          </button>
+                        ))}
+                        <p>{p.description.split("\n\nSource:")[0]}</p>
                         {p.coordinates &&
                           points
                             .filter(
@@ -182,33 +344,28 @@ export default function MigrationMap({
                               <button
                                 key={other.id}
                                 className="source-link"
-                                onClick={() => {
-                                  const next = {
-                                    ...state,
-                                    event: other.id,
-                                    camera: null,
-                                  };
-                                  latest.current.state = next;
-                                  onChange(next);
-                                  api.current?.focus(other);
-                                }}
+                                onClick={() => select(other.id)}
                               >
                                 Also recorded here: {other.name} ·{" "}
                                 {other.date_label}
                               </button>
                             ))}
                         <p className="evidence">
-                          {p.evidence} · {p.coordinate_precision}
-                          {p.coordinates ? " coordinates" : " location"}. Dates
-                          retain the record’s uncertainty.
+                          {p.evidence}.{" "}
+                          {p.coordinates
+                            ? `Location: ${p.coordinate_precision}.`
+                            : "Location unrecorded."}
                         </p>
-                        <button
-                          className="source-link"
-                          onClick={() => onNavigate?.(p.page_ref)}
-                        >
-                          Read page {Number(p.page_ref.slice(4))}, columns{" "}
-                          {p.column_refs.join(", ")} →
-                        </button>
+                        {p.description.includes("\n\nSource:") && (
+                          <details className="chronology-source">
+                            <summary>Transcription and translation</summary>
+                            <div>
+                              {p.description.slice(
+                                p.description.indexOf("\n\nSource:") + 2,
+                              )}
+                            </div>
+                          </details>
+                        )}
                       </>
                     )}
                     <button
@@ -224,6 +381,14 @@ export default function MigrationMap({
           </ol>
         </aside>
       </div>
+      <ChronologyTimeline
+        records={points}
+        year={currentYear}
+        selected={state.event}
+        interaction={interaction}
+        onSelect={select}
+        onYear={scrub}
+      />
     </section>
   );
 }

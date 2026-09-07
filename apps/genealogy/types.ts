@@ -68,6 +68,9 @@ export interface PageData {
 }
 
 export interface MigrationPoint {
+  source_refs?: { page_ref: string; column_refs: number[] }[];
+  event_date?: string;
+  sort_date?: string;
   id: string;
   name: string;
   year: number | null;

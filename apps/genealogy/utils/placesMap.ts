@@ -140,10 +140,11 @@ export function createPlacesMap(host: HTMLDivElement, options: Options) {
         path = L.polyline([
           [from.coordinates.lat, from.coordinates.lng],
           [to.coordinates.lat, to.coordinates.lng],
-        ], { weight: 2, dashArray: "6 6", interactive: false });
+        ], { weight: 3, dashArray: "6 6", interactive: false });
         paths.set(connection.id, path);
       }
-      path.setStyle({ color: dark ? "#e0a19a" : "#6f211f", opacity: 0.8 });
+      // The OSM basemap stays light in both UI themes.
+      path.setStyle({ color: "#6f211f", opacity: 0.9 });
       if (!map.hasLayer(path)) path.addTo(map);
       path.bringToBack();
     }

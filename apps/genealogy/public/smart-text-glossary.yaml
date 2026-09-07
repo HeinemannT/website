@@ -1,7 +1,7 @@
 terms:
   - term: "Jinshi"
     zh: "進士"
-    definition: "Imperial Scholar / Presented Scholar. The highest and final degree in the imperial examination system. Passing this exam allowed entry into the high-level bureaucracy."
+    definition: "The highest degree in the imperial examination system. It is not equivalent to a modern doctorate and did not guarantee national leadership."
 
   - term: "Zhuanshu"
     zh: "篆書"
@@ -13,7 +13,7 @@ terms:
 
   - term: "Earth Veins"
     zh: "地脉"
-    definition: "Currents of Qi (energy) running through the earth. In Feng Shui, locating a grave or home on a strong vein ensures prosperity for descendants."
+    definition: "In feng shui belief, currents of qi associated with the landscape. The genealogy describes auspicious sites in these terms; prosperity is a belief, not an established effect."
 
   - term: "Couplet"
     zh: "對聯"
@@ -29,39 +29,39 @@ terms:
 
   - term: "Jiajing"
     zh: "嘉靖"
-    definition: "Regnal name of the Emperor who reigned from 1521 to 1567 (Ming Dynasty)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1522–1566. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Hongwu"
     zh: "洪武"
-    definition: "Regnal name of the first Ming Emperor, Zhu Yuanzhang (1368–1398)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1368–1398. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Yongle"
     zh: "永樂"
-    definition: "Regnal name of the third Ming Emperor (1402–1424), known for moving the capital to Beijing."
+    definition: "Reign era: numbered lunar years correspond approximately to 1403–1424. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Xuande"
     zh: "宣德"
-    definition: "Regnal name of the fifth Ming Emperor (1425–1435)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1426–1435. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Chenghua"
     zh: "成化"
-    definition: "Regnal name of the eighth Ming Emperor (1464–1487)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1465–1487. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Hongzhi"
     zh: "弘治"
-    definition: "Regnal name of the ninth Ming Emperor (1487–1505)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1488–1505. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Zhengde"
     zh: "正德"
-    definition: "Regnal name of the tenth Ming Emperor (1505–1521)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1506–1521. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Wanli"
     zh: "萬曆"
-    definition: "Regnal name of the thirteenth Ming Emperor (1572–1620)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1573–1620. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Guangxu"
     zh: "光緒"
-    definition: "Regnal name of the penultimate Qing Emperor (1875–1908)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1875–1908. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Xiangsheng"
     zh: "庠生"
@@ -85,11 +85,11 @@ terms:
 
   - term: "Zi"
     zh: "字"
-    definition: "Courtesy Name. A name given at adulthood (20), used by peers to show respect."
+    definition: "Courtesy name, distinct from the personal name. Its use does not establish another identity."
 
   - term: "Hao"
     zh: "號"
-    definition: "Art Name / Unit. Can refer to a pseudonym chosen by an educated person OR a unit of area (1/1000 of a Mu) or length."
+    definition: "Art name or sobriquet, written 號. The unit 毫 is a different character."
 
   - term: "Juren"
     zh: "舉人"
@@ -99,13 +99,13 @@ terms:
     zh: "國子監"
     definition: "The National Academy. The highest institution of learning in imperial China."
 
-  - term: "Golden Pagoda"
+  - term: "Bone urn"
     zh: "金塔"
     definition: "Jinta. A burial urn used in secondary burials to store the bones of the deceased."
 
   - term: "Gaoyang"
     zh: "高陽"
-    definition: "A prestigious choronym (hall name) for the Lao clan, claiming descent from the legendary Emperor Zhuanxu."
+    definition: "Name in the temple couplet. Its identification as a Lao ancestral choronym or proof of descent from Zhuanxu remains unverified."
 
   - term: "Tianshun"
     zh: "天順"
@@ -117,43 +117,43 @@ terms:
 
   - term: "Tianqi"
     zh: "天啟"
-    definition: "Regnal era of the Ming Dynasty (1620–1627)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1621–1627. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Chongzhen"
     zh: "崇禎"
-    definition: "Regnal era of the last Ming Emperor (1627–1644)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1628–1644. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Shunzhi"
     zh: "順治"
-    definition: "Regnal era of the first Qing Emperor to rule China proper (1643–1661)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1644–1661. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Kangxi"
     zh: "康熙"
-    definition: "Regnal era of the Qing Dynasty (1661–1722), known for its length and stability."
+    definition: "Reign era: numbered lunar years correspond approximately to 1662–1722. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Yongzheng"
     zh: "雍正"
-    definition: "Regnal era of the Qing Dynasty (1722–1735)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1723–1735. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Qianlong"
     zh: "乾隆"
-    definition: "Regnal era of the Qing Dynasty (1735–1796), marking a peak of prosperity."
+    definition: "Reign era: numbered lunar years correspond approximately to 1736–1795. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Jiaqing"
     zh: "嘉慶"
-    definition: "Regnal era of the Qing Dynasty (1796–1820)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1796–1820. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Daoguang"
     zh: "道光"
-    definition: "Regnal era of the Qing Dynasty (1820–1850)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1821–1850. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Xianfeng"
     zh: "咸豐"
-    definition: "Regnal era of the Qing Dynasty (1850–1861)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1851–1861. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Tongzhi"
     zh: "同治"
-    definition: "Regnal era of the Qing Dynasty (1861–1875)."
+    definition: "Reign era: numbered lunar years correspond approximately to 1862–1874. Era year one and accession year can differ; lunar years extend into the following Western year."
 
   - term: "Zhang"
     zh: "丈"
@@ -181,39 +181,39 @@ terms:
 
   - term: "Gong"
     zh: "公"
-    definition: "Lord / Honorable. A respectful suffix for ancestors (e.g., Yanzhong-gong)."
+    definition: "Respectful designation for a man or ancestor. Often translated Lord in this edition; the word alone does not establish noble rank."
 
   - term: "Lady"
     zh: "氏"
-    definition: "Madam / Chi. Suffix for a married woman's maiden surname (e.g., Zhou-shi = Lady Zhou)."
+    definition: "The word Shi (氏) follows a family surname. Lady Zhou identifies a woman of the Zhou family; it does not supply her personal name."
 
   - term: "Concubine"
     zh: "妾"
-    definition: "Secondary wife. A recognized union in historical Chinese society, often taken to ensure male heirs."
+    definition: "Qie (妾), a recognized historical relationship distinct from a principal spouse (配). The source’s wording should be preserved without assuming a motive."
 
   - term: "Bazong"
     zh: "把總"
-    definition: "Squad Leader (Rank 7 Military). Commanded approx. 10-15 soldiers."
+    definition: "Historical military office, generally seventh rank in the Qing system. Exact strength and a modern unit equivalent are not established by this record."
 
   - term: "Qianzong"
     zh: "千總"
-    definition: "Company Commander (Rank 6 Military). Commanded approx. 100 soldiers."
+    definition: "Historical military office, generally sixth rank in the Qing system. No fixed troop count is implied here."
 
   - term: "Shoubei"
     zh: "守備"
-    definition: "Garrison Commandant (Rank 5 Military). Independent command of a battalion."
+    definition: "Historical military office commonly translated garrison commandant, generally fifth rank. Its specific duties depended on the appointment."
 
   - term: "Dusi"
     zh: "都司"
-    definition: "Priority Commander or Major (Rank 4 Military). Second-in-command of a Brigade."
+    definition: "Historical military office, generally fourth rank. Priority for appointment is a separate phrase, not the translation of the office itself."
 
   - term: "Zhaowu Duwei"
     zh: "昭武都尉"
-    definition: "Commandant of Manifest Martiality. A prestige title for Rank 4 officers, allowing the wearing of the Blue Plume."
+    definition: "A fourth-rank military prestige title. An ancestral grant does not by itself establish active command or a blue-plume award."
 
   - term: "Blue Plume"
     zh: "藍翎"
-    definition: "Lanling. A dyed feather attached to the official hat, awarded for bravery in combat."
+    definition: "Lanling, a blue feather distinction worn with official headgear. The genealogy records Yongzhao’s award but does not name the campaign or deed behind it."
 
   - term: "Gongren"
     zh: "恭人"
@@ -233,7 +233,7 @@ terms:
 
   - term: "Xiedou"
     zh: "械鬥"
-    definition: "Armed Feuds. Inter-clan warfare involving hired mercenaries and artillery, common in 19th-century Guangdong."
+    definition: "Armed fighting between local groups or lineages. Specific motives, weapons, and troop numbers cannot be inferred from this term alone."
 
   - term: "Ancestral Tablet"
     zh: "神主"
@@ -253,4 +253,4 @@ terms:
 
   - term: "Taiping Rebellion"
     zh: "太平天國"
-    definition: "A massive civil war (1850-1864). Western historical records suggest Gen 18 fought in the naval campaigns of this war."
+    definition: "Civil war in nineteenth-century China (1850–1864). The genealogy’s recorded dates and offices do not establish Yongzhao’s participation."

@@ -16,19 +16,16 @@ people:
     page_ref: "img_05"
     children: ["gen3_zhe", "gen3_jian", "gen3_li"]
 
-  - id: "gen3_zhe"
-    name_zh: "蔗"
-    name_en: "Zhe"
+  - id: gen3_zhe
+    name_zh: 蔗
+    name_en: Zhe
     generation: 3
-    page_ref: "img_06"
+    page_ref: img_06
     children:
-      [
-        "gen4_zongxu",
-        "gen4_zongjing",
-        "gen4_zongqin",
-        "gen4_zonghou",
-        "gen4_zongsui",
-      ]
+      - gen4_zongxu
+      - gen4_zongqin
+      - gen4_zonghou
+      - gen4_zongsui
 
   - id: "gen3_jian"
     name_zh: "建"
@@ -46,11 +43,6 @@ people:
     generation: 4
     page_ref: "img_08"
     children: ["gen5_shangqian", "gen5_shangzhong", "gen5_shanghe"]
-
-  - id: "gen4_zongjing"
-    name_zh: "宗敬"
-    name_en: "Zongjing"
-    generation: 4
 
   - id: "gen4_zongqin"
     name_zh: "宗勤"
@@ -91,10 +83,12 @@ people:
     page_ref: "img_09"
     children: ["gen7_xianci"]
 
-  - id: "gen6_wang"
-    name_zh: "望"
-    name_en: "Wang"
+  - id: gen6_wang
+    name_zh: 任
+    name_en: Ren
     generation: 6
+    page_ref: img_09
+    note: Formerly read as Wang/望; scan lists 任惠策賢. Stable record ID retained.
 
   - id: "gen6_hui"
     name_zh: "惠"
@@ -138,11 +132,13 @@ people:
     page_ref: "img_13"
     children: ["gen10_yingyun"]
 
-  - id: "gen9_wanbang"
-    name_zh: "萬邦"
-    name_en: "Wanbang"
+  - id: gen9_wanbang
+    name_zh: 萬邦
+    name_en: Wanbang
     generation: 9
-    page_ref: "img_14"
+    page_ref: img_14
+    adopted_children:
+      - gen10_yingxi
 
   - id: "gen9_wanfang"
     name_zh: "萬方"
@@ -195,17 +191,25 @@ people:
     page_ref: "img_18"
     children: ["gen11_chaoshi", "gen11_kangshi"]
 
-  - id: "gen10_hanzhang"
-    name_zh: "漢章"
-    name_en: "Hanzhang"
+  - id: gen10_hanzhang
+    name_zh: 漢章
+    name_en: Hanzhang
     generation: 10
-    page_ref: "img_19"
-    children: ["gen11_dingquan", "gen11_dingzhen"]
+    page_ref: img_19
+    children:
+      - gen11_dingquan
+      - gen11_ding_unknown
+      - gen11_dingzhong
+      - gen11_dingzhen
 
-  - id: "gen10_shi"
-    name_zh: "時"
-    name_en: "Shi"
+  - id: gen10_shi
+    name_zh: 俊錫
+    name_en: Junxi
     generation: 10
+    page_ref: img_19
+    children:
+      - gen11_zhaogui
+    note: Biography identifies him as Taijie/Wanhua’s son. Former Shi identity arose from a damaged child-list transcription on page 15; stable ID retained.
 
   - id: "gen10_junjie"
     name_zh: "俊傑"
@@ -214,13 +218,15 @@ people:
     page_ref: "img_20"
     children: ["gen11_zhuogui"]
 
-  - id: "gen10_junxiu"
-    name_zh: "俊秀"
-    name_en: "Junxiu"
+  - id: gen10_junxiu
+    name_zh: 俊秀
+    name_en: Junxiu
     generation: 10
-    page_ref: "img_20"
+    page_ref: img_20
     children:
-      ["gen11_zhaogui", "gen11_menggui", "gen11_guifeng", "gen11_guigong"]
+      - gen11_menggui
+      - gen11_guifeng
+      - gen11_guigong
 
   - id: "gen11_shengshi"
     name_zh: "聖世"
@@ -246,10 +252,12 @@ people:
     name_en: "Shushi"
     generation: 11
 
-  - id: "gen11_chaoshi"
-    name_zh: "起世"
-    name_en: "Chaoshi"
+  - id: gen11_chaoshi
+    name_zh: 趙世 [?]
+    name_en: Zhaoshi [?]
     generation: 11
+    page_ref: img_18
+    note: First character appears 趙, formerly transcribed 起; reading tentative.
 
   - id: "gen11_kangshi"
     name_zh: "康世"
@@ -266,16 +274,16 @@ people:
     name_en: "Zhaogui"
     generation: 11
 
-  # Note: Generation numbering in the text has Yanjun as "11th Gen" title,
-  # but he is the son of 11th Gen Shengshi. We align to logical generation 12.
-  # Corrected name from Yanjun/Yanheng to Tingjing/Tingheng based on char 'Ting' (廷)
-  - id: "gen12_tingjing"
-    name_zh: "廷驚"
-    name_en: "Tingjing"
-    title: "Quan'an"
+  - id: gen12_tingjing
+    name_zh: 廷驚
+    name_en: Tingjing [?]
+    title: Quan'an
     generation: 12
-    page_ref: "img_22"
-    children: ["gen13_linju"]
+    page_ref: img_22
+    children:
+      - gen13_linju
+      - gen13_lingao
+    note: 'Personal name unresolved: the bird-based character may be 鷺; 廷/延 also needs review. Courtesy name Jiangjun (獎君). Heading is second branch within generation 12.'
 
   - id: "gen12_tingheng"
     name_zh: "廷衡"
@@ -284,12 +292,14 @@ people:
     page_ref: "img_22"
     children: ["gen13_wenhan", "gen13_wenen", "gen13_yigui"]
 
-  - id: "gen12_tingyuan"
-    name_zh: "廷瑗"
-    name_en: "Tingyuan"
+  - id: gen12_tingyuan
+    name_zh: 廷瑗
+    name_en: Tingyuan
     generation: 12
-    page_ref: "img_24"
-    children: ["gen13_wenyue_adopted"]
+    page_ref: img_24
+    children: []
+    adopted_children:
+      - gen13_wenyue_adopted
 
   - id: "gen12_tingzan"
     name_zh: "廷瓚"
@@ -321,21 +331,26 @@ people:
     name_en: "Yigui"
     generation: 13
 
-  - id: "gen13_hui"
-    name_zh: "輝"
-    name_en: "Hui"
+  - id: gen13_hui
+    name_zh: 輝鼎
+    name_en: Huiding
     generation: 13
+    page_ref: img_24
+    note: 'Name continues across columns 7–8: 輝 + 鼎.'
 
   - id: "gen13_huicheng"
     name_zh: "輝晟"
     name_en: "Huicheng"
     generation: 13
 
-  - id: "gen13_wenyue_adopted"
-    name_zh: "文曜"
-    name_en: "Wenyue"
-    title: "Heir to Tingyuan"
+  - id: gen13_wenyue_adopted
+    name_zh: 文曜
+    name_en: Wenyao
+    title: Heir to Tingyuan
     generation: 13
+    page_ref: img_24
+    note: Natural father identified by name Keliu; parentage beyond this is unrecorded.
+    natural_parent_label: Keliu (可六), otherwise unidentified
 
   - id: "gen14_dianqu"
     name_zh: "殿取"
@@ -345,12 +360,18 @@ people:
     page_ref: "img_25"
     children: ["gen15_wenlong"]
 
-  - id: "gen14_dianyuan"
-    name_zh: "殿元"
-    name_en: "Dianyuan"
+  - id: gen14_dianyuan
+    name_zh: 殿元
+    name_en: Dianyuan
     generation: 14
-    page_ref: "img_26"
-    children: ["gen15_wenxian_2"] # Renamed to avoid ID conflict with Gen 15 Wenxian (Lost Branch)
+    page_ref: img_26
+    children:
+      - gen15_wenxian
+      - gen15_wenzhang
+      - gen15_wensheng_sheng
+      - gen15_wenchun
+    adoptive_parent_label: Yushan (玉山), otherwise unidentified
+    note: Natural son of Linju, adopted out to Yushan (pages 25–26); rendered under natural parent.
 
   - id: "gen14_diangui"
     name_zh: "殿貴"
@@ -367,36 +388,35 @@ people:
     page_ref: "img_27"
     children: ["gen16_guanxin", "gen16_guanwei", "gen16_guanzhi"]
 
-  - id: "gen15_wenxian_2"
-    name_zh: "文顯"
-    name_en: "Wenxian (2)"
-    generation: 15
-
   - id: "gen15_wensheng"
     name_zh: "文昇"
     name_en: "Wensheng"
     generation: 15
 
-  - id: "gen15_wenxian" # The Lost Branch mentioned in original
-    name_zh: "文顯"
-    name_en: "Wenxian"
-    title: "The Lost Branch (Guangxi)"
+  - id: gen15_wenxian
+    name_zh: 文顯
+    name_en: Wenxian
+    title: Branch with unknown whereabouts
     generation: 15
-    page_ref: "img_27"
-    children: ["gen16_yanchun"]
+    page_ref: img_27
+    children:
+      - gen16_yanchun
+    note: Resumed biography of Dianyuan’s son, pages 26–27. Traveler in Guangxi may be Wenxian or Yanchun; no journey date recorded.
 
   - id: "gen16_yanchun"
     name_zh: "彥純"
     name_en: "Yanchun"
     generation: 16
 
-  - id: "gen16_guanxin"
-    name_zh: "觀信"
-    name_en: "Guanxin"
-    title: "Puzhai / Zhaowu Duwei"
+  - id: gen16_guanxin
+    name_zh: 觀信
+    name_en: Guanxin
+    title: Puzhai / Zhaowu Duwei
     generation: 16
-    page_ref: "img_28"
-    children: ["gen17_shangda", "gen17_zongrong_adopted"]
+    page_ref: img_28
+    children:
+      - gen17_shangda
+      - gen17_zongrong
 
   - id: "gen16_guanwei"
     name_zh: "觀位"
@@ -405,46 +425,54 @@ people:
     page_ref: "img_28"
     children: ["gen17_shihong"]
 
-  - id: "gen16_guanzhi"
-    name_zh: "觀智"
-    name_en: "Guanzhi"
+  - id: gen16_guanzhi
+    name_zh: 觀智
+    name_en: Guanzhi
     generation: 16
-    page_ref: "img_28"
-    children: ["gen17_zongrong"]
+    page_ref: img_28
+    children: []
+    adopted_children:
+      - gen17_zongrong
 
-  - id: "gen17_shangda"
-    name_zh: "尚達"
-    name_en: "Shangda"
-    title: "Naval Captain (4th Rank)"
+  - id: gen17_shangda
+    name_zh: 上達
+    name_en: Shangda
+    title: Danshan; ancestral honors
     generation: 17
-    page_ref: "img_29"
-    children: ["gen18_yongzhao"]
+    page_ref: img_29
+    children:
+      - gen18_yongzhao
+    note: Honored through son Yongzhao. Attribution of the repeated naval career on page 29 is unresolved.
 
-  - id: "gen17_zongrong"
-    name_zh: "宗榮"
-    name_en: "Zongrong"
+  - id: gen17_zongrong
+    name_zh: 宗榮
+    name_en: Zongrong
     generation: 17
-    page_ref: "img_30"
-    children: ["gen18_fuling", "gen18_fugao", "gen18_liang"]
+    page_ref: img_30
+    children:
+      - gen18_zongrong_eldest
+      - gen18_fuling
+      - gen18_fugao
+      - gen18_liang
+    note: Natural son of Guanxin; adopted heir of Guanzhi. Confirmed by 出嗣 / 入嗣 on page 28 and 嗣子 on page 30.
 
-  - id: "gen17_zongrong_adopted"
-    name_zh: "宗榮"
-    name_en: "Zongrong (Adopted)"
+  - id: gen17_shihong
+    name_zh: 元泰
+    name_en: Yuantai
+    title: Courtesy name Shihong (式洪)
     generation: 17
+    page_ref: img_31
+    note: A son of Zongrong was adopted as his heir; which son is not specified.
+    unidentified_adoption: A son of Zongrong (identity unrecorded)
 
-  - id: "gen17_shihong"
-    name_zh: "式洪"
-    name_en: "Shihong"
-    title: "Yuantai"
-    generation: 17
-
-  - id: "gen18_yongzhao"
-    name_zh: "永照"
-    name_en: "Yongzhao"
-    title: "Lord Xiulin"
+  - id: gen18_yongzhao
+    name_zh: 永兆
+    name_en: Yongzhao
+    title: Xiulin; naval officer
     generation: 18
-    page_ref: "img_31"
-    children: ["gen19_guozhi"]
+    page_ref: img_31
+    children:
+      - gen19_guozhi
 
   - id: "gen18_fuling"
     name_zh: "福玲"
@@ -461,34 +489,120 @@ people:
     name_en: "Liang"
     generation: 18
 
-  - id: "gen19_guozhi"
-    name_zh: "國治"
-    name_en: "Guozhi"
-    title: "Pingpo / 6th Rank Official"
+  - id: gen19_guozhi
+    name_zh: 國治
+    name_en: Guozhi
+    title: Pingpo / 6th Rank Official
     generation: 19
-    page_ref: "img_35"
-    children: ["gen20_zhenbang", "gen20_zhenmeng", "gen20_zhenbei"]
+    page_ref: img_35
+    children:
+      - gen20_zhenbang
+      - gen20_zhenbei
 
-  - id: "gen20_zhenbang"
-    name_zh: "鎮邦"
-    name_en: "Zhenbang"
-    title: "Migrated to South Africa"
+  - id: gen20_zhenbang
+    name_zh: 鎮邦
+    name_en: Zhenbang
+    title: Recorded in South Africa by 1955
     generation: 20
-    page_ref: "img_36"
-    children: ["gen21_zejia"]
+    page_ref: img_36
+    children:
+      - gen21_zejia
 
-  - id: "gen20_zhenmeng"
-    name_zh: "鎮孟"
-    name_en: "Zhenmeng"
+  - id: gen20_zhenbei
+    name_zh: 鎮盃
+    name_en: Zhenbei
     generation: 20
-
-  - id: "gen20_zhenbei"
-    name_zh: "鎮盃"
-    name_en: "Zhenbei"
-    generation: 20
+    page_ref: img_36
+    note: Name 鎮盃 agrees across pages 35–36; formerly duplicated as Zhenmeng. Birth recorded as Guangxu 31 (1905), lunar 8/26.
 
   - id: "gen21_zejia"
     name_zh: "澤家"
     name_en: "Zejia"
     generation: 21
     title: "Son of Zhenbang"
+  - id: gen13_lingao
+    name_zh: 林皋
+    name_en: Lingao
+    generation: 13
+    page_ref: img_23
+
+  - id: gen10_yingxi
+    name_zh: 應錫
+    name_en: Yingxi
+    generation: 10
+    page_ref: img_17
+    note: Natural son of Wanfang; adopted heir of Wanbang. Courtesy name Changxi (昌禧).
+    adopted_children:
+      - gen11_dingzhen
+
+  - id: gen11_dingquan
+    name_zh: 鼎銓
+    name_en: Dingquan
+    generation: 11
+    page_ref: img_19
+
+  - id: gen11_ding_unknown
+    name_zh: 鼎□
+    name_en: Ding-[unresolved]
+    generation: 11
+    page_ref: img_19
+    note: Second of four sons; the second name character is blank or illegible.
+
+  - id: gen11_dingzhong
+    name_zh: 鼎鍾
+    name_en: Dingzhong
+    generation: 11
+    page_ref: img_19
+
+  - id: gen11_dingzhen
+    name_zh: 鼎鎮
+    name_en: Dingzhen
+    generation: 11
+    page_ref: img_19
+    note: Natural fourth son of Hanzhang (Changchu); adopted heir of Yingxi (Changxi), pages 18–19.
+
+  - id: gen11_menggui
+    name_zh: 夢桂
+    name_en: Menggui
+    generation: 11
+    page_ref: img_21
+
+  - id: gen11_guifeng
+    name_zh: 育桂 [?]
+    name_en: Yugui [?]
+    generation: 11
+    page_ref: img_21
+    note: Tentative segmentation of 育桂鳳桂 across columns 1–2; formerly Guifeng.
+
+  - id: gen11_guigong
+    name_zh: 鳳桂 [?]
+    name_en: Fenggui [?]
+    generation: 11
+    page_ref: img_21
+    note: Tentative segmentation; 公 starts the next sentence rather than the name. Formerly Guigong.
+
+  - id: gen15_wenzhang
+    name_zh: 文章
+    name_en: Wenzhang
+    generation: 15
+    page_ref: img_27
+
+  - id: gen15_wensheng_sheng
+    name_zh: 文勝
+    name_en: Wensheng
+    generation: 15
+    page_ref: img_27
+    note: Different person from 文昇, son of Diangui.
+
+  - id: gen15_wenchun
+    name_zh: 文春
+    name_en: Wenchun
+    generation: 15
+    page_ref: img_27
+
+  - id: gen18_zongrong_eldest
+    name_zh: '[未記名]'
+    name_en: Unnamed eldest son
+    generation: 18
+    page_ref: img_31
+    note: A blank follows 長 in Zongrong’s four-son list. It is unknown which of his sons became Yuantai’s heir.

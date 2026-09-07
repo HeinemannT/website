@@ -9,9 +9,20 @@ export interface DocumentMetadata {
 }
 
 export interface MapData {
-  event_date: string | null;
+  event_date?: string | null;
   event_type: string;
   location_name: string;
+  location_status?: string;
+  subject?: string;
+  original_calendar: string;
+  original_date: string;
+  date_precision: string;
+  normalization_status: string;
+  year_start?: number;
+  year_end?: number;
+  source_url?: string;
+  page_ref: string;
+  column_ref: number;
   lat?: number;
   lng?: number;
 }
@@ -59,10 +70,17 @@ export interface PageData {
 export interface MigrationPoint {
   id: string;
   name: string;
-  year: number;
-  coordinates: { lat: number; lng: number };
+  year: number | null;
+  year_end?: number;
+  date_label: string;
+  event_type: string;
+  page_ref: string;
+  column_refs: number[];
+  evidence: string;
+  coordinate_precision: string;
+  coordinates: { lat: number; lng: number } | null;
   description: string;
-  era: string;
+  era?: string;
 }
 
 export interface MigrationPath {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import jsyaml from 'js-yaml';
 import { Network } from 'lucide-react';
 import { useDraggableScroll } from '../hooks/useDraggableScroll';
+import { treeLayout } from '../utils/evidence.mjs';
 
 interface FamilyMember {
     id: string;
@@ -11,6 +12,11 @@ interface FamilyMember {
     generation: number;
     page_ref?: string;
     children?: string[];
+    adopted_children?: string[];
+    note?: string;
+    natural_parent_label?: string;
+    adoptive_parent_label?: string;
+    unidentified_adoption?: string;
 }
 
 interface TreeData {
@@ -56,6 +62,8 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
         return new Map(data.people.map((p) => [p.id, p]));
     }, [data]);
 
+    const layout = React.useMemo(() => treeLayout(data?.people || []), [data]);
+
     // 2. Safer Scroll Logic using requestAnimationFrame
     useEffect(() => {
         if (!isLoading && data && data.root_id) {
@@ -82,9 +90,10 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
 
         const newVisited = new Set(visited).add(id);
         const person = peopleMap.get(id);
-        if (!person) return null;
+        if (!person) return <div key={id}>Unresolved reference: {id}</div>;
 
-        const hasChildren = person.children && person.children.length > 0;
+        const renderedChildren = layout.renderedChildren(person);
+        const hasChildren = renderedChildren.length > 0;
 
         return (
             <div key={id} className="flex flex-col items-center">
@@ -135,7 +144,15 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
                             </div>
                         </div>
                     )}
+                    {(person.note || person.natural_parent_label || person.adoptive_parent_label || layout.adoptedParent.has(id)) && <div className="mt-2 text-xs text-stone-600 dark:text-zinc-400 leading-relaxed normal-case">
+                        {layout.adoptedParent.has(id) && <p>Adopted heir of {peopleMap.get(layout.adoptedParent.get(id))?.name_en}.</p>}
+                        {person.natural_parent_label && <p>Natural parent: {person.natural_parent_label}.</p>}
+                        {person.adoptive_parent_label && <p>Adoptive parent: {person.adoptive_parent_label}.</p>}
+                        {person.note && <p>{person.note}</p>}
+                    </div>}
                 </div>
+                {layout.adoptionReferences(person).map(childId => <button key={`adoption-${id}-${childId}`} className="text-xs underline max-w-[200px] mt-2 text-cinnabar dark:text-red-400" onClick={() => document.getElementById(`node-${childId}`)?.scrollIntoView({block:'center',inline:'center',behavior:'smooth'})}>Adopted heir: {peopleMap.get(childId)?.name_en} (shown under natural parent)</button>)}
+                {person.unidentified_adoption && <p className="text-xs max-w-[200px] mt-2">Adopted heir: {person.unidentified_adoption}</p>}
 
                 {/* Vertical Line to Children */}
                 {hasChildren && (
@@ -145,7 +162,7 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
                 {/* Children Container - REMOVED gap-8, added padding to children for lines to connect */}
                 {hasChildren && (
                     <div className="flex flex-nowrap relative pt-4">
-                        {person.children!.map((childId, index, arr) => {
+                        {renderedChildren.map((childId, index, arr) => {
                             const isFirst = index === 0;
                             const isLast = index === arr.length - 1;
                             const isOnly = arr.length === 1;
@@ -197,8 +214,9 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
             <div className="min-w-max mx-auto flex flex-col items-center pointer-events-none">
                 <div className="mb-4 flex items-center gap-2 text-stone-400 dark:text-zinc-500 uppercase tracking-widest text-xs">
                     <Network size={16} />
-                    <span>Lineage Graph (WIP)</span>
+                    <span>Lineage graph</span>
                 </div>
+                <p className="mb-6 text-sm text-stone-500">Natural descent uses lines; adoption is labeled. A missing continuation does not imply childlessness. [?] marks an unresolved reading.</p>
                 {/* Enable pointer events on nodes so clicking works */}
                 <div className="pointer-events-auto">
                     {data.root_id && renderNode(data.root_id, 0, new Set())}
@@ -209,4 +227,3 @@ const FamilyTree: React.FC<FamilyTreeProps> = ({ onNavigate, isDarkMode }) => {
 };
 
 export default FamilyTree;
-

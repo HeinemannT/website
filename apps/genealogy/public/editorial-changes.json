@@ -1,0 +1,843 @@
+{
+  "date": "2026-09-07",
+  "scope": "Selective scan verification and editorial review; unresolved readings retained",
+  "changes": [
+    {
+      "page": "img_36",
+      "column": 6,
+      "field": "text_zh",
+      "before": "無病終于南非伊梨沙白甚至是砵埠",
+      "after": "在南斐洲波尼時碧埠無病而終葬於南斐皇后鎮西人墳場"
+    },
+    {
+      "page": "img_36",
+      "column": 6,
+      "field": "translation",
+      "before": "He died of natural causes (without illness) at Port Elizabeth in South Africa. He was buried in the Westerners' Cemetery in Queenstown, South Africa.",
+      "after": "He died in South Africa at the place written “Bonishibi,” with no illness reported. He was buried in the Westerners’ Cemetery at Queenstown, South Africa."
+    },
+    {
+      "page": "img_36",
+      "column": 6,
+      "field": "translator_note",
+      "before": "**Port Elizabeth** is written as 'Bonishibi' in the original text, which is the phonetic transcription of the town name. 'Huang-hou-zhen' (皇后鎮) translates to Queenstown. ",
+      "after": "Editorial identification: 波尼時碧埠 may represent Port Elizabeth; this phonetic identification remains tentative. 皇后鎮 explicitly means Queenstown. The previous transcription invented 伊梨沙白 and omitted the burial clause. No arrival year or medical cause of death is recorded. Regional research leads: [Port Elizabeth chronology](https://sahistory.org.za/article/port-elizabeth-timeline-1799-1986) and [South End Museum exhibitions](https://southend-themuseum.co.za/Pages/Exhibitions.asp); neither identifies this ancestor."
+    },
+    {
+      "page": "img_36",
+      "column": 5,
+      "field": "translator_note",
+      "after": "The manuscript itself supplies the Western date, 16 March 1955. Its lunar equivalent is also supported by the [HKO 1955 calendar](https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1955e.pdf)."
+    },
+    {
+      "page": "img_36",
+      "column": 1,
+      "field": "text_zh",
+      "before": "二十世 鎮孟 國治公次子",
+      "after": "二十世 鎮盃 平坡公次子生於光緒三十一年乙巳八月二十六日寅時"
+    },
+    {
+      "page": "img_36",
+      "column": 1,
+      "field": "translation",
+      "before": "**20th Generation: Zhenmeng**. Second son of Lord Guozhi.",
+      "after": "**20th Generation: Zhenbei**. Second son of Pingpo [Guozhi]. Born in Guangxu 31 (1905), a Yisi year, on the 26th day of the 8th lunar month, at Yin hour."
+    },
+    {
+      "page": "img_36",
+      "column": 1,
+      "field": "translator_note",
+      "after": "Scan correction: this heading belongs to Zhenbei (鎮盃), not Zhenmeng or Zhenbang. The former 1889 birth metadata belonged to the following Zhenbang biography."
+    },
+    {
+      "page": "img_35",
+      "column": 6,
+      "field": "translation",
+      "before": "passed away in the 27th year of Guangxu (1901), a Xinchou year, on the 28th day of the 3rd lunar month, at the hour of the Rat (Zi hour). The Lord's tomb is located at Langxiayuan, [near] Yuanbideng Temple",
+      "after": "...died on the 28th day of the 3rd lunar month in Guangxu 27 (1901), a Xinchou year, at Zi hour. Guozhi’s grave is in the home village, beside the Yuan family grave at a site whose precise reading is unresolved."
+    },
+    {
+      "page": "img_35",
+      "column": 6,
+      "field": "translator_note",
+      "after": "The former 1907 “son_birth” metadata was unrelated to this spouse-death passage. Grave-site characters in the later hand remain uncertain; no temple identification is asserted."
+    },
+    {
+      "page": "img_35",
+      "column": 5,
+      "field": "text_zh",
+      "before": "七月二十日寅時配崔氏生于光緒二十六年庚子九月二十八日子時妻畢氏",
+      "after": "七月二十日寅時配終於光緒二十六年庚子九月二十八日子時妾梁氏"
+    },
+    {
+      "page": "img_35",
+      "column": 5,
+      "field": "translation",
+      "before": "on the 20th day of the 7th lunar month, between 3:00 AM and 5:00 AM (Yin hour). Zhenmeng wife, Lady Cui, born in the 26th year of Guangxu (1900), a Gengzi year, on the 28th day of the 9th lunar month, at the hour of the Rat (Zi hour). [Another] wife",
+      "after": "...on the 20th day of the 7th lunar month at Yin hour. His principal wife died on the 28th day of the 9th lunar month in Guangxu 26 (1900), a Gengzi year, at Zi hour. The concubine Lady Liang..."
+    },
+    {
+      "page": "img_35",
+      "column": 5,
+      "field": "translator_note",
+      "after": "Scan correction: 配終於 introduces the principal wife’s death; it does not name a new “Lady Cui.” The final surname is read as Liang, consistent with column 3, but the later handwriting deserves further review. Guozhi’s lunar death date corresponds to [8 September 1906 in the HKO calendar](https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/1906e.pdf)."
+    },
+    {
+      "page": "img_35",
+      "column": 4,
+      "field": "text_zh",
+      "before": "緒十三年丁亥六月二十六日戌時子一鎮孟 公終於光緒三十二年丙午",
+      "after": "緒十三年丁亥六月二十六日戌時子一鎮盃 公終於光緒三十二年丙午"
+    },
+    {
+      "page": "img_35",
+      "column": 4,
+      "field": "translation",
+      "before": "specifically the 13th year (1887), a Ding-hai year, on the 26th day of the 6th lunar month, at the Xu-shi hour. They had a son, Zhenmeng. The Lord died on the 28th day of the 9th lunar month in the 32nd year of Guangxu (1906), a Bing-wu year",
+      "after": "...in Guangxu 13 (1887), a Dinghai year, on the 26th day of the 6th lunar month, at Xu hour. A son, Zhenbei, is listed. Guozhi died in Guangxu 32 (1906), a Bingwu year..."
+    },
+    {
+      "page": "img_35",
+      "column": 4,
+      "field": "translator_note",
+      "after": "Scan correction: the son is written 鎮盃, matching the heading on page 36. The former separate Zhenmeng identity is unsupported. The birth-year reading for Lady Luo remains difficult; the compressed relationships should be checked against another family copy."
+    },
+    {
+      "page": "img_35",
+      "column": 1,
+      "field": "translator_note",
+      "before": "The rank **Liupin Dingdai** (六品頂戴) denotes a senior military officer of the 6th rank. An unassigned officer **Waiwei** (外委) refers to a common rank for those who had achieved merit but were waiting for a specific vacancy. As the Qing dynasty crumbled, our military influence status, transitioning from active command to honorary status.",
+      "after": "Manuscript statement: Guozhi held sixth-rank insignia and was registered for priority appointment as a waiwei officer. The entry does not by itself establish a general decline from active to honorary service."
+    },
+    {
+      "page": "img_33",
+      "column": 8,
+      "field": "text_zh",
+      "before": "年壬辰四月初七日亥時 續修光緒三十四年戊戌七月二十一",
+      "after": "年壬辰四月初七日亥時 續修光緒二十四年戊戌七月二十一"
+    },
+    {
+      "page": "img_33",
+      "column": 8,
+      "field": "translation",
+      "before": "a Renchen year, on the 7th day of the 4th month at the Hai-shi hour. According to later records, she died on the 20th day of the 7th lunar month in the 24th year of Guangxu (1898)",
+      "after": "a Renchen year, on the 7th day of the 4th month at the Hai-shi hour. According to later records, she died on the 21st day of the 7th lunar month in the 24th year of Guangxu (1898)"
+    },
+    {
+      "page": "img_33",
+      "column": 8,
+      "field": "translator_note",
+      "after": "Scan correction: the marginal annotation reads Guangxu 24, Wuxu (1898), seventh lunar month, day 21. Its attachment to Lady Yang’s death is editorial; it is not a verified Western day conversion."
+    },
+    {
+      "page": "img_33",
+      "column": 7,
+      "field": "translation",
+      "before": "the lower tier. The mountain deed is kept at the Ma family's place in Shangcun, Nanhai.His third concubine, Lady Yang, was born in the 12th year of Daoguang (1832)",
+      "after": "the lower tier. The mountain deed is kept at the Ma family's place in Shangcun, Nanhai. His third concubine, Lady Yang, was born in the 12th year of Daoguang (1832)"
+    },
+    {
+      "page": "img_33",
+      "column": 5,
+      "field": "translation",
+      "before": "beneath which were two layers of yellow sand. The Golden Pagoda is set at the transition from yellow to red. The Golden Pagoda is placed to the right of the enclosure, in front of the stele.",
+      "after": "beneath which were two layers of yellow sand. The bone urn is set at the transition from yellow to red. The bone urn is placed to the right of the enclosure, in front of the stele."
+    },
+    {
+      "page": "img_33",
+      "column": 1,
+      "field": "translation",
+      "before": "The land deed is preserved. The Golden Pagoda is placed inside the stone enclosure on the 'Mountain Hand' side. His wife, Lady Huang, was born in the 6th year of Daoguang (1826), a Bing-xu year",
+      "after": "The land deed is preserved. The bone urn is placed inside the stone enclosure on the 'Mountain Hand' side. His wife, Lady Huang, was born in the 6th year of Daoguang (1826), a Bing-xu year"
+    },
+    {
+      "page": "img_32",
+      "column": 3,
+      "field": "translator_note",
+      "before": "昭武都尉 (Zhaowu Duwei) translates to 'Commandant of Manifest Martiality.', it was a prestige title, roughly equivalent to a Colonel or a Brigadier General in a modern army. He would have worn blue robes and a tiger embroidered chest patch instead of the civil officials who wore birds.",
+      "after": "Regional context: fourth military rank was associated with a tiger rank badge; see [LACMA’s surviving example](https://collections.lacma.org/object/1123). This supports the rank convention, not a claim about Yongzhao’s actual clothing or equivalence to a modern army rank."
+    },
+    {
+      "page": "img_31",
+      "column": 8,
+      "field": "translator_note",
+      "before": "Not just legal battles but full-scale battles between clans over water rights, land, or feng shui (械鬥 - Xiedou).<br>The Qing government hated these feuds because they destabilized the region. As a high-ranking Imperial Officer, Yongzhao was expected to stop the violence. Instead, the text implies he got involved (supporting our own village). Because of his past war heroics (and the 'Merit Grades'), they let him keep the title so he wouldn't be humiliated.",
+      "after": "Manuscript statement: fighting and persistent lawsuits burdened the lineage; Yongzhao was dismissed and returned home retaining his rank. The precise dispute and the reason his rank was retained are not established."
+    },
+    {
+      "page": "img_31",
+      "column": 7,
+      "field": "translator_note",
+      "before": "Rank 4 Dusi (Priority Commander): Secondin-command of a Brigade (Xie)<br>Merit grades were additional decorations.",
+      "after": "Manuscript statement: the entry records priority for a dusi appointment and three additional grades, then a village conflict in Tongzhi 9 (1870)."
+    },
+    {
+      "page": "img_31",
+      "column": 6,
+      "field": "translator_note",
+      "before": "The blue plume was a dyed feather attached to the back of his official hat, a medal for bravery in combat.<br>**Historical Context:** The Taiping Rebellion was 1850–1864. This was the bloodiest civil war in human history. Yuezhou is a strategic port on the Yangtze River system. In the 1850s, this was a meat grinder battleground where the Qing Navy fought fierce river battles against the Taiping rebels. His advancement was likely a reward for surviving these brutal river campaigns.<br> The Red Turban Rebellion (1854) was a massive uprising in Guangdong. The rebels tried to capture Guangzhou. His station in Shunde (just south of Guangzhou) put him in the thick of this fight.",
+      "after": "Manuscript statement: the genealogy records the Yuezhou appointment, blue-plume award, and retention in Guangdong. Participation in Taiping or Red Turban campaigns requires separate military records; it cannot be inferred from dates and locations alone."
+    },
+    {
+      "page": "img_31",
+      "column": 5,
+      "field": "translation",
+      "before": "He was subsequently promoted to Company Commander (Qianzong) of the same battalion. He successively served as Acting Garrison Commandant (Shoubei) of the Central Force in the Rear Battalion of the Naval Admiral's Command, and was later promoted",
+      "after": "He was subsequently promoted to qianzong of the same battalion. He successively served as Acting Garrison Commandant (Shoubei) of the Central Force in the Rear Battalion of the Naval Admiral's Command, and was later promoted"
+    },
+    {
+      "page": "img_31",
+      "column": 5,
+      "field": "translator_note",
+      "before": "Rank 6 Qianzong (Company Commander): Commanding roughly 100 soldiers.<br> Rank 5 Shoubei (Garrison Commandant): Independent command of a battalion and administrative duties over a specific territory.",
+      "after": "Editorial note: qianzong and shoubei are historical offices. Modern army equivalents and exact troop counts have been omitted because they vary by establishment and are not supplied here."
+    },
+    {
+      "page": "img_31",
+      "column": 4,
+      "field": "translation",
+      "before": "**18th Gen: Yongzhao**. Courtesy name: Qihui. Art name: Xiulin. The son of Lord Danshan. Rising from the ranks, he was specially appointed as a Squad Leader (Bazong) in the Rear Battalion of the Naval Admiral's Command.",
+      "after": "**18th Generation: Yongzhao**. Courtesy name: Qihui. Art name: Xiulin. Son of Danshan [Shangda]. From service in the ranks, he was specially appointed bazong in the rear battalion under the naval commander."
+    },
+    {
+      "page": "img_31",
+      "column": 4,
+      "field": "translator_note",
+      "before": "Started his career in the ranks (Hangwu) - meaning he enlisted as a common soldier, not an academy graduate.<br>Rank 7 Bazong (Squad Leader): Commanding roughly 10–15 soldiers.<br>**Historical Context**: The First Opium War was 1839–1842 in Guangdong. As a young naval officer in his 30s, he would have been on the front lines against the British navy.",
+      "after": "Manuscript statement: the recorded offices establish a naval career. Its overlap with the Opium War does not establish participation in that war; no campaign is named here."
+    },
+    {
+      "page": "img_30",
+      "column": 9,
+      "field": "translation",
+      "before": "during a lucky hour. He married Lady Pei [unrecorded] Shi, born [unrecorded]",
+      "after": "...at an auspicious hour. The wife’s surname and birth details were left blank."
+    },
+    {
+      "page": "img_30",
+      "column": 9,
+      "field": "translator_note",
+      "before": "吉時 - Ji Shi is an auspicious hour or lucky time. This might be used as a placeholder when the exact birth hour was unknown, to ensure good fortune for the ancestor's spirit<br>The scribe left a gap to fill in the name and birth year of the wife if it was found. ",
+      "after": "配氏生 is an unfinished spouse entry, not the personal name “Lady Pei.” The blanks are retained."
+    },
+    {
+      "page": "img_30",
+      "column": 8,
+      "field": "translation",
+      "before": "**Zongrong**. Courtesy name: Shihua. He was the son of Lord Guanzhi. He was born on the 25th day of the 8th lunar month in the 57th year of Qianlong (1792), a Ren-zi year",
+      "after": "**Zongrong**. Courtesy name: Shihua. He was the adopted heir of Guanzhi and the natural son of Guanxin (page 28). He was born on the 25th day of the 8th lunar month in the 57th year of Qianlong (1792), a Ren-zi year"
+    },
+    {
+      "page": "img_30",
+      "column": 6,
+      "field": "translation",
+      "before": "at the Chou-shi hour. She was buried at Daliang, Lianhuashi (_Lotus Stone_), facing Ding-Gui/Wei-Chou (South/SW to North/NE). The Golden Pagoda is placed right in front of the big stone. This mountain is about",
+      "after": "at the Chou-shi hour. She was buried at Daliang, Lianhuashi (_Lotus Stone_), facing Ding-Gui/Wei-Chou (South/SW to North/NE). The bone urn is placed right in front of the big stone. This mountain is about"
+    },
+    {
+      "page": "img_30",
+      "column": 2,
+      "field": "translation",
+      "before": " locally named Banlian Plain, [near] the Zhenwu Hall. It faces Qian facing Xun combined with Xu-Chen (NW facing SE). The Golden Pagoda is placed within the mountain enclosure",
+      "after": " locally named Banlian Plain, [near] the Zhenwu Hall. It faces Qian facing Xun combined with Xu-Chen (NW facing SE). The bone urn is placed within the mountain enclosure"
+    },
+    {
+      "page": "img_29",
+      "column": 8,
+      "field": "translation",
+      "before": "the 6th-rank title of Tai Anren, then promoted to the 5th-rank title of Tai Yiren, and finally, by imperial decree, the 4th-rank title of Tai Gongren (Grand Lady of Respect, Standard 4th Rank. The Lord died in the 16th year of Daoguang,",
+      "after": "the 6th-rank title of Tai Anren, then promoted to the 5th-rank title of Tai Yiren, and finally, by imperial decree, the 4th-rank title of Tai Gongren (Grand Lady of Respect, Standard 4th Rank). The Lord died in the 16th year of Daoguang,"
+    },
+    {
+      "page": "img_29",
+      "column": 5,
+      "field": "translation",
+      "before": "'then promoted to Wude Qiwei (Rank 5 Military Officer), and finally posthumously, awarded the 4th rank title of Zhaowu Duwei. He married the ",
+      "after": "Wulüe Qiwei, then Wude Qiwei, and finally Zhaowu Duwei, by imperial grant. He married..."
+    },
+    {
+      "page": "img_29",
+      "column": 4,
+      "field": "translation",
+      "before": "promotion and retained in Guangdong as a 'Priority' Major (Dusi) of the Left Battalion, Shunde Brigade. He was imperially granted the title Wuxin Qiwei (6th rank military official), repeatedly granted",
+      "after": "promotion and retained in Guangdong as an officer awaiting priority appointment as dusi of the Left Battalion, Shunde Brigade. He was imperially granted the title Wuxin Qiwei (6th rank military official), repeatedly granted"
+    },
+    {
+      "page": "img_29",
+      "column": 2,
+      "field": "translation",
+      "before": "on the 14th day, at the Sishi hour. Due to his own merits, he entered military service. Honored by the nobility of his son, he began his career rising from the ranks, successively serving as a Squad Leader (Bazong) in the Rear Battalion of the Admiral’s Command, then as a Company Commander (Qianzong) and as the",
+      "after": "...on the 14th day, at Si hour. Honored through his son’s standing, the passage then lists service from the ranks: bazong and qianzong in the naval rear battalion, followed by acting..."
+    },
+    {
+      "page": "img_29",
+      "column": 2,
+      "field": "translator_note",
+      "after": "Attribution unresolved: 由子貴 means “honored through his son.” The ensuing naval career closely repeats Yongzhao’s on page 31 and may describe the son as the basis for Shangda’s honors. It must not be treated as a separately verified career for Shangda."
+    },
+    {
+      "page": "img_28",
+      "column": 9,
+      "field": "translator_note",
+      "after": "Adoption: columns 4 and 9, together with page 30 column 8, identify Zongrong as Guanxin’s natural son and Guanzhi’s adopted heir. Shihong is Yuantai’s courtesy name (page 31), not a separate person. The sibling order around Guanzhi remains compressed."
+    },
+    {
+      "page": "img_28",
+      "column": 3,
+      "field": "translation",
+      "before": "He Kongchuan from Nantou in Yuebu Village. She was born at the Sishi hour on the 4th day of the 9th lunar month in the 21st year of Qianlong (1756). She was posthumously granted the title of",
+      "after": "...He Kongchuan’s elder sister, of Nantou in Yuebu Village. She was born on the 4th day of the 9th lunar month in Qianlong 21 (1756), at Si hour. She was posthumously granted a..."
+    },
+    {
+      "page": "img_28",
+      "column": 2,
+      "field": "translator_note",
+      "before": "驰贈 (Chizheng) refers to posthumous titles granted to ancestors based on the current rank of their descendants.<br>Guanxin received the honorary title to show that his spirit now holds this rank in the afterlife, matching the status of his successful grandson Yongzhao",
+      "after": "Manuscript statement: Guanxin received an ancestral honor through his grandson Yongzhao’s standing. This is not evidence that Guanxin held the same active command."
+    },
+    {
+      "page": "img_27",
+      "column": 9,
+      "field": "translation",
+      "before": "Wenzhang, Wensheng, Wenchun, and others went abroad for business; further details are not clear.",
+      "after": "The business destinations and further circumstances of Wenzhang, Wensheng, Wenchun, and others are unknown."
+    },
+    {
+      "page": "img_27",
+      "column": 8,
+      "field": "translator_note",
+      "before": "Yongzhao seems to be generous, and he wants everyone to know how generous he is.",
+      "after": "Manuscript statement: Yongzhao funded rites for this branch. The record supplies no independent account of the traveler’s fate."
+    },
+    {
+      "page": "img_27",
+      "column": 7,
+      "field": "translation",
+      "before": "**Wenxian**, courtesy name Yunyi. He had a son named Yanchun who traveled to Guangxi for business and never returned; his whereabouts became unknown. His ancestral tablet is maintained and worshipped",
+      "after": "**Wenxian**, courtesy name Yunyi. He had a son named Yanchun. The entry records business travel to Guangxi, no return, and unknown whereabouts. His ancestral tablet was maintained for worship..."
+    },
+    {
+      "page": "img_27",
+      "column": 7,
+      "field": "translator_note",
+      "before": "Business travel to Guangxi from Guangdong was common but perilous in the 18th century.",
+      "after": "Editorial uncertainty: the compressed wording does not make it certain whether Wenxian or Yanchun is the traveler. No journey year is recorded. This resumes the Wenxian branch listed among Dianyuan’s sons on page 26; the duplicate tree identity has been merged on that basis."
+    },
+    {
+      "page": "img_26",
+      "column": 4,
+      "field": "translation",
+      "before": "**Dianyuan**, courtesy name Tisi. He was the adopted son of Lord Yushan. He was born on the 25th day of the 9th lunar month in the 48th year of Kangxi (1709), an Yi-chou year",
+      "after": "**Dianyuan**, courtesy name Tisi. He was the adopted son of Lord Yushan. He was born on the 25th day of the 9th lunar month in the 48th year of Kangxi (1709), an Jichou year"
+    },
+    {
+      "page": "img_26",
+      "column": 2,
+      "field": "translator_note",
+      "after": "Source contradiction: birth in 1703 and death in 1784 imply eighty-two years inclusively, one less than the stated eighty-three."
+    },
+    {
+      "page": "img_26",
+      "column": 1,
+      "field": "translator_note",
+      "after": "Source contradiction: birth in 1703 and death in 1766 imply sixty-four years inclusively, one less than the stated sixty-five."
+    },
+    {
+      "page": "img_25",
+      "column": 7,
+      "field": "translator_note",
+      "before": "The relocation of graves in 1848 (Gen 18 rescuing Gen 13) after exactly two sexagenary cycles is geomantically profound. In times of chaos (like the mid-19th century rebellions), clans believed 'stale' or 'blocked' Qi in old graves caused misfortune. Relocating them was a spiritual to save the lineage from decline.",
+      "after": "Manuscript statement: Yongzhao funded the relocation in Daoguang 28 (1848). The text records his choice of an auspicious site; it does not establish a two-cycle timetable or a causal connection to later rebellions."
+    },
+    {
+      "page": "img_24",
+      "column": 7,
+      "field": "text_zh",
+      "before": "丑時配水藤鄧生康熙四十一年壬子六月初九子時子二輝",
+      "after": "丑時配水藤鄧生康熙十一年壬子六月初九子時子二輝"
+    },
+    {
+      "page": "img_24",
+      "column": 7,
+      "field": "translation",
+      "before": "at the Choushi hour. He married Lady Deng of Shuiteng, born on the 9th day of the 6th lunar month in the 41st year of Kangxi (1702), a Renwu year, at the Zishi hour. They had two sons:",
+      "after": "At Chou hour. He married Lady Deng of Shuiteng, born on the 9th day of the 6th lunar month in Kangxi 11 (1672), a Renzi year, at Zi hour. They had two sons [names continue]."
+    },
+    {
+      "page": "img_24",
+      "column": 7,
+      "field": "translator_note",
+      "after": "Scan correction: 康熙十一年壬子 is Kangxi 11, Renzi (1672), not Kangxi 41 (1702). The former Western day conversion is discarded. 輝 at the end of this column joins 鼎 in column 8: Huiding (輝鼎)."
+    },
+    {
+      "page": "img_24",
+      "column": 6,
+      "field": "translation",
+      "before": "**Tingzan**, courtesy name Zijun, art name Luezhai. He was the fourth son of Lord Mingyu. He was born on the 10th day of the 10th lunar month in the 13th year of Kangxi (1674), a Jiayin year,",
+      "after": "**Tingzan**, courtesy name Zijun, art name Guizhai. He was the fourth son of Lord Mingyu. He was born on the 10th day of the 10th lunar month in the 13th year of Kangxi (1674), a Jiayin year,"
+    },
+    {
+      "page": "img_24",
+      "column": 5,
+      "field": "translation",
+      "before": "...on the 20th day of the 7th lunar month at the Youshi hour. Wenyue, the second son of Lord Keliu, was adopted as heir.",
+      "after": "...on the 20th day of the 7th lunar month at the Youshi hour. Wenyao, the second son of Lord Keliu, was adopted as heir."
+    },
+    {
+      "page": "img_23",
+      "column": 8,
+      "field": "translation",
+      "before": "as evidence. In the future, no one is permitted to change the orientation or relocate the tomb. If any descendants moves the tomb to another location",
+      "after": "as evidence. In the future, no one is permitted to change the orientation or relocate the tomb. If any descendant moves the tomb to another location"
+    },
+    {
+      "page": "img_23",
+      "column": 5,
+      "field": "translation",
+      "before": "The burial site faces the Ding-Gui direction with a deviation towards Wei-Chou. A small golden pagoda was placed in front of the tombstone at a depth of over seven chi. There is a mountain",
+      "after": "The burial site faces the Ding-Gui direction with a deviation towards Wei-Chou. A small bone urn was placed in front of the tombstone at a depth of over seven chi. There is a mountain"
+    },
+    {
+      "page": "img_23",
+      "column": 1,
+      "field": "text_zh",
+      "before": "林舉林舉女二長適簡岸簡次適藤沖劉配終乾隆四年己",
+      "after": "林舉林皋女二長適簡岸簡次適藤沖劉配終乾隆四年己"
+    },
+    {
+      "page": "img_22",
+      "column": 8,
+      "field": "text_zh",
+      "before": "十一世 廷驚 字獎君 號勸菴 鳴虞公次子 生順治十六年己亥正月十九",
+      "after": "二房 廷驚 字獎君 號勸菴 鳴虞公次子 生順治十六年己亥正月十九"
+    },
+    {
+      "page": "img_22",
+      "column": 8,
+      "field": "translation",
+      "before": "**12th Generation: Tingjing**. Courtesy name: Fanjun. Art name: Quan'an. He was the second son of Lord Mingyu. Born in the 16th year of Shunzhi (1659), a Jihai year, on the 19th day of the 1st lunar month,",
+      "after": "**12th Generation: Tingjing [reading unresolved]**. Courtesy name: Jiangjun. Art name: Quan'an. He was the second son of Lord Mingyu. Born in the 16th year of Shunzhi (1659), a Jihai year, on the 19th day of the 1st lunar month,"
+    },
+    {
+      "page": "img_22",
+      "column": 8,
+      "field": "translator_note",
+      "after": "Editorial note: the photograph’s heading reads “second branch” (二房), within the twelfth generation introduced above. The personal name was formerly read 廷驚/Tingjing; a bird-based character such as 鷺, and 延 rather than 廷, require further specialist review. The historical label is retained as an uncertain reading, not a confirmed identity spelling."
+    },
+    {
+      "page": "img_22",
+      "column": 3,
+      "field": "text_zh",
+      "before": "十一世 廷衡 字準君 號敬菴 鳴虞公長子 生順治三年丙戌十月二十三",
+      "after": "十二世 廷衡 字準君 號敬菴 鳴虞公長子 生順治三年丙戌十月二十三"
+    },
+    {
+      "page": "img_22",
+      "column": 1,
+      "field": "text_zh",
+      "before": "時壽八十四配終順治十一年甲午八月二十八巳時歐氏",
+      "after": "時壽七十四配終順治十一年甲午八月二十八巳時歐氏"
+    },
+    {
+      "page": "img_21",
+      "column": 3,
+      "field": "translation",
+      "before": "on the 28th day. Lady Liang died on the 2nd day of the 7th lunar month in the 26th year of Kangxi (1687), a Dingmao year, at [?] hour.",
+      "after": "on the 28th day. Lady Liang died on the 2nd day of the 7th lunar month in the 20th year of Kangxi (1681), a Dingmao year, at [?] hour."
+    },
+    {
+      "page": "img_21",
+      "column": 3,
+      "field": "translator_note",
+      "after": "Source contradiction: Kangxi 20 points to 1681, while Dingmao points to 1687. Her birth in 1612 and stated age seventy-six support the latter under inclusive reckoning, but this is an inference."
+    },
+    {
+      "page": "img_21",
+      "column": 2,
+      "field": "translation",
+      "before": "Guifeng and Guigong. The Lord died on the 3rd day of the 3rd lunar month in the 8th year of Shunzhi (1651), a Xinmao year. His wife died in the in the 7th lunar month,",
+      "after": "...[the sons’ names are difficult to segment; see note]. Junxiu died on the 3rd day of the 3rd lunar month in Shunzhi 8 (1651), a Xinmao year. His wife died in an unrecorded year and month..."
+    },
+    {
+      "page": "img_21",
+      "column": 2,
+      "field": "translator_note",
+      "after": "The continuous characters across columns 1–2 read 育桂鳳桂. These probably form two names, Yugui/育桂 and Fenggui/鳳桂, rather than the former Guifeng and Guigong. The tree marks both readings tentative; 公 begins the following death statement."
+    },
+    {
+      "page": "img_21",
+      "column": 1,
+      "field": "translation",
+      "before": "...his son was called Menggui. He remarried Lady Liang of Shuikou, born on the 18th day of the 9th lunar month in the 40th year of Wanli (1612), a Renzi year. They had two sons,",
+      "after": "...a son, Menggui. He later married Lady Liang of Shuikou, born on the 18th day of the 9th lunar month in Wanli 40 (1612), a Renzi year. Two further sons are listed [names continue]."
+    },
+    {
+      "page": "img_19",
+      "column": 9,
+      "field": "translation",
+      "before": "He married the daughter of Zheng Shun'an of Lunjiao, who was born on the 16th day of the 3rd lunar month in the 29th year of Wanli (1601), an Xinchou year, at that hour.",
+      "after": "He married the daughter of Zheng Shun'an of Lunjiao, who was born on the 16th day of the 3rd lunar month in the 29th year of Wanli (1601), an Xinchou year, at an unrecorded hour."
+    },
+    {
+      "page": "img_19",
+      "column": 5,
+      "field": "translation",
+      "before": "zhong. and Dingzhen ( who was adopted out as heir to Changxi). They had one daughter who married Lord Hu of Guizhou. The Lord died in the 36th year of Kangxi (1697), a Ding-chou year",
+      "after": "...and Dingzhen, who was adopted as heir to Changxi [Yingxi]. They also had a daughter, who married into the Hu family of Guizhou. Hanzhang died in Kangxi 36 (1697), a Dingchou year..."
+    },
+    {
+      "page": "img_19",
+      "column": 4,
+      "field": "translation",
+      "before": "specifically the nephew of Chen Cai. His concubine, Lady Chen, was born in the 4th month of the year Dingchou of Chongzhen (1637). They had four sons: Dingquan, Ding-..., Ding-",
+      "after": "...the nephew of Chen Cai. His concubine Lady Chen was born in the fourth lunar month of a Dingchou year in the Chongzhen era (1637). Four sons are listed: Dingquan, Ding-[second character unresolved], Dingzhong [name continues],"
+    },
+    {
+      "page": "img_18",
+      "column": 7,
+      "field": "text_zh",
+      "before": "時子二起世康世女三長適上僚梁次適馬村黃三適北滘",
+      "after": "時子二趙世康世女三長適上僚梁次適馬村黃三適北滘"
+    },
+    {
+      "page": "img_18",
+      "column": 7,
+      "field": "translation",
+      "before": "They had two sons: Chaoshi and Kangshi; and three daughters. and three daughters: the eldest married into the Liang family of Shangliao; the next married into the Huang family of Mavillage; the third married into the",
+      "after": "They had two sons: Zhaoshi (reading tentative) and Kangshi; and three daughters. The eldest married into the Liang family of Shangliao, the second into the Huang family of Macun, and the third into the..."
+    },
+    {
+      "page": "img_18",
+      "column": 7,
+      "field": "translator_note",
+      "after": "The first son’s name appears to be 趙世 (Zhaoshi), rather than the former transcription 起世 or romanization Chaoshi. The difficult character remains tentative."
+    },
+    {
+      "page": "img_18",
+      "column": 5,
+      "field": "translation",
+      "before": "**Zhongxi**, courtesy name Changnian, art name Ruiyun. EHe was the eldest son of Lord Xinwu. He was born on the 25th day of the 7th lunar month in the 29th year of Wanli (1601), a Xin-chou year",
+      "after": "**Zhongxi**, courtesy name Changnian, art name Ruiyun. He was the eldest son of Lord Xinwu. He was born on the 25th day of the 7th lunar month in the 29th year of Wanli (1601), a Xin-chou year"
+    },
+    {
+      "page": "img_18",
+      "column": 4,
+      "field": "translation",
+      "before": "died on the 26th day of the 10th lunar month in the year Guiyou (1633). Dingzhen, the fourth son of Changchu, was adopted into this line as the heir.",
+      "after": "died on the 26th day of the 10th lunar month in the year Guiyou [era unrecorded]. Dingzhen, the fourth son of Changchu, was adopted into this line as the heir."
+    },
+    {
+      "page": "img_18",
+      "column": 1,
+      "field": "translation",
+      "before": "...at that time. He married Lady Li, born on the 8th day of the 11th lunar month in the year Bingzi (1576), at the Youshi hour. e later married Lady Lun, born...",
+      "after": "...at that time. He married Lady Li, born on the 8th day of the 11th lunar month in the year Bingzi [era unrecorded], at the Youshi hour. He later married Lady Lun, born..."
+    },
+    {
+      "page": "img_17",
+      "column": 10,
+      "field": "translation",
+      "before": "at the Shen-shi hour. They had two sons...",
+      "after": "at the Shen-shi hour. "
+    },
+    {
+      "page": "img_16",
+      "column": 1,
+      "field": "translation",
+      "before": "[Lord Wanfu] married Lady Liang of Shen Village, born on the 26th day of the 7th lunar month in the 7th year of Wanli (1579), an Yi-mao year, at the Si-shi hour. They had a son, Junjie, and two daughters.",
+      "after": "[Lord Wanfu] married Lady Liang of Shen Village, born on the 26th day of the 7th lunar month in the 7th year of Wanli (1579), an Jimao year, at the Si-shi hour. They had a son, Junjie, and two daughters."
+    },
+    {
+      "page": "img_15",
+      "column": 7,
+      "field": "translation",
+      "before": "He married Lady Chen of Xingang, who was born on the 12th day of the 3rd lunar month in the 2nd year of Wanli (1574), a Jiaxu year, at the Xushi hour. They had one son named Shi. His wife died in the Wanli era",
+      "after": "He married Lady Chen of Xingang, who was born on the 12th day of the 3rd lunar month in the 2nd year of Wanli (1574), a Jiaxu year, at the Xushi hour. Their son was Junxi (俊錫; see his biography on page 19). His wife died in the Wanli era"
+    },
+    {
+      "page": "img_15",
+      "column": 7,
+      "field": "translator_note",
+      "after": "The child’s name is written as a small insertion, 俊錫. The former “Shi” identity resulted from a misreading of this insertion."
+    },
+    {
+      "page": "img_15",
+      "column": 2,
+      "field": "translation",
+      "before": "**9th Generation: Wanshi**. Courtesy name Honggao, art name Chongyi, was the fourth son of Lord Yuwu. He was born on the 9th day of the 9th lunar month in the 10th year of Wanli (1582), a Renwu year, at the Zishi hour.",
+      "after": "**9th Generation: Wanshi**. Courtesy name Hongxie, art name Chongyi, was the fourth son of Lord Yuwu. He was born on the 9th day of the 9th lunar month in the 10th year of Wanli (1582), a Renwu year, at the Zishi hour."
+    },
+    {
+      "page": "img_15",
+      "column": 2,
+      "field": "translator_note",
+      "after": "Scan reading: the courtesy name 洪諧 is romanized Hongxie. The former romanization Honggao did not match the characters."
+    },
+    {
+      "page": "img_14",
+      "column": 9,
+      "field": "translator_note",
+      "after": "Source contradiction: Lady Zhou’s birth in 1579 and death in 1695 would imply about 116 elapsed years. This exceptional lifespan is unresolved and is not accepted as verified."
+    },
+    {
+      "page": "img_14",
+      "column": 8,
+      "field": "translator_note",
+      "after": "Source contradiction: Chongzhen 12 corresponds to 1639, but the accompanying Wuyin cyclical year corresponds to 1638. The record’s wording and stated age are preserved."
+    },
+    {
+      "page": "img_13",
+      "column": 7,
+      "field": "translator_note",
+      "before": "The 'illegal burials' by locals reflect the fierce Feng Shui wars of the Pearl River Delta. Rival clans would 'plant trees' (to block Qi flow) or bury their own dead on top of existing graves to steal the geomantic energy. This was not just vandalism, but could escalate to 'spiritual warfare' aimed at destroying the victim's lineage.",
+      "after": "Manuscript statement: local people made unauthorized burials and planted trees at the site. The record describes obstruction and later action over the grave; it does not establish a motive of stealing geomantic energy or destroying the lineage."
+    },
+    {
+      "page": "img_13",
+      "column": 4,
+      "field": "translation",
+      "before": "a Yi-mao year, on the 29th day of the 12th lunar month, aged sixty-seven. They were buried together at the 'Fisherman Casting a Net' place in Panyu",
+      "after": "a Jimao year, on the 29th day of the 12th lunar month, aged sixty-seven. They were buried together at the 'Fisherman Casting a Net' place in Panyu"
+    },
+    {
+      "page": "img_12",
+      "column": 8,
+      "field": "text_zh",
+      "before": "天啟元年辛酉十月初五日配終萬曆十五年丁亥二月十",
+      "after": "公終天啟元年辛酉十月初五日配終萬曆十五年丁亥二月十"
+    },
+    {
+      "page": "img_12",
+      "column": 8,
+      "field": "translation",
+      "before": "on the 5th day of the 10th lunar month in the 1st year of Tianqi (1621), a Xin-you year. His [first] wife died on the 17th day of the 2nd lunar month in the 15th year of Wanli (1587), a Dinghai year...",
+      "after": "Yunan died on the 5th day of the 10th lunar month in a Xinyou year, written as Tianqi 1 (1621). His first wife died on the 17th day of the 2nd lunar month in Wanli 15 (1587), a Dinghai year..."
+    },
+    {
+      "page": "img_12",
+      "column": 8,
+      "field": "translator_note",
+      "after": "Scan correction: 公終 precedes the date; this is Yunan’s death, not Lady Liang’s birth. A marginal Taichang annotation complicates the reign reading. The wife’s stated age seventy on the next column also conflicts with her 1548 birth and 1587 death."
+    },
+    {
+      "page": "img_12",
+      "column": 7,
+      "field": "translation",
+      "before": "Wanhua, Wanfu, and Wancun. He later married Lady Liang of Shen Village, who was born",
+      "after": "Wanhua, Wanfu, and Wancun. He later married Lady Liang of Xincun; her birth entry is blank."
+    },
+    {
+      "page": "img_11",
+      "column": 9,
+      "field": "translation",
+      "before": "a Dingwei year (1547) on the 1st day of the 8th lunar month at the Youshi hour. They had four sons: Wanji, Wanbang, Wanang, and Wanshi, and two daughters.",
+      "after": "a Dingwei year (1547) on the 1st day of the 8th lunar month at the Youshi hour. They had four sons: Wanji, Wanbang, Wanfang, and Wanshi, and two daughters."
+    },
+    {
+      "page": "img_11",
+      "column": 7,
+      "field": "translation",
+      "before": "**8th Generation: Yuzi**. Courtesy name: Guochu. Art name: Yuwu. Eldest son of Lord Neju. Born on the 10th day of the 8th lunar month in the 26th year of Jiajing (1547), a Dingwei year",
+      "after": "**8th Generation: Yuzi**. Courtesy name: Guochu. Art name: Yuwu. Eldest son of Lord Neju. Born on the 11th day of the 8th lunar month in the 26th year of Jiajing (1547), a Dingwei year"
+    },
+    {
+      "page": "img_11",
+      "column": 2,
+      "field": "translation",
+      "before": "art name Pinzhi. The Lord, later remarried Lady He of Guipu, born on the 28th day of the 4th lunar month in the 15th year of Zhengde (1520), a Gengchen year, at the Yinshi hour.",
+      "after": "courtesy name Pinzhi. The Lord, later remarried Lady He of Guipu, born on the 28th day of the 4th lunar month in the 15th year of Zhengde (1520), a Gengchen year, at the Yinshi hour."
+    },
+    {
+      "page": "img_11",
+      "column": 1,
+      "field": "translation",
+      "before": "...son and Yunan, and two daughters: the eldest married the third son of Guan Wenming from Luzhou; the second married Lu Ruzi, a student from Zhangcha,",
+      "after": "...and Yunan, and two daughters: the eldest married the third son of Guan Wenming from Luzhou; the second married Lu Ruzi, a student from Zhangcha,"
+    },
+    {
+      "page": "img_10",
+      "column": 9,
+      "field": "translation",
+      "before": "He married Lady Guan of Jili, who was born on the 5th day of the 8th lunar month in the 12th year of Zhengde (1517), a Dingchou year, at the Chenshi hour. They had two sons, Xing...",
+      "after": "He married Lady Guan of Jili, who was born on the 5th day of the 8th lunar month in the 12th year of Zhengde (1517), a Dingchou year, at the Chenshi hour. They had two sons: Yuzi [name continues in the next column]..."
+    },
+    {
+      "page": "img_10",
+      "column": 9,
+      "field": "translator_note",
+      "after": "Scan reading: 與 at the end of this column joins 子 at the beginning of page 11 to form the personal name 與子 (Yuzi)."
+    },
+    {
+      "page": "img_10",
+      "column": 4,
+      "field": "translation",
+      "before": "on the 8th day. He lived to sixty-one. His wife died on the 27th day of the 2nd lunar month in the 38th year of Jiajing (1559), a Jiyou year.",
+      "after": "on the 8th day. He lived to sixty-one. His wife died on the 27th day of the 2nd lunar month in the 38th year of Jiajing (1559), a Jiwei year."
+    },
+    {
+      "page": "img_10",
+      "column": 3,
+      "field": "translation",
+      "before": "married Huang Ji of Shajiao; the youngest married Zheng of Lunjiao. The Lord died on the 8th day of the 10th lunar month in the 32nd year of Jiajing (1553)",
+      "after": "married into the Huang family of Shajiao, Sanshui; the youngest married Zheng of Lunjiao. The Lord died on the 8th day of the 10th lunar month in the 32nd year of Jiajing (1553)"
+    },
+    {
+      "page": "img_09",
+      "column": 5,
+      "field": "translation",
+      "before": "month, 18th day. She was virtuous, prudent, and filial. They had four sons: Wang, Hui, Ce, and Xian. A daughter married Lord Chen Guocai of Sanshan Village. The Lord",
+      "after": "month, 18th day. She was virtuous, prudent, and filial. They had four sons: Ren, Hui, Ce, and Xian. A daughter married Lord Chen Guocai of Sanshan Village. The Lord"
+    },
+    {
+      "page": "img_09",
+      "column": 2,
+      "field": "translation",
+      "before": "and determined, and feared not the strong, nor did he bully the weak and small. He was a filial son to his mother and raised and isntructed his two younger brHe avenged his father's grievances and greatly restored the family reputation.",
+      "after": "and determined, and feared not the strong, nor did he bully the weak and small. He was a filial son to his mother and raised and instructed his two younger brothers. He avenged his father's grievances and greatly restored the family reputation."
+    },
+    {
+      "page": "img_08",
+      "column": 8,
+      "field": "translator_note",
+      "after": "Source contradiction: Lady Liang’s recorded birth in 1429 and death in 1506 imply about seventy-seven elapsed years (seventy-eight inclusively), not the stated sixty-two. Both source statements are retained."
+    },
+    {
+      "page": "img_08",
+      "column": 5,
+      "field": "translator_note",
+      "before": "His 'flight to Ding'an' fits the 'Orphan of the Zhao' literary archetype; the vulnerable heir hidden away to preserve the bloodline until he can return and reclaim his patrimony.",
+      "after": "Manuscript statement: Lady Huang entrusted the young heir to relatives in Ding’an. The precise modern location and year are not established."
+    },
+    {
+      "page": "img_07",
+      "column": 5,
+      "field": "translator_note",
+      "before": "Family affairs could be either plentiful or troublesome - an euphemism.",
+      "after": "Source contradiction: Zhe’s death is recorded as 1433, but the biography says his wife was thirty-six and his eldest son nine at his death. Zongxu’s recorded birth in 1426 does not reconcile with age nine under ordinary inclusive age reckoning. No date has been replaced to force agreement."
+    },
+    {
+      "page": "img_07",
+      "column": 4,
+      "field": "translation",
+      "before": "The Lord and his concubine were buried together at the Changtang Gaodi site in their home village, facing the Mao-Yi direction (East). Lady Su is buried beside them. Great-Grandmother Lady Huang,",
+      "after": "Zhe, his wife, and a concubine were buried together at the Changtang Gaodi site in their home village, facing the Mao-Yi direction (East). Lady Su is buried beside them. Great-Grandmother Lady Huang,"
+    },
+    {
+      "page": "img_07",
+      "column": 2,
+      "field": "translation",
+      "before": "a Guichou year, on the 10th day of the 9th month. His concubine died in the 19th year of Chenghua (1483), a Guimao year, on the 11th day of the 10th month. His concubine, Lady Su,",
+      "after": "a Guichou year, on the 10th day of the 9th month. His wife died in the 19th year of Chenghua (1483), a Guimao year, on the 11th day of the 10th month. His concubine, Lady Su,"
+    },
+    {
+      "page": "img_07",
+      "column": 1,
+      "field": "translation",
+      "before": "Cong was a student of the Xiangsheng. His great-grandson, Shaoke, passed the imperial exam in the Ren-chen year of Jiajing (1532) as a Jinshi and served as the Sichuan Commissioner of Education. The Lord died in the 8th year of Xuande (1433),",
+      "after": "Cong was a student at the prefectural school. His great-grandson, Shaoke, passed the imperial exam in the Ren-chen year of Jiajing (1532) as a Jinshi and served as the Sichuan Commissioner of Education. The Lord died in the 8th year of Xuande (1433),"
+    },
+    {
+      "page": "img_07",
+      "column": 1,
+      "field": "translator_note",
+      "before": "This likely concludes the biography of the 3rd generation ancestor (Zhe) or his son's line.<br>Cong might be the grandchild that inherited the will.",
+      "after": "Manuscript statement: this continues Zhe’s biography. Research lead: the recorded 1532 jinshi and Sichuan career resemble [Lao Shaoke’s biographical entry](https://zh.wikipedia.org/wiki/勞紹科). This is a secondary lead; its cited examination and court records and differing ancestral names need comparison before linking further people."
+    },
+    {
+      "page": "img_06",
+      "column": 7,
+      "field": "text_zh",
+      "before": "子妻謝氏居省城之雙門底生子宗隨公在西甕街X塊石",
+      "after": "子妾謝氏居省城之雙門底生子宗隨公在西甕街X塊石"
+    },
+    {
+      "page": "img_06",
+      "column": 4,
+      "field": "text_zh",
+      "before": "十日已時配北滘周生嗣周生萬曆七年已卯九月十日卯時",
+      "after": "配甘竹黃氏生永樂二年甲申十一月十三子三宗勗宗勤"
+    },
+    {
+      "page": "img_06",
+      "column": 4,
+      "field": "translation",
+      "before": "Married Lady Huang from Ganzhu. She was born on the 13th day of the 11th lunar month in the 2nd year of Yongle (1404), a Jia-shen year. They had three sons: Zongjing, Zongqin",
+      "after": "He married Lady Huang of Ganzhu, born on the 13th day of the 11th lunar month in Yongle 2 (1404), a Jiashen year. They had three sons: Zongxu, Zongqin,"
+    },
+    {
+      "page": "img_06",
+      "column": 4,
+      "field": "translator_note",
+      "after": "Scan correction: the previous Chinese column was copied from a different biography (Lady Zhou, Wanli 7). The sons continue with Zonghou in column 5. Zongxu replaces the unsupported reading Zongjing."
+    },
+    {
+      "page": "img_06",
+      "column": 3,
+      "field": "translation",
+      "before": "**3rd Generation: Zhe**. Courtesy name: Tianlu. Art name: Donglin.The eldest son of Lord Danbi. Born in the 30th year of Hongwu (1397), the Ding-chou year, on the 6th day of the 9th lunar month.",
+      "after": "**3rd Generation: Zhe**. Courtesy name: Tianlu. Art name: Donglin. The eldest son of Lord Danbi. Born in the 30th year of Hongwu (1397), the Ding-chou year, on the 6th day of the 9th lunar month."
+    },
+    {
+      "page": "img_06",
+      "column": 1,
+      "field": "translation",
+      "before": "...6th Day. On the 15th day of the 12th lunar month in the 4th year of Zhengde (1509), a Ji-si year, at the Zi-shi hour, she was buried together [with her husband] ",
+      "after": "...26th day. She lived to seventy-four. On the 15th day of the 12th lunar month in Zhengde 4 (1509), a Jisi year, at Zi hour, they were buried together..."
+    },
+    {
+      "page": "img_04",
+      "column": 7,
+      "field": "translator_note",
+      "after": "Surname reading unresolved: the inherited transcription has 宗氏 (Zong), while the English gives Song and a later burial passage uses 宋氏. Compare the scans and another family copy before standardizing the surname."
+    },
+    {
+      "page": "img_04",
+      "column": 2,
+      "field": "translator_note",
+      "before": "Yuping could refer to the Guifeng Mountain (圭峰山) in Xinhui (新會) or Enping (恩平). The Yuan Dynasty collapsed into civil war and rebellion (like the Red Turban Rebellions) between 1351 and 1368",
+      "after": "Editorial note: the biography records flight from turmoil to Yuping Mountain. Its precise location and the particular conflict are unresolved; no exact map position or journey year is assigned."
+    },
+    {
+      "page": "img_03",
+      "column": 2,
+      "field": "translator_note",
+      "before": "This is a generation poem (Zhaomu). Each character is assigned to a specific generation to maintain order in the family hierarchy.",
+      "after": "Read this sequence alongside column 3: Yun/Jian, Yan/De, and so on are alternatives in the same generation."
+    },
+    {
+      "page": "img_03",
+      "column": 1,
+      "field": "translator_note",
+      "before": "Traditionally, a clan would create a poem where each character represents a specific generation. Every male born in that generation would use that character as part of their given name, making it easy to identify someone's place in the family tree just by their name.",
+      "after": "Manuscript statement: this page gives twenty generation positions, with two alternative characters for each position. The pairs are explained in columns 4–5; they are not forty consecutive generations."
+    },
+    {
+      "page": "img_02",
+      "column": 6,
+      "field": "translator_note",
+      "before": "_Gaoyang_ (高陽) is a common ancestral choronym (hall name) for the Lao surname, tracing the origins back to the legendary Emperor Zhuanxu.",
+      "after": "Editorial note: Gaoyang is named in this temple couplet. Its identification as a Lao ancestral hall name, and a connection to the legendary Zhuanxu, remain unverified."
+    },
+    {
+      "page": "img_02",
+      "column": 3,
+      "field": "translator_note",
+      "before": "**Western Yue** refers to Guangxi. Since these term 'west' is relative, it might however refer to the Xinhui/Western Pearl River Delta.<br><br>**Wooden Chicken** (木鷄): A famous idiom from the Daoist text Zhuangzi. A king wanted a fighting cock trained to be invincible. He kept asking the trainer if the bird was ready.<br>- 10 days: 'Not yet. He is vain and arrogant.'<br>- 20 days: 'Not yet. He reacts to every sound and shadow.'  <br>- 30 days: 'Not yet. He looks angry and aggressive.'<br>- Final day: 'He is ready. When he stands there, he resembles a Wooden Chicken.'<br><br>**The Platform of Prajna** (般若台) is a Buddhist term for enlightenment or wisdom.",
+      "after": "**Western Yue** refers to Guangxi. Since the term 'west' is relative, it might however refer to the Xinhui/Western Pearl River Delta.<br><br>**Wooden Chicken** (木鷄): A famous idiom from the Daoist text Zhuangzi. A king wanted a fighting cock trained to be invincible. He kept asking the trainer if the bird was ready.<br>- 10 days: 'Not yet. He is vain and arrogant.'<br>- 20 days: 'Not yet. He reacts to every sound and shadow.'  <br>- 30 days: 'Not yet. He looks angry and aggressive.'<br>- Final day: 'He is ready. When he stands there, he resembles a Wooden Chicken.'<br><br>**The Platform of Prajna** (般若台) is a Buddhist term for enlightenment or wisdom."
+    },
+    {
+      "page": "img_02",
+      "column": 1,
+      "field": "translation",
+      "before": "The Principal Ancestral Temple of Lao Village",
+      "after": "The Village Patron Temple of Lao Village"
+    },
+    {
+      "page": "img_01",
+      "column": 2,
+      "field": "text_zh",
+      "before": "第三十二代小勞子冠斐紀錄",
+      "after": "第二十一代小勞子冠斐紀錄"
+    }
+  ]
+}

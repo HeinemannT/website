@@ -398,6 +398,7 @@ const GenealogyApp: React.FC = () => {
               {((!isMobile && desktopViewMode === 'map') || (isMobile && mobileViewMode === 'map')) && (
                 <Suspense fallback={<div className="text-stone-400 text-sm tracking-widest uppercase">Loading map…</div>}>
                   <MigrationMap
+                    onNavigate={handlePageIdNavigate}
                     points={data.migration.points}
                     paths={data.migration.paths}
                     isDarkMode={isDarkMode}

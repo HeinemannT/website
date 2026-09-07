@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { ContentColumn, PageMetadata, MarginaliaItem, GlossaryTerm } from '../types';
 import { Info, ChevronDown, MapPin, Landmark, Book, X } from 'lucide-react';
-import { marked } from 'marked';
+import { formatRecordDate, renderGlossaryMarkdown } from '../utils/evidence.mjs';
 
 interface TranslationPanelProps {
   columns: ContentColumn[];
@@ -61,6 +61,7 @@ const TranslationParagraph = React.memo<{
       onMouseLeave={() => !isMobile && onHover(null)}
       onClick={(e) => onClick(e, col.id)}
       onKeyDown={(e) => {
+        if ((e.target as HTMLElement).closest('a, button')) return;
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           onClick(e as unknown as React.MouseEvent, col.id);
@@ -145,12 +146,16 @@ const TranslationParagraph = React.memo<{
                     <div className="flex flex-col gap-1.5 font-body">
                       <div className="flex justify-between items-baseline">
                         <span className="text-xs font-bold text-stone-900 dark:text-zinc-200 uppercase tracking-wider">{col.map_data.event_type}</span>
-                        <span className="text-sm font-semibold text-stone-800 dark:text-zinc-300">{col.map_data.event_date}</span>
+                        <span className="text-sm font-semibold text-stone-800 dark:text-zinc-300">{formatRecordDate(col.map_data)}</span>
                       </div>
+                      <p className="text-xs text-stone-600 dark:text-zinc-400">{col.map_data.subject && `${col.map_data.subject} · `}{col.map_data.original_calendar} · {col.map_data.normalization_status.replaceAll('_', ' ')}</p>
+                      {col.map_data.normalization_status === 'verified' && <p className="text-xs">Original: {col.map_data.original_date}</p>}
+                      {col.map_data.source_url && <a className="text-sm underline" href={col.map_data.source_url}>Date source</a>}
                       <div className="flex items-center gap-1.5 text-stone-600 dark:text-zinc-400 text-xs">
                         <MapPin size={12} />
                         <span>{col.map_data.location_name}</span>
                       </div>
+                      {col.map_data.location_status && <p className="text-xs text-stone-600 dark:text-zinc-400">{col.map_data.location_status}</p>}
                     </div>
                   )}
                 </div>
@@ -226,13 +231,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
   const processedColumns = useMemo(() => {
     const process = (text: string) => {
       if (!text) return '';
-      let processed = text;
-      if (termRegex) {
-        processed = text.replace(termRegex, (match) => {
-          return `<span class="glossary-term text-cinnabar dark:text-red-400 font-medium cursor-help border-b border-dashed border-cinnabar/40" data-term-key="${match.toLowerCase()}">${match}</span>`;
-        });
-      }
-      return marked.parse(processed) as string;
+      return renderGlossaryMarkdown(text, glossaryTerms) as string;
     };
 
     return columns.map(col => ({
@@ -240,7 +239,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
       htmlTranslation: process(col.translation || ''),
       htmlNote: process(col.translator_note || '')
     }));
-  }, [columns, termRegex]);
+  }, [columns, glossaryTerms]);
 
   const handleInteraction = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -279,6 +278,7 @@ const TranslationPanel: React.FC<TranslationPanelProps> = ({
   const handleParagraphInteraction = React.useCallback((e: React.MouseEvent, id: number) => {
     // Check if we clicked a glossary term
     const target = e.target as HTMLElement;
+    if (target.closest('a, button')) return;
     const glossaryTerm = target.closest('.glossary-term');
 
     if (glossaryTerm) {

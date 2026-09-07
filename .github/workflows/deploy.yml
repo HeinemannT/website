@@ -36,6 +36,8 @@ jobs:
         run: |
           cd apps/genealogy
           npm ci
+          npm test
+          npm run typecheck
           npm run build
 
       - name: Build ERM Course App

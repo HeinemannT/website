@@ -1,440 +1,109 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { MigrationPoint, MigrationPath } from '../types';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
-import { Clock, Play, Pause, RotateCcw } from 'lucide-react';
+import { Play, Pause, RotateCcw } from 'lucide-react';
+import { MigrationPoint, MigrationPath } from '../types';
+import { escapeHtml, nextTimelineYear, timelineBounds, visibleEvents } from '../utils/evidence.mjs';
 
-interface MigrationMapProps {
+interface Props {
   points: MigrationPoint[];
   paths: MigrationPath[];
   isDarkMode: boolean;
+  onNavigate?: (pageId: string) => void;
 }
 
-const MIN_YEAR = 1290;
-const MAX_YEAR = 1955;
-const PLAY_TICK_MS = 70;
-const PLAY_STEP_YEARS = 4; // ~57 years/sec — full timeline plays in ~12s
-
-// --- TILE LAYERS ---
-const TILE_LIGHT_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}';
-const TILE_LIGHT_ATTR = 'Tiles &copy; Esri &mdash; National Geographic';
-const TILE_DARK_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-const TILE_DARK_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
-
-// Dynasty boundaries shown as tick marks on the timeline slider.
-const DYNASTY_MARKS = [
-  { year: 1368, label: 'Ming' },
-  { year: 1644, label: 'Qing' },
-  { year: 1912, label: 'Republic' },
-];
-
-// --- ICONS (SVG STRINGS) ---
-const ICON_ANCIENT = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="3"></circle>
-    <path d="M12 2L12 9"></path>
-    <path d="M12 15L12 22"></path>
-    <path d="M2 12L9 12"></path>
-    <path d="M15 12L22 12"></path>
-    <path d="M18.36 5.64L16.24 7.76"></path>
-    <path d="M7.76 16.24L5.64 18.36"></path>
-    <path d="M18.36 18.36L16.24 16.24"></path>
-    <path d="M7.76 7.76L5.64 5.64"></path>
-  </svg>
-`;
-
-const ICON_NAV = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(45deg);">
-    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-  </svg>
-`;
-
-// Quadratic bezier curve between two coords — gives the migration paths a graceful arc.
-const getCurvedPathPoints = (
-  start: { lat: number, lng: number },
-  end: { lat: number, lng: number }
-): [number, number][] => {
-  const { lat: lat1, lng: lng1 } = start;
-  const { lat: lat2, lng: lng2 } = end;
-  const offsetX = lng2 - lng1;
-  const offsetY = lat2 - lat1;
-  const midLat = (lat1 + lat2) / 2;
-  const midLng = (lng1 + lng2) / 2;
-  const curveIntensity = 0.2;
-  const controlLat = midLat - (offsetX * curveIntensity);
-  const controlLng = midLng + (offsetY * curveIntensity);
-
-  const points: [number, number][] = [];
-  const steps = 45;
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const lat = (1 - t) * (1 - t) * lat1 + 2 * (1 - t) * t * controlLat + t * t * lat2;
-    const lng = (1 - t) * (1 - t) * lng1 + 2 * (1 - t) * t * controlLng + t * t * lng2;
-    points.push([lat, lng]);
-  }
-  return points;
-};
-
-const MigrationMap: React.FC<MigrationMapProps> = ({ points, paths, isDarkMode }) => {
-  const [currentYear, setCurrentYear] = useState<number>(MIN_YEAR);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-
-  // Refs to hold Leaflet instances
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const tileLayerRef = useRef<L.TileLayer | null>(null);
-  const svgRendererRef = useRef<L.SVG | null>(null);
-  const lastFlyTargetIdRef = useRef<string | null>(null);
-  const playIntervalRef = useRef<number | null>(null);
-  // Mirror of currentYear for the prep effect to consult without re-running on each tick.
-  const currentYearRef = useRef<number>(MIN_YEAR);
-  useEffect(() => { currentYearRef.current = currentYear; }, [currentYear]);
-
-  // Cache for map objects to avoid re-creating them
-  type CachedLayer = { layer: L.Layer; year: number; type: 'point' | 'path' };
-  const staticLayersRef = useRef<{ [key: string]: CachedLayer }>({});
-  const markersLayerRef = useRef<L.LayerGroup | null>(null);
-  const linesLayerRef = useRef<L.LayerGroup | null>(null);
-
-  const visiblePoints = useMemo(() => {
-    return [...points].filter(p => p.year <= currentYear).sort((a, b) => a.year - b.year);
-  }, [points, currentYear]);
-
-  const currentEra = useMemo(() => {
-    if (currentYear < 1368) return "Yuan Dynasty";
-    if (currentYear < 1644) return "Ming Dynasty";
-    if (currentYear < 1912) return "Qing Dynasty";
-    return "Republic / Modern";
-  }, [currentYear]);
-
-  // 1. Initialize Map (tile layer is added in a separate effect so dark mode can swap it).
+export default function MigrationMap({ points, isDarkMode, onNavigate }: Props) {
+  const bounds = useMemo(() => timelineBounds(points), [points]);
+  const [year, setYear] = useState(bounds?.min ?? 0);
+  const [playing, setPlaying] = useState(false);
+  const [showUndated, setShowUndated] = useState(true);
+  const [showList, setShowList] = useState(true);
+  const container = useRef<HTMLDivElement>(null);
+  const map = useRef<L.Map | null>(null);
+  const markers = useRef(new Map<string, L.CircleMarker>());
+  const visible = useMemo(() => visibleEvents(points, year, showUndated), [points, year, showUndated]);
+  const latest = visible.filter(p => p.year !== null).at(-1);
+  useEffect(() => { map.current?.invalidateSize(); }, [showList]);
   useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
+    if (latest?.coordinates) map.current?.setView([latest.coordinates.lat, latest.coordinates.lng], latest.year! > 1900 ? 7 : 9);
+  }, [latest?.id]);
 
-    const map = L.map(mapContainerRef.current, {
-      center: [25.4310, 119.0077],
-      zoom: 6,
-      zoomControl: false,
-      attributionControl: false,
-    });
-
-    // Explicit SVG renderer so we own the <svg> root and can inject arrow-marker <defs>.
-    const svgRenderer = L.svg();
-    svgRenderer.addTo(map);
-    const svgEl = (svgRenderer as unknown as { _container: SVGSVGElement })._container;
-    if (svgEl && !svgEl.querySelector('#mig-arrow-light')) {
-      const SVG_NS = 'http://www.w3.org/2000/svg';
-      const defs = document.createElementNS(SVG_NS, 'defs');
-      defs.innerHTML = `
-        <marker id="mig-arrow-light" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
-          <path d="M0,0 L10,5 L0,10 z" fill="#A63434"/>
-        </marker>
-        <marker id="mig-arrow-dark" viewBox="0 0 10 10" refX="9" refY="5"
-                markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
-          <path d="M0,0 L10,5 L0,10 z" fill="#F87171"/>
-        </marker>
-      `;
-      svgEl.insertBefore(defs, svgEl.firstChild);
-    }
-
-    const linesLayer = L.layerGroup().addTo(map);
-    const markersLayer = L.layerGroup().addTo(map);
-
-    mapRef.current = map;
-    svgRendererRef.current = svgRenderer;
-    markersLayerRef.current = markersLayer;
-    linesLayerRef.current = linesLayer;
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-      tileLayerRef.current = null;
-    };
+  useEffect(() => { setYear(bounds?.min ?? 0); setPlaying(false); }, [bounds]);
+  useEffect(() => {
+    if (!container.current) return;
+    const instance = L.map(container.current, { center: [23, 113.1], zoom: 8 });
+    map.current = instance;
+    return () => { instance.remove(); map.current = null; };
   }, []);
-
-  // Swap tile layer when dark mode toggles.
   useEffect(() => {
-    if (!mapRef.current) return;
-    if (tileLayerRef.current) tileLayerRef.current.remove();
-    tileLayerRef.current = L.tileLayer(
-      isDarkMode ? TILE_DARK_URL : TILE_LIGHT_URL,
-      {
-        maxZoom: 16,
-        attribution: isDarkMode ? TILE_DARK_ATTR : TILE_LIGHT_ATTR,
-      }
-    ).addTo(mapRef.current);
+    if (!map.current) return;
+    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 16,
+    }).addTo(map.current);
+    return () => { tiles.remove(); };
   }, [isDarkMode]);
-
-  // 2. Pre-calculate Layers (Run when data or dark mode changes — paths recolor).
   useEffect(() => {
-    if (!mapRef.current || !points.length) return;
-
-    const newStaticLayers: { [key: string]: CachedLayer } = {};
-
-    // --- PREPARE POINTS ---
-    points.forEach((point) => {
-      const isModern = point.year > 1900;
-      const bgColor = isModern ? 'bg-blue-600' : 'bg-cinnabar';
-      const iconSvg = isModern ? ICON_NAV : ICON_ANCIENT;
-
-      const customIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: `
-          <div class="relative group" style="transform: translate(-50%, -50%);">
-            <div id="icon-${point.id}" class="migration-marker w-8 h-8 ${bgColor} text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-zinc-800 transition-transform hover:scale-110">
-              ${iconSvg}
-            </div>
-          </div>
-        `,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-      });
-
-      const marker = L.marker([point.coordinates.lat, point.coordinates.lng], { icon: customIcon });
-
-      // Hover tooltip — small "year · name" chip so identification doesn't require a click.
-      marker.bindTooltip(`${point.year} · ${point.name}`, {
-        direction: 'top',
-        offset: [0, -12],
-        className: 'migration-tooltip',
-        opacity: 1,
-      });
-
-      const popupContent = `
-        <div class="p-3 text-center min-w-[150px]">
-          <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1">${point.year}</div>
-          <div class="text-sm font-bold text-ink dark:text-zinc-100 font-serif-tc mb-1">${point.name}</div>
-          <div class="text-xs text-stone-500 dark:text-zinc-400 leading-tight">${point.description}</div>
-        </div>
-      `;
-      marker.bindPopup(popupContent, { closeButton: false });
-
-      newStaticLayers[`p-${point.id}`] = { layer: marker, year: point.year, type: 'point' };
+    if (!map.current) return;
+    markers.current.forEach(marker => marker.remove());
+    markers.current.clear();
+    visible.forEach(point => {
+      if (!point.coordinates) return;
+      const marker = L.circleMarker([point.coordinates.lat, point.coordinates.lng], {
+        radius: 7, color: isDarkMode ? '#f87171' : '#a63434', weight: 2,
+        fillOpacity: point.year === null ? 0.2 : 0.8,
+      }).addTo(map.current!);
+      marker.bindTooltip(escapeHtml(`${point.name} · ${point.event_type.replaceAll('_', ' ')}`));
+      marker.bindPopup(`<strong>${escapeHtml(point.name)}</strong><p>${escapeHtml(point.date_label)}</p><p>${escapeHtml(point.description)}</p><p>${escapeHtml(point.evidence)} · ${escapeHtml(point.coordinate_precision)} coordinates</p><p>Source: ${escapeHtml(point.page_ref)}, columns ${point.column_refs.join(', ')}</p>`);
+      markers.current.set(point.id, marker);
     });
-
-    // --- PREPARE PATHS ---
-    const arrowId = isDarkMode ? 'mig-arrow-dark' : 'mig-arrow-light';
-    paths.forEach((path) => {
-      const from = points.find(p => p.id === path.fromId);
-      const to = points.find(p => p.id === path.toId);
-      if (!from || !to) return;
-      const curvedPoints = getCurvedPathPoints(from.coordinates, to.coordinates);
-      const polyline = L.polyline(curvedPoints, {
-        color: isDarkMode ? '#F87171' : '#A63434',
-        weight: 2.5,
-        opacity: 0.9,
-        className: 'migration-path',
-        lineCap: 'round',
-        lineJoin: 'round',
-        renderer: svgRendererRef.current ?? undefined,
-      });
-
-      // Decorate the underlying SVG path when added to the map:
-      //   - point a directional arrow at the destination (marker-end)
-      //   - run a one-shot draw-in animation via the Web Animations API
-      polyline.on('add', function () {
-        const pathEl = (this as unknown as { _path?: SVGPathElement })._path;
-        if (!pathEl) return;
-        pathEl.setAttribute('marker-end', `url(#${arrowId})`);
-        try {
-          const length = pathEl.getTotalLength();
-          if (!length || !pathEl.animate) return;
-          pathEl.style.strokeDasharray = String(length);
-          pathEl.animate(
-            [{ strokeDashoffset: length }, { strokeDashoffset: 0 }],
-            { duration: 1200, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
-          );
-        } catch {
-          // getTotalLength can throw on detached elements; skip animation.
-        }
-      });
-
-      const pathYear = path.year || to.year;
-      newStaticLayers[`l-${path.fromId}-${path.toId}`] = { layer: polyline, year: pathYear, type: 'path' };
-    });
-
-    staticLayersRef.current = newStaticLayers;
-
-    // Re-seed the layer groups based on the current year. Without this, toggling dark mode
-    // (which re-runs this effect to recolor paths) would leave the *previous* marker
-    // instances attached and the new ones absent — the visibility effect below only runs
-    // on year changes, so it wouldn't fire here.
-    markersLayerRef.current?.clearLayers();
-    linesLayerRef.current?.clearLayers();
-    Object.values(newStaticLayers).forEach((item) => {
-      if (item.year <= currentYearRef.current) {
-        const group = item.type === 'point' ? markersLayerRef.current : linesLayerRef.current;
-        group?.addLayer(item.layer);
-      }
-    });
-  }, [points, paths, isDarkMode]);
-
-  // 3. Render loop — toggle visibility, mark the latest point as "is-latest" for the pulse ring,
-  // and fly the camera to the newest visible point.
+  }, [visible, isDarkMode]);
   useEffect(() => {
-    if (!mapRef.current || !markersLayerRef.current || !linesLayerRef.current) return;
+    if (!playing || !bounds) return;
+    const interval = window.setInterval(() => setYear(current => {
+      const next = nextTimelineYear(current, bounds);
+      if (next === bounds.max) setPlaying(false);
+      return next!;
+    }), 90);
+    return () => window.clearInterval(interval);
+  }, [playing, bounds]);
 
-    const markersLayer = markersLayerRef.current;
-    const linesLayer = linesLayerRef.current;
-
-    Object.values(staticLayersRef.current).forEach((item: CachedLayer) => {
-      const isVisible = item.year <= currentYear;
-      const layerGroup = item.type === 'point' ? markersLayer : linesLayer;
-      if (isVisible) {
-        if (!layerGroup.hasLayer(item.layer)) layerGroup.addLayer(item.layer);
-      } else {
-        if (layerGroup.hasLayer(item.layer)) layerGroup.removeLayer(item.layer);
-      }
-    });
-
-    const latestVisible = visiblePoints[visiblePoints.length - 1];
-
-    // Pulse ring on the newest revealed point.
-    document.querySelectorAll('.migration-marker.is-latest').forEach(el => el.classList.remove('is-latest'));
-    if (latestVisible) {
-      const el = document.getElementById(`icon-${latestVisible.id}`);
-      if (el) el.classList.add('is-latest');
+  const focusPoint = (point: MigrationPoint) => {
+    if (point.coordinates) {
+      map.current?.setView([point.coordinates.lat, point.coordinates.lng], point.year && point.year > 1900 ? 8 : 10);
+      markers.current.get(point.id)?.openPopup();
     }
-
-    // Fly to the latest target only when it changes.
-    if (latestVisible && mapRef.current && lastFlyTargetIdRef.current !== latestVisible.id) {
-      lastFlyTargetIdRef.current = latestVisible.id;
-      mapRef.current.flyTo(
-        [latestVisible.coordinates.lat, latestVisible.coordinates.lng],
-        latestVisible.year > 1900 ? 5 : 8,
-        { duration: 1.5, easeLinearity: 0.25 }
-      );
-    }
-    // isDarkMode in deps: when the prep effect rebuilds markers on dark-mode toggle,
-    // we need to re-apply .is-latest to the newly-created marker DOM.
-  }, [currentYear, visiblePoints, isDarkMode]);
-
-  // 4. Auto-play timeline — interval advances the year while isPlaying is true.
-  useEffect(() => {
-    if (!isPlaying) {
-      if (playIntervalRef.current) {
-        clearInterval(playIntervalRef.current);
-        playIntervalRef.current = null;
-      }
-      return;
-    }
-    playIntervalRef.current = window.setInterval(() => {
-      setCurrentYear(y => {
-        if (y >= MAX_YEAR) {
-          setIsPlaying(false);
-          return MAX_YEAR;
-        }
-        return Math.min(MAX_YEAR, y + PLAY_STEP_YEARS);
-      });
-    }, PLAY_TICK_MS);
-    return () => {
-      if (playIntervalRef.current) clearInterval(playIntervalRef.current);
-    };
-  }, [isPlaying]);
-
-  const handleReset = () => {
-    setIsPlaying(false);
-    setCurrentYear(MIN_YEAR);
-    lastFlyTargetIdRef.current = null;
   };
-
-  // If the user scrubs the slider manually, pause auto-play.
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentYear(Number(e.target.value));
-    if (isPlaying) setIsPlaying(false);
-  };
-
-  const atEnd = currentYear >= MAX_YEAR;
-
-  return (
-    <div className="relative w-full h-full flex flex-col">
-      {/* --- TIMELINE CONTROLS --- */}
-      <div className="absolute bottom-24 md:bottom-8 left-4 right-4 md:left-12 md:right-12 z-40">
-        <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-stone-200 dark:border-zinc-800 rounded-xl p-4 shadow-xl">
-          <div className="flex justify-between items-end mb-3 gap-4">
-            <div>
-              <div className="flex items-center gap-2 text-cinnabar dark:text-red-400 font-bold uppercase tracking-widest text-xs mb-1">
-                <Clock size={14} />
-                <span>Timeline</span>
-              </div>
-              <div className="text-2xl font-bold text-ink dark:text-zinc-100">
-                {currentYear} <span className="text-base font-normal text-stone-400 dark:text-zinc-500 italic ml-2">{currentEra}</span>
-              </div>
-            </div>
-
-            {/* Play / Pause / Reset */}
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={() => {
-                  if (atEnd) handleReset();
-                  setIsPlaying(p => atEnd ? true : !p);
-                }}
-                aria-label={isPlaying ? 'Pause timeline' : 'Play timeline'}
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-cinnabar text-white shadow-md hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cinnabar/60 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900"
-              >
-                {isPlaying ? <Pause size={18} /> : <Play size={18} className="translate-x-[1px]" />}
-              </button>
-              <button
-                onClick={handleReset}
-                aria-label="Reset timeline"
-                disabled={currentYear === MIN_YEAR && !isPlaying}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-stone-500 dark:text-zinc-400 hover:bg-stone-100 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cinnabar/60"
-              >
-                <RotateCcw size={18} />
-              </button>
-            </div>
-
-            <div className="hidden md:block text-right">
-              <div className="text-xs text-stone-400 dark:text-zinc-500 uppercase tracking-widest">Latest Migration</div>
-              <div className="text-sm font-medium text-ink dark:text-zinc-300 truncate max-w-[18ch]">
-                {visiblePoints[visiblePoints.length - 1]?.name || "Origins"}
-              </div>
-            </div>
-          </div>
-
-          {/* Slider + dynasty tick marks */}
-          <div className="relative pb-5">
-            <input
-              type="range"
-              min={MIN_YEAR}
-              max={MAX_YEAR}
-              value={currentYear}
-              onChange={handleSliderChange}
-              aria-label="Year"
-              aria-valuetext={`${currentYear}, ${currentEra}`}
-              className="
-                w-full h-1 bg-stone-300 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer
-                accent-cinnabar dark:accent-red-500
-                hover:accent-red-700 dark:hover:accent-red-400
-                focus:outline-none focus-visible:ring-2 focus-visible:ring-cinnabar/60 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900
-              "
-            />
-            {/* Dynasty markers under the slider */}
-            <div className="absolute inset-x-0 top-3 pointer-events-none select-none">
-              {DYNASTY_MARKS.map(m => (
-                <div
-                  key={m.year}
-                  className="absolute -top-[5px]"
-                  style={{ left: `${((m.year - MIN_YEAR) / (MAX_YEAR - MIN_YEAR)) * 100}%` }}
-                >
-                  <div className="w-px h-2.5 bg-stone-400/70 dark:bg-zinc-500/70 mx-auto" />
-                  <span className="absolute top-3 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-wider font-medium text-stone-500 dark:text-zinc-500 whitespace-nowrap">
-                    {m.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+  return <div className="relative w-full h-full flex flex-col bg-stone-100 dark:bg-zinc-950">
+    <div className="p-3 md:pt-28 border-b border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm z-10">
+      <div className="flex flex-wrap items-center gap-3">
+        <strong>Places and recorded events</strong>
+        <label className="flex items-center gap-2"><input type="checkbox" checked={showUndated} onChange={e => setShowUndated(e.target.checked)} /> Include undated events ({points.filter(p => p.year === null).length})</label>
+        <button className="underline" onClick={() => setShowList(value => !value)}>{showList ? 'Hide event list' : 'Show event list'}</button>
       </div>
-
-      {/* MAP CONTAINER */}
-      <div className="flex-1 w-full relative bg-[#e6dccf] dark:bg-zinc-900">
-        <div ref={mapContainerRef} className="absolute inset-0 z-0 outline-none" />
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-stone-100/20 dark:to-zinc-950/20 mix-blend-multiply z-20"></div>
-      </div>
+      <p className="mt-1 text-stone-600 dark:text-zinc-400">Markers identify approximate areas. Events include burials, property, offices and travel; no traveled route is established.</p>
     </div>
-  );
-};
-
-export default MigrationMap;
+    <div className="relative flex-1 min-h-0 flex">
+      <div ref={container} className="flex-1 min-w-0 z-0" aria-label="Map of recorded places" />
+      {showList && <div className="absolute md:relative right-0 top-0 bottom-0 w-64 max-w-[65%] overflow-y-auto border-l border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm z-10 p-3">
+        {!visible.length && <p>No events in this selection.</p>}
+        <ol className="space-y-4">
+          {visible.map(point => <li key={point.id}>
+            <button className="font-semibold text-left underline" onClick={() => focusPoint(point)} disabled={!point.coordinates}>{point.name}</button>
+            <p className="text-stone-600 dark:text-zinc-400">{point.event_type.replaceAll('_', ' ')} · {point.date_label}</p>
+            <p className="mt-1">{point.description}</p>
+            <p className="mt-1 text-stone-600 dark:text-zinc-400">{point.evidence}; {point.coordinate_precision}{point.coordinates ? ' coordinates' : ' location'}</p>
+            <button className="mt-1 underline text-cinnabar dark:text-red-400" onClick={() => onNavigate?.(point.page_ref)}>Page {Number(point.page_ref.slice(4))}, columns {point.column_refs.join(', ')}</button>
+          </li>)}
+        </ol>
+      </div>}
+    </div>
+    <div className="p-4 border-t border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 z-10">
+      <div className="flex items-center gap-3 mb-2">
+        <button disabled={!bounds || bounds.min === bounds.max} aria-label={playing ? 'Pause timeline' : 'Play timeline'} className="p-2 border rounded disabled:opacity-40" onClick={() => { if(bounds && year>=bounds.max)setYear(bounds.min);setPlaying(value=>!value); }}>{playing ? <Pause size={18}/> : <Play size={18}/>}</button>
+        <button disabled={!bounds} aria-label="Reset timeline" className="p-2 border rounded disabled:opacity-40" onClick={() => {setYear(bounds?.min ?? 0);setPlaying(false);}}><RotateCcw size={18}/></button>
+        <span>{bounds ? `${year} · ${latest?.name ?? 'Start of dated records'}` : 'No dated events; undated records remain available.'}</span>
+      </div>
+      {bounds && <input className="w-full accent-cinnabar" type="range" aria-label="Timeline year" min={bounds.min} max={bounds.max} value={year} disabled={bounds.min===bounds.max} onChange={e=>{setPlaying(false);setYear(Number(e.target.value));}}/>}
+    </div>
+  </div>;
+}

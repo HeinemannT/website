@@ -65,11 +65,11 @@ terms:
 
   - term: "Xiangsheng"
     zh: "庠生"
-    definition: "A student of a county or prefecture school in the imperial examination system; often referred to as a chosen budding scholar."
+    definition: "A student of a county or prefectural government school in the imperial examination system."
 
   - term: "Zhaomu"
     zh: "昭穆"
-    definition: "The order of precedence in ancestral temples, often determining the generation naming poem."
+    definition: "Generational ordering in ancestral rites and temples. This ritual arrangement is distinct from the generation-character alternatives recorded on page 3."
 
   - term: "Dingyou"
     zh: "丁酉"
@@ -81,7 +81,7 @@ terms:
 
   - term: "Xiaolao"
     zh: "小勞"
-    definition: "Lit. 'Little Lao', the nickname of the founder, which later became the village name."
+    definition: "Literally Little Lao. According to this genealogy, the founder was called Xiaolao and associated that name with the place where he settled; the story is a manuscript claim."
 
   - term: "Zi"
     zh: "字"
@@ -157,15 +157,15 @@ terms:
 
   - term: "Zhang"
     zh: "丈"
-    definition: "Unit of length ~3.3 meters. Traditionally used for measuring land or distance."
+    definition: "A unit of length, approximately 3.3 meters in the modern standard. Historical measures varied; this is not a verified conversion of the genealogy’s grave dimensions."
 
   - term: "Chi"
     zh: "尺"
-    definition: "Chinese Foot ~1/3 meter (~33cm). Used for measuring height, depth, or smaller distances."
+    definition: "A unit of length, approximately one-third of a meter in the modern standard. Historical measures varied; the original unit is retained in this edition."
 
   - term: "Cun"
     zh: "寸"
-    definition: "Chinese Inch ~3.3 cm. 1/10th of a Chi."
+    definition: "One-tenth of a chi, approximately 3.3 centimeters in the modern standard. Historical measures varied; this is an orientation aid, not a precise historical conversion."
 
   - term: "Fen"
     zh: "分"
@@ -177,7 +177,7 @@ terms:
 
   - term: "Si"
     zh: "絲"
-    definition: "Tiny unit. 1/1000th of a Cun (length) or 1/1000th of a Mu (area). Often implies 'thread-like' precision."
+    definition: "A small fractional unit written 絲, distinct from 毫. Its base depends on the measurement context; an exact conversion requires the relevant local metrology."
 
   - term: "Gong"
     zh: "公"
@@ -217,7 +217,7 @@ terms:
 
   - term: "Gongren"
     zh: "恭人"
-    definition: "Lady of Respect. Title for the wife of a Rank 4 official."
+    definition: "A rank-related honor associated with fourth rank, including honors conferred on women through descendants. It does not by itself establish that a husband held active fourth-rank office."
 
   - term: "Yiren"
     zh: "宜人"
@@ -237,11 +237,11 @@ terms:
 
   - term: "Ancestral Tablet"
     zh: "神主"
-    definition: "Spirit Tablet. A wooden plaque embodying the spirit of an ancestor, worshipped in temples."
+    definition: "A spirit tablet used in ancestral ritual. Within that ritual tradition it represents or houses the ancestor’s spirit; this describes a belief, not a physical claim."
 
   - term: "Longmai"
     zh: "龍脈"
-    definition: "Dragon Veins. The channels of Qi in the earth; central to the Feng Shui of burial sites."
+    definition: "Dragon veins: landscape channels of qi in feng shui belief, used when interpreting auspicious burial sites. Their effects are not presented as established physical facts."
 
   - term: "Wooden Chicken"
     zh: "木鷄"

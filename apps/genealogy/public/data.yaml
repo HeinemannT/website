@@ -271,7 +271,7 @@ pages:
         is_interlinear: false
         text_zh: "在昔西粵黌宮一介為儒耳數十年亦羈養就即登般若之臺"
         translation: "In the past at the academy of Western Yue, he was but a single Confucian scholar. Over decades, he cultivated the composure of a 'Wooden Chicken', only to eventually ascend the Platform of Prajna."
-        translator_note: "**Western Yue** refers to Guangxi. Since the term 'west' is relative, it might however refer to the Xinhui/Western Pearl River Delta.<br><br>**Wooden Chicken** (木鷄): A famous idiom from the Daoist text Zhuangzi. A king wanted a fighting cock trained to be invincible. He kept asking the trainer if the bird was ready.<br>- 10 days: 'Not yet. He is vain and arrogant.'<br>- 20 days: 'Not yet. He reacts to every sound and shadow.'  <br>- 30 days: 'Not yet. He looks angry and aggressive.'<br>- Final day: 'He is ready. When he stands there, he resembles a Wooden Chicken.'<br><br>**The Platform of Prajna** (般若台) is a Buddhist term for enlightenment or wisdom."
+        translator_note: "**Western Yue** is an unresolved literary or geographic reference in this couplet; the source does not establish a modern province.<br><br>**Wooden Chicken** recalls the trained fighting cock in the Dasheng chapter of the Zhuangzi: its stillness conveys composure rather than aggression. The interpretation of this difficult passage remains editorial.<br><br>**The Platform of Prajna** uses Buddhist language of wisdom."
 
       - id: 4
         elevation: 0
@@ -414,7 +414,7 @@ pages:
         is_interlinear: false
         text_zh: "一適大良羅公本以避亂至勞村及定思祖父塋基率子累"
         translation: "The daughter married Lord Luo of Daliang. Having moved to Lao Village to avoid chaos, when things settled, thinking of his grandfather's grave foundation, he led his son to repeatedly go back and search for it."
-        translator_note: "Daliang (大良) is modern-day Shunde"
+        translator_note: "Daliang (大良) is a locality within present-day Shunde, not another name for the whole district."
 
 
       - id: 9
@@ -558,7 +558,7 @@ pages:
         text_zh: "子妾謝氏居省城之雙門底生子宗隨公在西甕街X塊石"
 
         translation: "His concubine, Lady Xie, lived at Shuangmendi in the provincial capital [Guangzhou]. She gave birth to a son, Zongsui. The Lord [Zhe] was at Xiweng Jie (West Urn Street), Seven Piece Stone,"
-        translator_note: "Shuangmendi is the historic commercial center of Guangzhou, near modern-day Beijing Road."
+        translator_note: "Regional context: Shuangmendi was a historic shopping area associated with books and antiques around present-day Beijing Road, Guangzhou. See the [Guangzhou municipal account](https://www.gz.gov.cn/zlgz/tsgz/content/post_8791823.html). This locates the wider commercial setting, not a surviving family shop."
         map_data: {"event_type":"location_reference","location_name":"Shuangmendi, Guangzhou","location_status":"Legacy identification; geographic attribution unverified","page_ref":"img_06","column_ref":7,"original_calendar":"Chinese lunisolar","normalization_status":"unverified","date_precision":"unknown","original_date":"Date unrecorded","source_text":"子妾謝氏居省城之雙門底生子宗隨公在西甕街X塊石","lat":23.1291,"lng":113.2644,"coordinate_precision":"approximate; historical identification unverified"}
 
       - id: 8
@@ -566,7 +566,7 @@ pages:
         is_interlinear: false
         text_zh: "買大小舖屋一十五間又買受咸粘沙田三頃籍載在番禺"
         translation: "where he purchased fifteen shop houses, both large and small. He also purchased 3 _qing_ of alluvial (lit: _sand-sticky_) sandy fields. His household registration was recorded in Panyu, "
-        translator_note: "Buying land in Panyu (Guangzhou) indicates the family's growing wealth and status during the Ming Dynasty.<br> 3 _qing_ is approx. 45 acres"
+        translator_note: "Manuscript statement: the passage records fifteen shops and three qing of fields. A qing traditionally comprised one hundred mu, but physical area varied with period and local standards; no precise size for these plots is established. A [modern metrology notice](https://www.samr.gov.cn/jls/zcfg/jlfg/art/2023/art_faaa3f13d94344bda48ce1158a033495.html) documents variation in local mu and is not a Ming conversion table. The purchases alone do not establish a change in the family’s wealth or status."
 
 
       - id: 9
@@ -587,9 +587,9 @@ pages:
         elevation: 0
         is_interlinear: false
         text_zh: "琮郡庠生曾孫紹科登嘉靖壬辰進士任四川提學公終宣德八"
-        translation: "Cong was a student at the prefectural school. His great-grandson, Shaoke, passed the imperial exam in the Ren-chen year of Jiajing (1532) as a Jinshi and served as the Sichuan Commissioner of Education. The Lord died in the 8th year of Xuande (1433),"
+        translation: "His grandson Cong was a student at the prefectural school. His great-grandson Shaoke became a jinshi in the renchen year of Jiajing (1532) and served as an education official in Sichuan. The Lord died in the eighth year of Xuande (1433),"
 
-        translator_note: "Manuscript statement: this continues Zhe’s biography. Research lead: the recorded 1532 jinshi and Sichuan career resemble [Lao Shaoke’s biographical entry](https://zh.wikipedia.org/wiki/勞紹科). This is a secondary lead; its cited examination and court records and differing ancestral names need comparison before linking further people."
+        translator_note: "Contextual reading: page 6 ends 至孫 and this page continues with Cong, followed by 曾孫紹科. Both “his grandson Cong” and “his great-grandson Shaoke” refer to Zhe, the subject of the biography; no intermediate parent link is established here.<br><br>External research: the [1927 Dongguan Gazetteer, actual juan 93](https://upload.wikimedia.org/wikipedia/commons/a/a3/NLC403-312001077662-61750_%E6%9D%B1%E8%8E%9E%E7%B8%A3%E8%AA%8C_%E6%B0%91%E5%9C%8B16%E5%B9%B4%281927%29_%E5%8D%B7%E4%B9%9D%E5%8D%81%E5%9B%9B.pdf) credits Panyu jinshi Lao Shaoke, a langzhong in the Nanjing Ministry of Works, with the calligraphy of Quejin Fang Ji (PDF page 19). PDF page 21 dates its erection to 1541, seventh lunar month. Wang Xiwen composed the prose. The hosting filename says juan 94, but the page headers identify juan 93. An [edited Kangxi Chengdu Gazetteer](https://upload.wikimedia.org/wikipedia/commons/9/92/SSID-12383837_%E6%88%90%E9%83%BD%E8%88%8A%E5%BF%97_%E9%80%9A%E5%BF%97%E9%A1%9E_9.pdf), juan 12, printed page 68 / PDF page 80, lists Panyu jinshi Lao Shaoke under qianshi. It gives neither an appointment year nor an education assignment. This is a likely external candidate, but differing ancestral names remain unresolved; no family lines are merged.<br><br>Regional context: the inscription commemorated Li Kai’s refusal of money from Siamese merchants; see [Guangzhou Museum researcher Li Liming’s discussion](https://gb.crntt.com/crn-webapp/cbspub/secDetail.jsp?bookid=10527&secid=10561). It does not establish that Shaoke traded with Siam or traveled there."
 
         map_data: {"event_type":"death","location_name":"Location unrecorded","location_status":"Legacy identification; geographic attribution unverified","page_ref":"img_07","column_ref":1,"original_calendar":"Chinese lunisolar","normalization_status":"unverified","date_precision":"source_expression","original_date":"Source excerpt: 琮郡庠生曾孫紹科登嘉靖壬辰進士任四川提學公終宣德八 (read with adjacent columns; Western conversion unverified)","source_text":"琮郡庠生曾孫紹科登嘉靖壬辰進士任四川提學公終宣德八","legacy_unverified_date":"1433-01-01"}
 
@@ -1382,7 +1382,7 @@ pages:
         is_interlinear: false
         text_zh: "至布政使司審斷定案今警業庚流沙是也"
         translation: "to the Provincial Administration Commission, which delivered the final judgment. The current ritual property at Gengliu Shayuan is the result of this victory."
-        translator_note: "Winning a lawsuit at the Provincial Administration Commission was rare and costly."
+        translator_note: "Manuscript statement: the genealogy describes family funding and the pursuit of ancestral land recovery, followed by referral to the provincial administration. It supplies no comparative evidence for how rare or costly such lawsuits were."
 
 
       - id: 9
@@ -1636,7 +1636,7 @@ pages:
         text_zh: "子夢桂再娶水口梁生萬曆四十年壬子九月十八子二育"
         translation: "...a son, Menggui. He later married Lady Liang of Shuikou, born on the 18th day of the 9th lunar month in Wanli 40 (1612), a Renzi year. Two further sons are listed [names continue]."
 
-        translator_note: "再娶 (Zàiqǔ): This term appears multiple times in this text. It translates to 'remarried' or 'married again.' It is used when a man marries another _primary wife_ after his previous wife has passed away."
+        translator_note: "再娶 (zaiqu) means that a man married again. The term alone does not establish why the previous marriage ended; see the [Ministry of Education dictionary](https://dict.revised.moe.edu.tw/dictView.jsp?ID=138357&la=0&powerMode=0)."
         map_data: {"event_type":"spouse_birth","location_name":"Shuikou, Kaiping","location_status":"Legacy identification; geographic attribution unverified","page_ref":"img_21","column_ref":1,"original_calendar":"Chinese lunisolar","normalization_status":"unverified","date_precision":"source_expression","original_date":"Source excerpt: 子夢桂再娶水口梁生萬曆四十年壬子九月十八子二育 (read with adjacent columns; Western conversion unverified)","source_text":"子夢桂再娶水口梁生萬曆四十年壬子九月十八子二育","legacy_unverified_date":"1612-10-12","lat":22.4285,"lng":112.7842,"coordinate_precision":"approximate; historical identification unverified"}
 
       - id: 2
@@ -1823,7 +1823,7 @@ pages:
         elevation: 0
         text_zh: "親尋之地此吉地係與南海沙頭堡崔岱雄買撥有紅契存"
         translation: "who personally found this site. This auspicious plot was purchased and transferred from Cui Daixiong of Shatou Fort, Nanhai. A red deed exists,"
-        translator_note: "A _Red deed_ is an official property deed."
+        translator_note: "Regional institutional context: a red deed was a registered or tax-certified deed bearing official endorsement, distinguished from a private white deed. An [1883 deed in the National Museum of Taiwan History](https://collections.nmth.gov.tw/CollectionContent.aspx?a=132&rno=2010.006.0384) illustrates the practice. It is a comparative example, not this family’s deed."
         map_data: {"event_type":"land_purchase","location_name":"Shatou, Nanhai","location_status":"Legacy identification; geographic attribution unverified","page_ref":"img_23","column_ref":7,"original_calendar":"Chinese lunisolar","normalization_status":"unverified","date_precision":"unknown","original_date":"Date unrecorded","source_text":"親尋之地此吉地係與南海沙頭堡崔岱雄買撥有紅契存","lat":22.9812,"lng":113.0145,"coordinate_precision":"approximate; historical identification unverified"}
 
       - id: 8
@@ -2126,7 +2126,7 @@ pages:
         elevation: 0
         text_zh: "品太恭人生子二長上達次宗榮出嗣公終道光六年丙戌"
         translation: "4th-rank title of Tai Gongren. They had two sons: the eldest named Shangda; the second named Zongrong (who was adopted into another line). The Lord died in the 6th year of Daoguang (1826), a Bingxu year"
-        translator_note: "Gongren (恭人) is the specific title reserved only for the wives of 4th-Rank officials.<br>Tai (太) indicates she received this title as a senior member of the clan"
+        translator_note: "Gongren (恭人) is a rank-related honor associated with fourth rank, including honors received by women through descendants. Here the surrounding passage records an ancestral grant. Tai (太) belongs to that ancestral-honor context; it does not merely indicate generic seniority within the clan. The title does not establish that her husband held an active fourth-rank command."
         map_data: {"event_type":"death","location_name":"Location unrecorded","location_status":"Legacy identification; geographic attribution unverified","page_ref":"img_28","column_ref":4,"original_calendar":"Chinese lunisolar","normalization_status":"unverified","date_precision":"source_expression","original_date":"Source excerpt: 品太恭人生子二長上達次宗榮出嗣公終道光六年丙戌 (read with adjacent columns; Western conversion unverified)","source_text":"品太恭人生子二長上達次宗榮出嗣公終道光六年丙戌","legacy_unverified_date":"1826-06-12"}
 
       - id: 5
